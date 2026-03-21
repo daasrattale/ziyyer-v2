@@ -1,0 +1,189 @@
+name: Release Pipeline
+
+on:
+  push:
+    branches:
+      - release/*
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Version bump type"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint-test-build:
+    name: Lint, Test, and Build
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.version.outputs.new_version }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.10.3"
+          channel: "stable"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run linter
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Calculate new version
+        id: version
+        run: |
+          current_version=$(grep "^version:" pubspec.yaml | sed 's/version: //')
+          IFS='+' read -r semantic_version build_number <<< "$current_version"
+          IFS='.' read -r major minor patch <<< "$semantic_version"
+
+          # Default to patch if not specified
+          BUMP_TYPE=${BUMP_TYPE:-patch}
+
+          case $BUMP_TYPE in
+            major)
+              major=$((major + 1))
+              minor=0
+              patch=0
+              ;;
+            minor)
+              minor=$((minor + 1))
+              patch=0
+              ;;
+            patch)
+              patch=$((patch + 1))
+              ;;
+          esac
+
+          build_number=$((build_number + 1))
+          new_version="${major}.${minor}.${patch}+${build_number}"
+
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "Version: $new_version"
+        env:
+          BUMP_TYPE: ${{ github.event.inputs.version_bump || 'patch' }}
+
+      - name: Update version in pubspec.yaml
+        run: |
+          sed -i "s/^version:.*/version: ${{ steps.version.outputs.new_version }}/" pubspec.yaml
+
+      - name: Install git-cliff
+        run: |
+          curl -L https://github.com/orhun/git-cliff/releases/download/v0.13.0/git-cliff-v0.13.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          sudo mv git-cliff /usr/local/bin/
+
+      - name: Generate changelog
+        run: |
+          git-cliff --tag ${{ steps.version.outputs.new_version }} --output CHANGELOG_TEMP.md
+
+          # If CHANGELOG exists, prepend the new entry
+          if [ -f CHANGELOG.md ]; then
+            tail -n +2 CHANGELOG_TEMP.md > CHANGELOG_NEW.md
+            cat CHANGELOG.md >> CHANGELOG_NEW.md
+            mv CHANGELOG_NEW.md CHANGELOG.md
+            rm CHANGELOG_TEMP.md
+          else
+            mv CHANGELOG_TEMP.md CHANGELOG.md
+          fi
+
+      - name: Commit version and changelog
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add pubspec.yaml CHANGELOG.md
+          git commit -m "chore: release v${{ steps.version.outputs.new_version }}"
+          git tag v${{ steps.version.outputs.new_version }}
+          git push origin $(git rev-parse --abbrev-ref HEAD) --tags
+
+      - name: Build Android
+        run: |
+          flutter build apk --release
+
+      - name: Build iOS
+        run: |
+          flutter build ios --release --no-codesign
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build
+          path: build/ios/iphoneos/Runner.app
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ steps.version.outputs.new_version }}
+          name: Release ${{ steps.version.outputs.new_version }}
+          bodyFile: CHANGELOG.md
+          artifacts: build/app/outputs/apk/release/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    name: Build iOS (macOS runner)
+    runs-on: macos-latest
+    needs: lint-test-build
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: v${{ needs.lint-test-build.outputs.new_version }}
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.10.3"
+          channel: "stable"
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build iOS
+        run: |
+          flutter build ios --release
+
+      - name: Create iOS IPA
+        run: |
+          mkdir -p Payload
+          cp -r build/ios/iphoneos/Runner.app Payload/
+          zip -r app-release.ipa Payload/
+          rm -rf Payload
+
+      - name: Upload iOS IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.ipa
+          path: app-release.ipa
+
+      - name: Update Release with iOS IPA
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v${{ needs.lint-test-build.outputs.new_version }}
+          artifacts: app-release.ipa
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}

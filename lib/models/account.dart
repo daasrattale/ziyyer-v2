@@ -6,7 +6,6 @@ part 'account.g.dart';
 class IsarAccount {
   Id? id;
 
-  @Index(unique: true)
   late String name;
 
   late String accountType; // 'savings', 'checking', 'credit_card', etc.
@@ -17,7 +16,6 @@ class IsarAccount {
   String? description;
   bool isActive = true;
 
-  @Index()
   late DateTime createdAt;
   late DateTime updatedAt;
 

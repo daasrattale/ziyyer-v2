@@ -11,13 +11,11 @@ class IsarBudget {
   late double spent = 0;
   late String period; // 'monthly', 'weekly', 'yearly'
 
-  @Index()
   late DateTime month; // For filtering by month
 
   bool isActive = true;
   String? notes;
 
-  @Index()
   late DateTime createdAt;
   late DateTime updatedAt;
 

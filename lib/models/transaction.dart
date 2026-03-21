@@ -6,14 +6,12 @@ part 'transaction.g.dart';
 class IsarTransaction {
   Id? id;
 
-  @Index()
   late int accountId; // Foreign key to account
 
   late String description;
   late double amount;
   late String type; // 'income' or 'expense'
 
-  @Index()
   late DateTime date;
 
   String? category;

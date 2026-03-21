@@ -46,18 +46,18 @@ class TransactionService extends BaseRepository<IsarTransaction> {
 
   /// Get transactions for a specific account
   Stream<List<IsarTransaction>> watchTransactionsByAccount(int accountId) {
-    return isar.isarTransactions.where().accountIdEqualTo(accountId).watch(fireImmediately: true);
+    return isar.isarTransactions.filter().accountIdEqualTo(accountId).watch(fireImmediately: true);
   }
 
   /// Get all transactions for an account
   Future<List<IsarTransaction>> getTransactionsByAccount(int accountId) async {
-    return await isar.isarTransactions.where().accountIdEqualTo(accountId).findAll();
+    return await isar.isarTransactions.filter().accountIdEqualTo(accountId).findAll();
   }
 
   /// Get transactions in a date range
   /// - From start date to end date (inclusive)
   Future<List<IsarTransaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
-    return await isar.isarTransactions.where().dateBetween(start, end).findAll();
+    return await isar.isarTransactions.filter().dateBetween(start, end).findAll();
   }
 
   /// Get transactions by account and date range

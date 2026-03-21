@@ -36,8 +36,9 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Verify Flutter version
+      - name: Force Flutter upgrade and verify version
         run: |
+          flutter upgrade
           flutter --version
           dart --version
 
@@ -85,8 +86,9 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Verify Flutter version
+      - name: Force Flutter upgrade and verify version
         run: |
+          flutter upgrade
           flutter --version
           dart --version
 

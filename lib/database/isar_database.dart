@@ -63,7 +63,7 @@ class IsarDatabase {
   }
 
   Stream<List<IsarTransaction>> watchTransactionsByAccount(int accountId) {
-    return _isar.isarTransactions.where().accountIdEqualTo(accountId).watch(fireImmediately: true);
+    return _isar.isarTransactions.filter().accountIdEqualTo(accountId).watch(fireImmediately: true);
   }
 
   Stream<List<IsarTransaction>> watchAllTransactions() {
@@ -71,11 +71,11 @@ class IsarDatabase {
   }
 
   Future<List<IsarTransaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
-    return await _isar.isarTransactions.where().dateBetween(start, end).findAll();
+    return await _isar.isarTransactions.filter().dateBetween(start, end).findAll();
   }
 
   Future<List<IsarTransaction>> getTransactionsByAccount(int accountId) async {
-    return await _isar.isarTransactions.where().accountIdEqualTo(accountId).findAll();
+    return await _isar.isarTransactions.filter().accountIdEqualTo(accountId).findAll();
   }
 
   Future<double> getTotalIncomeByAccount(int accountId, {DateTime? startDate, DateTime? endDate}) async {

@@ -4,35 +4,30 @@ on:
   push:
     branches:
       - release/*
-  workflow_dispatch:
-    inputs:
-      version_bump:
-        description: "Version bump type"
-        required: true
-        default: "patch"
-        type: choice
-        options:
-          - major
-          - minor
-          - patch
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
-  lint-test-build:
-    name: Lint, Test, and Build
+  build-and-release:
+    name: Build and Release
     runs-on: ubuntu-latest
     outputs:
-      new_version: ${{ steps.version.outputs.new_version }}
+      version: ${{ steps.version.outputs.version }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from branch
+        id: version
+        run: |
+          BRANCH_NAME=${GITHUB_REF##*/}
+          VERSION=${BRANCH_NAME#release/}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Release version: $VERSION"
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -43,48 +38,11 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run linter
-        run: flutter analyze
+      - name: Build Android APK
+        run: flutter build apk --release
 
-      - name: Run tests
-        run: flutter test
-
-      - name: Calculate new version
-        id: version
-        run: |
-          current_version=$(grep "^version:" pubspec.yaml | sed 's/version: //')
-          IFS='+' read -r semantic_version build_number <<< "$current_version"
-          IFS='.' read -r major minor patch <<< "$semantic_version"
-
-          # Default to patch if not specified
-          BUMP_TYPE=${BUMP_TYPE:-patch}
-
-          case $BUMP_TYPE in
-            major)
-              major=$((major + 1))
-              minor=0
-              patch=0
-              ;;
-            minor)
-              minor=$((minor + 1))
-              patch=0
-              ;;
-            patch)
-              patch=$((patch + 1))
-              ;;
-          esac
-
-          build_number=$((build_number + 1))
-          new_version="${major}.${minor}.${patch}+${build_number}"
-
-          echo "new_version=$new_version" >> $GITHUB_OUTPUT
-          echo "Version: $new_version"
-        env:
-          BUMP_TYPE: ${{ github.event.inputs.version_bump || 'patch' }}
-
-      - name: Update version in pubspec.yaml
-        run: |
-          sed -i "s/^version:.*/version: ${{ steps.version.outputs.new_version }}/" pubspec.yaml
+      - name: Build iOS
+        run: flutter build ios --release --no-codesign
 
       - name: Install git-cliff
         run: |
@@ -93,66 +51,26 @@ jobs:
 
       - name: Generate changelog
         run: |
-          git-cliff --tag ${{ steps.version.outputs.new_version }} --output CHANGELOG_TEMP.md
-
-          # If CHANGELOG exists, prepend the new entry
-          if [ -f CHANGELOG.md ]; then
-            tail -n +2 CHANGELOG_TEMP.md > CHANGELOG_NEW.md
-            cat CHANGELOG.md >> CHANGELOG_NEW.md
-            mv CHANGELOG_NEW.md CHANGELOG.md
-            rm CHANGELOG_TEMP.md
-          else
-            mv CHANGELOG_TEMP.md CHANGELOG.md
-          fi
-
-      - name: Commit version and changelog
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add pubspec.yaml CHANGELOG.md
-          git commit -m "chore: release v${{ steps.version.outputs.new_version }}"
-          git tag v${{ steps.version.outputs.new_version }}
-          git push origin $(git rev-parse --abbrev-ref HEAD) --tags
-
-      - name: Build Android
-        run: |
-          flutter build apk --release
-
-      - name: Build iOS
-        run: |
-          flutter build ios --release --no-codesign
-
-      - name: Upload Android APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.apk
-          path: build/app/outputs/apk/release/app-release.apk
-
-      - name: Upload iOS build
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-build
-          path: build/ios/iphoneos/Runner.app
+          git-cliff --tag ${{ steps.version.outputs.version }} > CHANGELOG_RELEASE.md
 
       - name: Create GitHub Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ steps.version.outputs.new_version }}
-          name: Release ${{ steps.version.outputs.new_version }}
-          bodyFile: CHANGELOG.md
+          tag: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          bodyFile: CHANGELOG_RELEASE.md
           artifacts: build/app/outputs/apk/release/app-release.apk
+          makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-macos:
-    name: Build iOS (macOS runner)
+  build-ios-ipa:
+    name: Build iOS IPA
     runs-on: macos-latest
-    needs: lint-test-build
+    needs: build-and-release
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: v${{ needs.lint-test-build.outputs.new_version }}
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -164,8 +82,7 @@ jobs:
         run: flutter pub get
 
       - name: Build iOS
-        run: |
-          flutter build ios --release
+        run: flutter build ios --release
 
       - name: Create iOS IPA
         run: |
@@ -174,16 +91,10 @@ jobs:
           zip -r app-release.ipa Payload/
           rm -rf Payload
 
-      - name: Upload iOS IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release.ipa
-          path: app-release.ipa
-
-      - name: Update Release with iOS IPA
+      - name: Upload iOS IPA to Release
         uses: ncipollo/release-action@v1
         with:
-          tag: v${{ needs.lint-test-build.outputs.new_version }}
+          tag: ${{ needs.build-and-release.outputs.version }}
           artifacts: app-release.ipa
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}

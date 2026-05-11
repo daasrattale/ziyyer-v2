@@ -1,5 +1,5 @@
 /// Database Migrations for Ziyyer
-/// 
+///
 /// Isar automatically handles schema versioning through the @collection
 /// and @index annotations. When you modify the schema, Isar will:
 /// 1. Detect the change
@@ -30,7 +30,7 @@
 /// 1. Modify the model (add/remove fields, indexes) in lib/models/
 /// 2. Run: flutter pub run build_runner build --delete-conflicting-outputs
 /// 3. Rebuild: flutter clean && flutter pub get && flutter run
-/// 
+///
 /// Isar handles data migration automatically - existing data is preserved
 /// and new fields are initialized with default values.
 library;

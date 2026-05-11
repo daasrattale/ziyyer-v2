@@ -9,9 +9,9 @@ class AppColors {
   AppColors._();
 
   // Brand / Accent
-  static const accent = Color(0xFF4169E1); // Royal Blue
-  static const accentDark = Color(0xFF1E40AF); // Dark Royal Blue
-  static const accentLight = Color(0xFF60A5FA); // Light Royal Blue
+  static const accent = Color(0xFF60A5FA); // Royal Blue
+  static const accentDark = Color.fromARGB(255, 68, 207, 203); // Dark Royal Blue
+  static const accentLight = Color.fromARGB(255, 61, 187, 183); // Light Royal Blue
 
   // Balance card gradient
   static const gradientStart = Color(0xFF00C9A7);
@@ -70,7 +70,7 @@ class AppColors {
   static Color navBarBg(BuildContext context) => getColor(context, light: lightNavBarBg, dark: darkNavBarBg);
 
   // ── App-specific colors ───────────────
-  static Color accentColor(BuildContext context) => getColor(context, light: accent, dark: accentDark);
+  static Color accentColor(BuildContext context) => getColor(context, light: accentLight, dark: accentDark);
 
   static Color accentLightColor(BuildContext context) => accentLight; // Same in both themes
 

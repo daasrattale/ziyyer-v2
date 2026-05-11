@@ -10,6 +10,6 @@ class AppConstants {
 
   // Other constants
   static const double defaultPadding = 16.0;
-  static const double defaultBorderRadius = 12.0;
+  static const double defaultBorderRadius = 32.0;
   static const double maxBorderRadius = 999.0;
 }

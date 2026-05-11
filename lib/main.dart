@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_router.dart';
 import 'package:ziyyer/config/theme.dart';
+import 'package:ziyyer/constants/app_constants.dart';
 import 'package:ziyyer/database/isar_database.dart';
 import 'package:ziyyer/services/service_locator.dart';
 
@@ -17,9 +18,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Ziyyer',
+      title: AppConstants.appName,
       routerConfig: appRouter,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.light,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       debugShowCheckedModeBanner: false,

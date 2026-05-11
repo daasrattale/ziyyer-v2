@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/screens/backbone_screen.dart';
 import 'package:ziyyer/screens/details_screen.dart';
+import 'package:ziyyer/screens/history_screen.dart';
 import 'package:ziyyer/screens/home_screen.dart';
 
 final GoRouter appRouter = GoRouter(
@@ -11,6 +12,9 @@ final GoRouter appRouter = GoRouter(
       branches: [
         StatefulShellBranch(
           routes: [GoRoute(path: '/', name: 'home', builder: (context, state) => const HomeScreen())],
+        ),
+        StatefulShellBranch(
+          routes: [GoRoute(path: '/history', name: 'history', builder: (context, state) => const HistoryScreen())],
         ),
         StatefulShellBranch(
           routes: [GoRoute(path: '/details', name: 'details', builder: (context, state) => const DetailsScreen())],

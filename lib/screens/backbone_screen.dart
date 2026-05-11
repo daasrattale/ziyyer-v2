@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/theme.dart';
 import 'package:ziyyer/constants/app_constants.dart';
+import 'package:ziyyer/constants/app_icons.dart';
+import 'package:ziyyer/widgets/add_expense_btn.dart';
 
 class BackboneScreen extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -28,20 +30,22 @@ class _BackboneScreenState extends State<BackboneScreen> {
     final maxWidth = screenWidth > 600 ? 600.0 : screenWidth - (horizontalMargin * 2);
 
     return Scaffold(
-      body: Stack(
-        children: [
-          widget.navigationShell,
-          Positioned(
-            left: horizontalMargin,
-            right: horizontalMargin,
-            bottom: bottomMargin,
-            child: SafeArea(
+      backgroundColor: AppColors.background(context),
+      body: SafeArea(
+        bottom: false,
+        child: Stack(
+          children: [
+            widget.navigationShell,
+            Positioned(
+              left: horizontalMargin,
+              right: horizontalMargin,
+              bottom: bottomMargin,
               child: Center(
                 child: Container(
                   constraints: BoxConstraints(maxWidth: maxWidth),
                   decoration: BoxDecoration(
-                    color: AppColors.background(context),
-                    boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: Colors.black.withAlpha(15))],
+                    color: AppColors.surface(context),
+                    boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
                     borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
                     border: Border.all(color: AppColors.card(context)),
                   ),
@@ -51,7 +55,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         _NavItem(
-                          icon: Icons.home_rounded,
+                          icon: AppIcons.home,
                           label: 'Home',
                           isSelected: widget.navigationShell.currentIndex == 0,
                           onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
@@ -59,15 +63,20 @@ class _BackboneScreenState extends State<BackboneScreen> {
                           isLandscape: isLandscape,
                         ),
                         _NavItem(
-                          icon: Icons.history,
+                          icon: AppIcons.history,
                           label: 'History',
                           isSelected: widget.navigationShell.currentIndex == 1,
                           onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
                           screenWidth: screenWidth,
                           isLandscape: isLandscape,
                         ),
+                        AddExpenseButton(
+                          onPressed: () {
+                            // TODO: Open the Add Expense bottom sheet
+                          },
+                        ),
                         _NavItem(
-                          icon: Icons.pie_chart_outline_outlined,
+                          icon: AppIcons.insights,
                           label: 'Insight',
                           isSelected: widget.navigationShell.currentIndex == 2,
                           onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
@@ -75,18 +84,10 @@ class _BackboneScreenState extends State<BackboneScreen> {
                           isLandscape: isLandscape,
                         ),
                         _NavItem(
-                          icon: Icons.wallet,
+                          icon: AppIcons.wallet,
                           label: 'Wallet',
                           isSelected: widget.navigationShell.currentIndex == 3,
                           onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
-                          screenWidth: screenWidth,
-                          isLandscape: isLandscape,
-                        ),
-                        _NavItem(
-                          icon: Icons.info_rounded,
-                          label: 'Details',
-                          isSelected: widget.navigationShell.currentIndex == 4,
-                          onTap: () => widget.navigationShell.goBranch(4, initialLocation: true),
                           screenWidth: screenWidth,
                           isLandscape: isLandscape,
                         ),
@@ -96,8 +97,8 @@ class _BackboneScreenState extends State<BackboneScreen> {
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -123,7 +124,7 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedColor = AppColors.accentColor(context);
-    final unselectedColor = AppColors.textPrimary(context).withAlpha(60);
+    final unselectedColor = AppColors.textHint(context);
 
     final iconSize = screenWidth * 0.06;
     final fontSize = isSelected ? screenWidth * 0.03 : screenWidth * 0.0275;

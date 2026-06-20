@@ -27,7 +27,7 @@ lint_feature:
     - when: never
 
 # Run tests on pushes and merge request pipelines for all branches
-flutter_test:
+test:
   stage: test
   interruptible: true
   script:
@@ -37,7 +37,7 @@ flutter_test:
     - when: never
 
 # Build debug APK on all branches/pushes and merge requests
-flutter_build_android_debug:
+build:apk:debug:
   stage: build:android
   interruptible: true
   script:
@@ -51,11 +51,11 @@ flutter_build_android_debug:
     - when: never
 
 # Build release APK only on release branches
-flutter_build_release:
+build:apk:release:
   stage: build:android
   interruptible: true
   needs:
-    - flutter_build_android_debug
+    - build:apk:debug
   script:
     - flutter build apk --release
   artifacts:
@@ -69,7 +69,7 @@ flutter_build_release:
 # When a release branch is merged into main, create a tag and release notes using
 # the GitLab Releases API. This job runs on pushes to `main` where the commit
 # message contains a merge from a `release/` branch.
-create_release_from_merge:
+changelog:
   stage: release
   interruptible: true
   image: curlimages/curl:latest

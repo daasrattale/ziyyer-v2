@@ -1,4 +1,9 @@
-image: ghcr.io/cirruslabs/flutter:stable
+variables:
+  # Set this to the exact Flutter version you use locally (e.g. 3.10.3).
+  # Update this value to make CI match your local SDK.
+  FLUTTER_VERSION: "3.10.3"
+
+image: "cirrusci/flutter:${FLUTTER_VERSION}"
 
 workflow:
   auto_cancel:
@@ -12,7 +17,8 @@ stages:
   - release
 
 before_script:
-  - flutter clean
+  - flutter --version
+  - flutter doctor -v || true
   - flutter pub get
 
 # Lint only on feature/feat branches
@@ -41,7 +47,7 @@ build:apk:debug:
   stage: build:android
   interruptible: true
   script:
-    - flutter build apk --debug
+    - flutter build apk --debug --no-shrink -v
   artifacts:
     paths:
       - build/app/outputs/flutter-apk/app-debug.apk
@@ -57,7 +63,7 @@ build:apk:release:
   needs:
     - build:apk:debug
   script:
-    - flutter build apk --release
+    - flutter build apk --release -v
   artifacts:
     paths:
       - build/app/outputs/flutter-apk/app-release.apk

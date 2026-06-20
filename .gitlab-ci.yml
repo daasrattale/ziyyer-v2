@@ -1,5 +1,9 @@
 image: ghcr.io/cirruslabs/flutter:stable
 
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+
 stages:
   - lint
   - test
@@ -12,6 +16,7 @@ before_script:
 # Lint only on feature/feat branches
 lint_feature:
   stage: lint
+  interruptible: true
   script:
     - flutter analyze
   rules:
@@ -22,6 +27,7 @@ lint_feature:
 # Run tests on pushes and merge request pipelines for all branches
 flutter_test:
   stage: test
+  interruptible: true
   script:
     - flutter test --coverage
   rules:
@@ -31,6 +37,7 @@ flutter_test:
 # Build debug APK on all branches/pushes and merge requests
 flutter_build_android:
   stage: build
+  interruptible: true
   script:
     - flutter build apk --debug
   artifacts:
@@ -44,6 +51,7 @@ flutter_build_android:
 # Build release APK only on release branches
 flutter_build_release:
   stage: build
+  interruptible: true
   needs:
     - flutter_build_android
   script:
@@ -61,6 +69,7 @@ flutter_build_release:
 # message contains a merge from a `release/` branch.
 create_release_from_merge:
   stage: release
+  interruptible: true
   image: curlimages/curl:latest
   variables:
     GIT_STRATEGY: fetch

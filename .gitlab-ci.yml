@@ -74,7 +74,7 @@ create_release_from_merge:
         exit 0
       fi
     - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
-    - echo "Creating release for version: $VERSION"
+    - 'echo "Creating release for version: $VERSION"'
     - >
       RELEASE_DATA=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s"}' \
       "$VERSION" "$VERSION" "$VERSION" "$CI_COMMIT_SHA")

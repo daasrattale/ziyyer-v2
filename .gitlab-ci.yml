@@ -46,6 +46,8 @@ flutter_build_android:
 # Build release APK only on release branches
 flutter_build_release:
   stage: build
+  needs:
+    - flutter_build_android
   script:
     - flutter build apk --release
   artifacts:

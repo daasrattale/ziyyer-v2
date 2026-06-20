@@ -35,7 +35,7 @@ flutter_test:
     - when: never
 
 # Build debug APK on all branches/pushes and merge requests
-flutter_build_android:
+flutter_build_android_debug:
   stage: build
   interruptible: true
   script:
@@ -53,7 +53,7 @@ flutter_build_release:
   stage: build
   interruptible: true
   needs:
-    - flutter_build_android
+    - flutter_build_android_debug
   script:
     - flutter build apk --release
   artifacts:

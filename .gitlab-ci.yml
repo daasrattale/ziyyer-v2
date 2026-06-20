@@ -12,6 +12,7 @@ stages:
   - release
 
 before_script:
+  - flutter clean
   - flutter pub get
 
 # Lint only on feature/feat branches

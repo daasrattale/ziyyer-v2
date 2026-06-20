@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:ziyyer/config/theme.dart';
 import 'package:ziyyer/constants/app_constants.dart';
+import 'package:ziyyer/constants/app_icons.dart';
 
 class SummaryCardsRow extends StatelessWidget {
   final double incomeAmount;
@@ -21,7 +21,7 @@ class SummaryCardsRow extends StatelessWidget {
               title: 'INCOME',
               amount: incomeAmount,
               subtitle: '$incomeSources sources',
-              iconData: FeatherIcons.trendingUp,
+              iconData: AppIcons.trendingUp,
               iconColor: AppColors.income,
               iconBackgroundColor: AppColors.income.withAlpha(30),
             ),
@@ -32,7 +32,7 @@ class SummaryCardsRow extends StatelessWidget {
               title: 'PAYMENTS',
               amount: paymentsAmount,
               subtitle: 'This month',
-              iconData: FeatherIcons.trendingDown,
+              iconData: AppIcons.trendingDown,
               iconColor: AppColors.expense,
               iconBackgroundColor: AppColors.expense.withAlpha(30),
             ),

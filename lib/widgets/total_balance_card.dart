@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:ziyyer/config/theme.dart';
 import 'package:ziyyer/constants/app_constants.dart';
+import 'package:ziyyer/constants/app_icons.dart';
 
 class TotalBalanceCard extends StatelessWidget {
   final double totalBalance;
@@ -28,8 +28,8 @@ class TotalBalanceCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.defaultPadding),
       padding: const EdgeInsets.all(AppConstants.defaultPadding * 2),
       decoration: BoxDecoration(
-        color: AppColors.accentColor(context), // Deep navy blue background
-        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius), // Large smooth rounded corners
+        color: AppColors.accentColor(context),
+        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
         boxShadow: [BoxShadow(color: const Color(0xFF233253).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
@@ -86,7 +86,7 @@ class TotalBalanceCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(percentageChange >= 0 ? FeatherIcons.arrowUpRight : FeatherIcons.arrowDownRight, color: Colors.white, size: 14),
+                Icon(percentageChange >= 0 ? AppIcons.arrowUpRight : AppIcons.arrowDownRight, color: Colors.white, size: 14),
                 const SizedBox(width: 6),
                 Text(
                   '${percentageChange >= 0 ? '+' : ''}${percentageChange.toStringAsFixed(1)}% from last month',

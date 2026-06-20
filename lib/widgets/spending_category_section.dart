@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_feather_icons/flutter_feather_icons.dart';
 import 'package:ziyyer/config/theme.dart';
 import 'package:ziyyer/constants/app_constants.dart';
+import 'package:ziyyer/constants/app_icons.dart';
 
 class SpendingCategorySection extends StatelessWidget {
   const SpendingCategorySection({super.key});
@@ -38,7 +38,7 @@ class SpendingCategorySection extends StatelessWidget {
             spacing: AppConstants.defaultPadding,
             children: [
               _CategoryItem(
-                iconData: FeatherIcons.home,
+                iconData: AppIcons.home,
                 title: 'Housing',
                 spent: 1200,
                 budget: 1500,
@@ -46,28 +46,28 @@ class SpendingCategorySection extends StatelessWidget {
                 isFirst: true,
               ),
               _CategoryItem(
-                iconData: FeatherIcons.coffee,
+                iconData: AppIcons.coffee,
                 title: 'Food & Dining',
                 spent: 420,
                 budget: 500,
                 baseColor: const Color(0xFFDAA520), // Orange/Yellow tone
               ),
               _CategoryItem(
-                iconData: FeatherIcons.truck,
+                iconData: AppIcons.truck,
                 title: 'Transport',
                 spent: 280,
                 budget: 350,
                 baseColor: const Color(0xFF2E8B57), // Green tone
               ),
               _CategoryItem(
-                iconData: FeatherIcons.shoppingBag,
+                iconData: AppIcons.shoppingBag,
                 title: 'Shopping',
                 spent: 510,
                 budget: 400,
                 baseColor: AppColors.expense, // Red tone for over budget
               ),
               _CategoryItem(
-                iconData: FeatherIcons.film,
+                iconData: AppIcons.film,
                 title: 'Entertainment',
                 spent: 95,
                 budget: 200,

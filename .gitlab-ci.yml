@@ -7,7 +7,8 @@ workflow:
 stages:
   - lint
   - test
-  - build
+  - build:android
+  - build:ios
   - release
 
 before_script:
@@ -36,7 +37,7 @@ flutter_test:
 
 # Build debug APK on all branches/pushes and merge requests
 flutter_build_android_debug:
-  stage: build
+  stage: build:android
   interruptible: true
   script:
     - flutter build apk --debug
@@ -50,7 +51,7 @@ flutter_build_android_debug:
 
 # Build release APK only on release branches
 flutter_build_release:
-  stage: build
+  stage: build:android
   interruptible: true
   needs:
     - flutter_build_android_debug

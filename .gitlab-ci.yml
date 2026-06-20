@@ -37,6 +37,8 @@ lint_feature:
 test:
   stage: test
   interruptible: true
+  needs:
+    - info
   script:
     - flutter test --coverage
   rules:
@@ -68,6 +70,8 @@ info:
 build:apk:debug:
   stage: build:android
   interruptible: true
+  needs:
+    - test
   script:
     - flutter build apk --debug --no-shrink -v
   artifacts:

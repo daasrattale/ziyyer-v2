@@ -67,13 +67,9 @@ create_release_from_merge:
   script:
     - echo "Checking commit message for release merge..."
     - 'if [[ "$CI_COMMIT_BRANCH" == "main" && "$CI_COMMIT_MESSAGE" =~ Merge.*release/ ]]; then echo "Detected release merge"; else echo "Not a release merge - skipping"; exit 0; fi'
-    - VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
     - echo "Creating release for version: $VERSION"
-    - |
-      curl --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" \
-        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-        --header "Content-Type: application/json" \
-        --data "{\"name\":\"Release $VERSION\",\"tag_name\":\"v$VERSION\",\"description\":\"Automated release for v$VERSION\",\"ref\":\"$CI_COMMIT_SHA\"}"
+    - RELEASE_DATA=$(echo "{\"name\":\"Release $VERSION\",\"tag_name\":\"v$VERSION\",\"description\":\"Automated release for v$VERSION\",\"ref\":\"$CI_COMMIT_SHA\"}")
+    - 'curl --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: application/json" --data "$RELEASE_DATA"'
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
-    - when: on_success

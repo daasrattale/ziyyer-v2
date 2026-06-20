@@ -48,7 +48,6 @@ test:
 info:
   stage: info
   interruptible: true
-  when: manual
   allow_failure: true
   script:
     - mkdir -p ci-logs

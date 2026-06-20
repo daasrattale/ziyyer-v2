@@ -26,7 +26,6 @@ flutter_test:
     - flutter test --coverage
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - when: never
 
 # Build debug APK on all branches/pushes and merge requests
@@ -40,7 +39,6 @@ flutter_build_android:
     expire_in: 1 week
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
     - when: never
 
 # Build release APK only on release branches

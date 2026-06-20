@@ -1,7 +1,7 @@
 variables:
-  # Set this to the exact Flutter version you use locallyyyy (e.g. 3.44.2).
+  # Set this to the exact Flutter version you use locallyyyy (e.g. 3.44.0).
   # Update this value to make CI match your local SDK.
-  FLUTTER_VERSION: "3.44.2"
+  FLUTTER_VERSION: "3.44.0"
 
 image: "cirrusci/flutter:${FLUTTER_VERSION}"
 

@@ -42,3 +42,23 @@ android {
 flutter {
     source = "../.."
 }
+
+// Ensure Flutter tooling can find the produced APK by copying it
+// into the root `build/app/outputs/flutter-apk` location after assembleDebug.
+tasks.register("copyDebugApk") {
+    doLast {
+        val src = file("$buildDir/outputs/flutter-apk/app-debug.apk")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/flutter-apk")
+        destDir.mkdirs()
+        copy {
+            from(src)
+            into(destDir)
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name == "assembleDebug" }.configureEach {
+        finalizedBy(tasks.named("copyDebugApk"))
+    }
+}

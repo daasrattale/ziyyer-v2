@@ -5,11 +5,11 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Keep the default Gradle build directory to avoid confusing tools
+// that expect the standard project layout. The project previously
+// redirected the build directory to a location two levels up which
+// can prevent the Flutter tooling from locating the generated APK.
+// Leaving the default rootProject.layout.buildDirectory in place.
 
 subprojects {
     afterEvaluate {

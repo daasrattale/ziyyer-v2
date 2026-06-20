@@ -1,0 +1,79 @@
+image: ghcr.io/cirruslabs/flutter:stable
+
+stages:
+  - lint
+  - test
+  - build
+  - release
+
+before_script:
+  - flutter pub get
+
+# Lint only on feature/feat branches
+lint_feature:
+  stage: lint
+  script:
+    - flutter analyze
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
+    - when: never
+
+# Run tests on pushes and merge request pipelines for all branches
+flutter_test:
+  stage: test
+  script:
+    - flutter test --coverage
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
+
+# Build debug APK on all branches/pushes and merge requests
+flutter_build_android:
+  stage: build
+  script:
+    - flutter build apk --debug
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-debug.apk
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - when: never
+
+# Build release APK only on release branches
+flutter_build_release:
+  stage: build
+  script:
+    - flutter build apk --release
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-release.apk
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+    - when: never
+
+# When a release branch is merged into main, create a tag and release notes using
+# the GitLab Releases API. This job runs on pushes to `main` where the commit
+# message contains a merge from a `release/` branch.
+create_release_from_merge:
+  stage: release
+  image: curlimages/curl:latest
+  variables:
+    GIT_STRATEGY: fetch
+  script:
+    - echo "Checking commit message for release merge..."
+    - 'if [[ "$CI_COMMIT_BRANCH" == "main" && "$CI_COMMIT_MESSAGE" =~ Merge.*release/ ]]; then echo "Detected release merge"; else echo "Not a release merge - skipping"; exit 0; fi'
+    - VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    - echo "Creating release for version: $VERSION"
+    - |
+      curl --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" \
+        --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+        --header "Content-Type: application/json" \
+        --data "{\"name\":\"Release $VERSION\",\"tag_name\":\"v$VERSION\",\"description\":\"Automated release for v$VERSION\",\"ref\":\"$CI_COMMIT_SHA\"}"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+    - when: on_success

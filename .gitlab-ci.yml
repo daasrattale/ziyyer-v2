@@ -10,6 +10,7 @@ workflow:
     on_new_commit: interruptible
 
 stages:
+  - info
   - lint
   - test
   - build:android
@@ -41,6 +42,28 @@ test:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - when: never
+
+# Job to capture environment info (Flutter/Dart versions and flutter doctor)
+# Useful for diagnosing SDK mismatches between local and CI.
+info:
+  stage: info
+  interruptible: true
+  when: manual
+  allow_failure: true
+  script:
+    - mkdir -p ci-logs
+    - echo "=== FLUTTER VERSION ===" > ci-logs/env.txt
+    - flutter --version >> ci-logs/env.txt 2>&1 || true
+    - echo "\n=== DART VERSION ===" >> ci-logs/env.txt
+    - dart --version >> ci-logs/env.txt 2>&1 || true
+    - echo "\n=== FLUTTER DOCTOR ===" >> ci-logs/env.txt
+    - flutter doctor -v >> ci-logs/env.txt 2>&1 || true
+    - cat ci-logs/env.txt
+  artifacts:
+    when: always
+    paths:
+      - ci-logs/env.txt
+    expire_in: 1 week
 
 # Build debug APK on all branches/pushes and merge requests
 build:apk:debug:

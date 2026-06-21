@@ -1,10 +1,5 @@
-#variables:
-#  # Set this to the exact Flutter version you use locally (e.g. 3.24.0).
-#  # Update this value to make CI match your local SDK.
-#  FLUTTER_VERSION: "3.24.0"
-
 variables:
-  FLUTTER_VERSION: "3.24.0"
+  FLUTTER_VERSION: "3.38.4"
   PUB_CACHE: "${CI_PROJECT_DIR}/.pub-cache"
   GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
 

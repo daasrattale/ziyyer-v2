@@ -43,12 +43,12 @@ flutter {
     source = "../.."
 }
 
-// Ensure Flutter tooling can find the produced APK by copying it
-// into the root `build/app/outputs/flutter-apk` location after assembleDebug.
-tasks.register("copyDebugApk") {
+// Ensure Flutter tooling can find the produced artifacts by copying them
+// into the root `build/app/outputs/...` location after build.
+tasks.register("copyDebugAab") {
     doLast {
-        val src = file("$buildDir/outputs/flutter-apk/app-debug.apk")
-        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/flutter-apk")
+        val src = file("$buildDir/outputs/bundle/debug/app-debug.aab")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/bundle/debug")
         destDir.mkdirs()
         copy {
             from(src)
@@ -57,10 +57,10 @@ tasks.register("copyDebugApk") {
     }
 }
 
-tasks.register("copyReleaseApk") {
+tasks.register("copyReleaseAab") {
     doLast {
-        val src = file("$buildDir/outputs/flutter-apk/app-release.apk")
-        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/flutter-apk")
+        val src = file("$buildDir/outputs/bundle/release/app-release.aab")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/bundle/release")
         destDir.mkdirs()
         copy {
             from(src)
@@ -70,10 +70,10 @@ tasks.register("copyReleaseApk") {
 }
 
 afterEvaluate {
-    tasks.matching { it.name == "assembleDebug" }.configureEach {
-        finalizedBy(tasks.named("copyDebugApk"))
+    tasks.matching { it.name == "bundleDebug" }.configureEach {
+        finalizedBy(tasks.named("copyDebugAab"))
     }
-    tasks.matching { it.name == "assembleRelease" }.configureEach {
-        finalizedBy(tasks.named("copyReleaseApk"))
+    tasks.matching { it.name == "bundleRelease" }.configureEach {
+        finalizedBy(tasks.named("copyReleaseAab"))
     }
 }

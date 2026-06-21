@@ -58,34 +58,34 @@ test:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - when: never
 
-# Build debug APK on all branches/pushes and merge requests (except release branches)
-build:apk:debug:
+# Build debug AAB on all branches/pushes and merge requests (except release branches)
+build:aab:debug:
   extends: .flutter_job
   stage: build:android
   script:
-    - flutter build apk --debug --no-shrink
+    - flutter build appbundle --debug
   artifacts:
     paths:
-      - build/app/outputs/flutter-apk/app-debug.apk
+      - build/app/outputs/bundle/debug/app-debug.aab
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
     - when: never
 
-# Build release APK only on release branches
-build:apk:release:
+# Build release AAB only on release branches
+build:aab:release:
   extends: .flutter_job
   stage: build:android
   script:
-    - flutter build apk --release
+    - flutter build appbundle --release
     - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
     - echo "VERSION=$VERSION" >> build.env
   artifacts:
     reports:
       dotenv: build.env
     paths:
-      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
@@ -123,28 +123,28 @@ changelog:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-# Publish the release APK to GitLab Generic Package Registry and update the release asset
-publish:apk:
+# Publish the release AAB to GitLab Generic Package Registry and update the release asset
+publish:aab:
   stage: publish
   image: curlimages/curl:latest
   needs:
-    - job: build:apk:release
+    - job: build:aab:release
       artifacts: true
   variables:
-    APK_PATH: "build/app/outputs/flutter-apk/app-release.apk"
-    PACKAGE_NAME: "ziyyer-apk"
+    AAB_PATH: "build/app/outputs/bundle/release/app-release.aab"
+    PACKAGE_NAME: "ziyyer-aab"
   script:
     - echo "Publishing version $VERSION"
     - |
-      # Upload APK to GitLab Generic Package Registry
+      # Upload AAB to GitLab Generic Package Registry
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-           --upload-file "${APK_PATH}" \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.apk"
+           --upload-file "${AAB_PATH}" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.aab"
     - |
       # Create or Update Release with the asset link using GitLab Release CLI or API
       # We use the API via curl for simplicity here since we already have curl in the image
-      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.apk"
-      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"apk-%s","url":"%s","link_type":"package"}]}}' \
+      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.aab"
+      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"aab-%s","url":"%s","link_type":"package"}]}}' \
         "$VERSION" "$VERSION" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
       
       echo "Creating/Updating release v$VERSION..."

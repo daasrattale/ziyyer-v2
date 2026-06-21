@@ -3,7 +3,7 @@
 #  # Update this value to make CI match your local SDK.
 #  FLUTTER_VERSION: "3.44.0"
 
-image: "ghcr.io/cirruslabs/flutter:3.38.4"
+image: "cirrusci/flutter:3.38.4"
 
 workflow:
   auto_cancel:
@@ -64,7 +64,15 @@ build:apk:release:
   needs:
     - build:apk:debug
   script:
-    - flutter build apk --release -v
+    - |
+      # Ensure Android SDK components for API 33 are available in CI
+      if command -v sdkmanager >/dev/null 2>&1; then
+        yes | sdkmanager --licenses || true
+        sdkmanager "platforms;android-33" "build-tools;33.0.2" "platform-tools" || true
+      else
+        echo "sdkmanager not found - assuming CI image has required SDK components"
+      fi
+      flutter build apk --release -v
   artifacts:
     paths:
       - build/app/outputs/flutter-apk/app-release.apk

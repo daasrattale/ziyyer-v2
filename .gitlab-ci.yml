@@ -79,8 +79,12 @@ build:aab:release:
   stage: build:android
   script:
     - flutter build appbundle --release
-    - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    - VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+    - VERSION=$(echo $VERSION_FULL | cut -d'+' -f1)
+    - BUILD_NUMBER=$(echo $VERSION_FULL | cut -d'+' -f2)
     - echo "VERSION=$VERSION" >> build.env
+    - echo "BUILD_NUMBER=$BUILD_NUMBER" >> build.env
+    - echo "VERSION_FULL=$VERSION_FULL" >> build.env
   artifacts:
     reports:
       dotenv: build.env
@@ -125,6 +129,7 @@ changelog:
 
 # Publish the release AAB to GitLab Generic Package Registry and update the release asset
 publish:aab:
+  extends: .flutter_job
   stage: publish
   image: curlimages/curl:latest
   needs:
@@ -134,18 +139,19 @@ publish:aab:
     AAB_PATH: "build/app/outputs/bundle/release/app-release.aab"
     PACKAGE_NAME: "ziyyer-aab"
   script:
-    - echo "Publishing version $VERSION"
+    - echo "Publishing version $VERSION_FULL"
+    - FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
     - |
       # Upload AAB to GitLab Generic Package Registry
       curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
            --upload-file "${AAB_PATH}" \
-           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.aab"
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/$FILENAME"
     - |
       # Create or Update Release with the asset link using GitLab Release CLI or API
       # We use the API via curl for simplicity here since we already have curl in the image
-      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.aab"
-      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"aab-%s","url":"%s","link_type":"package"}]}}' \
-        "$VERSION" "$VERSION" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
+      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/$FILENAME"
+      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"%s","url":"%s","link_type":"package"}]}}' \
+        "$VERSION_FULL" "$VERSION" "$VERSION_FULL" "$CI_COMMIT_SHA" "$FILENAME" "$ASSET_URL")
       
       echo "Creating/Updating release v$VERSION..."
       curl --request POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases" \

@@ -113,26 +113,44 @@ publish_release_apk:
       artifacts: true
   variables:
     APK_PATH: "build/app/outputs/flutter-apk/app-release.apk"
-  script:
-    - apk add --no-cache curl jq bash
-    - if [ ! -f "$APK_PATH" ]; then echo "Release APK not found at $APK_PATH"; exit 1; fi
-    - echo "Uploading $APK_PATH to GitLab uploads API..."
-    - UPLOAD_JSON=$(curl --silent --show-error --request POST --form "file=@${APK_PATH}" --header "JOB-TOKEN: $CI_JOB_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads")
-    - echo "Upload response: $UPLOAD_JSON"
-    - UPLOAD_URL=$(echo "$UPLOAD_JSON" | jq -r .url)
-    - if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then echo "Upload failed or returned no url"; exit 1; fi
-    - ASSET_URL="${CI_PROJECT_URL}${UPLOAD_URL}"
-    - echo "Asset available at: $ASSET_URL"
-    - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
-    - TAG="v${VERSION}"
-    - echo "Creating release ${TAG} (or updating if exists)"
-    - CREATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","ref":"%s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
-    - echo "Release payload: $CREATE_JSON"
-    - HTTP_STATUS=$(curl -s -o /dev/stderr -w "%{http_code}" --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: application/json" --data "$CREATE_JSON" 2>create_response.json || true) || true
-    - if [ "$HTTP_STATUS" = "201" ]; then echo "Release created."; cat create_response.json; exit 0; fi
-    - echo "Create returned status $HTTP_STATUS, attempting to update existing release..."
-    - UPDATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$VERSION" "$ASSET_URL")
-    - curl --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases/$TAG" --header "JOB-TOKEN: $CI_JOB_TOKEN" --header "Content-Type: application/json" --data "$UPDATE_JSON" || true
+  script: |
+    set -euo pipefail
+    apk add --no-cache curl jq bash
+    if [ ! -f "$APK_PATH" ]; then
+      echo "Release APK not found at $APK_PATH"
+      exit 1
+    fi
+    echo "Uploading $APK_PATH to GitLab uploads API..."
+    UPLOAD_JSON=$(curl --silent --show-error --request POST --form "file=@${APK_PATH}" --header "JOB-TOKEN: $CI_JOB_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads")
+    echo "Upload response: $UPLOAD_JSON"
+    UPLOAD_URL=$(echo "$UPLOAD_JSON" | jq -r .url)
+    if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
+      echo "Upload failed or returned no url"
+      exit 1
+    fi
+    ASSET_URL="${CI_PROJECT_URL}${UPLOAD_URL}"
+    echo "Asset available at: $ASSET_URL"
+    VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    TAG="v${VERSION}"
+    echo "Creating release ${TAG} (or updating if exists)"
+    CREATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","ref":"%s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
+    echo "Release payload: $CREATE_JSON"
+    # Try to create the release; capture HTTP status and response body
+    HTTP_STATUS=$(curl -s -w "%{http_code}" -o create_response.json --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" \
+      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      --header "Content-Type: application/json" \
+      --data "$CREATE_JSON" || true)
+    if [ "$HTTP_STATUS" = "201" ]; then
+      echo "Release created."
+      cat create_response.json
+      exit 0
+    fi
+    echo "Create returned status $HTTP_STATUS, attempting to update existing release..."
+    UPDATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$VERSION" "$ASSET_URL")
+    curl --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases/$TAG" \
+      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+      --header "Content-Type: application/json" \
+      --data "$UPDATE_JSON" || true
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'

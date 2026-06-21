@@ -1,24 +1,25 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
 import '../database/base_repository.dart';
-import '../models/transaction.dart';
+import '../database/database.dart';
+import '../models/transaction_table.dart';
 
 /// Transaction Service: Business logic for transaction management
 ///
 /// Singleton service that handles transaction operations, analytics, and reporting.
 /// Provides methods for transaction queries and financial calculations.
-class TransactionService extends BaseRepository<IsarTransaction> {
+class TransactionService extends BaseRepository<Transactions, Transaction> {
   static final TransactionService _instance = TransactionService._internal();
 
-  factory TransactionService(Isar isar) {
-    _instance.setIsar(isar);
+  factory TransactionService(AppDatabase db) {
+    _instance.setDatabase(db);
     return _instance;
   }
 
   TransactionService._internal() : super();
 
   @override
-  IsarCollection<IsarTransaction> get collection => isar.isarTransactions;
+  TableInfo<Transactions, Transaction> get table => db.transactions;
 
   /// Create a new transaction
   /// - Records income or expense
@@ -32,50 +33,52 @@ class TransactionService extends BaseRepository<IsarTransaction> {
     String? category,
     String? notes,
   }) async {
-    final transaction = IsarTransaction(
+    final transaction = TransactionsCompanion.insert(
       accountId: accountId,
       description: description,
       amount: amount,
       type: type,
       date: date,
-      category: category,
-      notes: notes,
+      category: Value(category),
+      notes: Value(notes),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
     return await create(transaction);
   }
 
   /// Get transactions for a specific account
-  Stream<List<IsarTransaction>> watchTransactionsByAccount(int accountId) {
-    return isar.isarTransactions.filter().accountIdEqualTo(accountId).watch(fireImmediately: true);
+  Stream<List<Transaction>> watchTransactionsByAccount(int accountId) {
+    return (db.select(table)..where((t) => t.accountId.equals(accountId))).watch();
   }
 
   /// Get all transactions for an account
-  Future<List<IsarTransaction>> getTransactionsByAccount(int accountId) async {
-    return await isar.isarTransactions.filter().accountIdEqualTo(accountId).findAll();
+  Future<List<Transaction>> getTransactionsByAccount(int accountId) async {
+    return await (db.select(table)..where((t) => t.accountId.equals(accountId))).get();
   }
 
   /// Get transactions in a date range
   /// - From start date to end date (inclusive)
-  Future<List<IsarTransaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
-    return await isar.isarTransactions.filter().dateBetween(start, end).findAll();
+  Future<List<Transaction>> getTransactionsByDateRange(DateTime start, DateTime end) async {
+    return await (db.select(table)..where((t) => t.date.isBetweenValues(start, end))).get();
   }
 
   /// Get transactions by account and date range
-  Future<List<IsarTransaction>> getTransactionsByAccountAndDateRange(int accountId, DateTime start, DateTime end) async {
-    return await isar.isarTransactions.where().filter().accountIdEqualTo(accountId).and().dateBetween(start, end).findAll();
+  Future<List<Transaction>> getTransactionsByAccountAndDateRange(int accountId, DateTime start, DateTime end) async {
+    return await (db.select(table)
+          ..where((t) => t.accountId.equals(accountId) & t.date.isBetweenValues(start, end)))
+        .get();
   }
 
   /// Get transactions by category
   /// - Returns all transactions with matching category
-  Future<List<IsarTransaction>> getTransactionsByCategory(String category) async {
-    final all = await getAll();
-    return all.where((t) => t.category == category).toList();
+  Future<List<Transaction>> getTransactionsByCategory(String category) async {
+    return await (db.select(table)..where((t) => t.category.equals(category))).get();
   }
 
   /// Get transactions by type (income or expense)
-  Future<List<IsarTransaction>> getTransactionsByType(String type) async {
-    final all = await getAll();
-    return all.where((t) => t.type == type).toList();
+  Future<List<Transaction>> getTransactionsByType(String type) async {
+    return await (db.select(table)..where((t) => t.type.equals(type))).get();
   }
 
   /// Calculate total income for an account
@@ -153,7 +156,7 @@ class TransactionService extends BaseRepository<IsarTransaction> {
   }
 
   /// Get transactions for the current month
-  Future<List<IsarTransaction>> getCurrentMonthTransactions(int accountId) async {
+  Future<List<Transaction>> getCurrentMonthTransactions(int accountId) async {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, 1);
     final end = DateTime(now.year, now.month + 1).subtract(const Duration(days: 1));
@@ -162,7 +165,7 @@ class TransactionService extends BaseRepository<IsarTransaction> {
   }
 
   /// Get transactions for a specific month
-  Future<List<IsarTransaction>> getMonthTransactions(int accountId, int year, int month) async {
+  Future<List<Transaction>> getMonthTransactions(int accountId, int year, int month) async {
     final start = DateTime(year, month, 1);
     final end = DateTime(year, month + 1).subtract(const Duration(days: 1));
 
@@ -197,7 +200,7 @@ class TransactionService extends BaseRepository<IsarTransaction> {
 
   /// Get largest transactions (by amount)
   /// - Returns top N transactions sorted by amount
-  Future<List<IsarTransaction>> getLargestTransactions(int accountId, {int limit = 10}) async {
+  Future<List<Transaction>> getLargestTransactions(int accountId, {int limit = 10}) async {
     final transactions = await getTransactionsByAccount(accountId);
     transactions.sort((a, b) => b.amount.compareTo(a.amount));
     return transactions.take(limit).toList();
@@ -205,7 +208,7 @@ class TransactionService extends BaseRepository<IsarTransaction> {
 
   /// Get most recent transactions
   /// - Returns newest transactions first
-  Future<List<IsarTransaction>> getRecentTransactions(int accountId, {int limit = 20}) async {
+  Future<List<Transaction>> getRecentTransactions(int accountId, {int limit = 20}) async {
     final transactions = await getTransactionsByAccount(accountId);
     transactions.sort((a, b) => b.date.compareTo(a.date));
     return transactions.take(limit).toList();

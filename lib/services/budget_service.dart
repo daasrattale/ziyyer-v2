@@ -1,25 +1,31 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
 import '../database/base_repository.dart';
-import '../models/budget.dart';
-import '../models/transaction.dart';
+import '../database/database.dart';
+import '../models/budget_table.dart';
+
+/// Extension to add missing helper logic to Budget data class
+extension BudgetExtension on Budget {
+  double get remainingBudget => limit - spent;
+  double get percentageUsed => limit > 0 ? spent / limit : 0.0;
+}
 
 /// Budget Service: Business logic for budget management
 ///
 /// Singleton service that handles budget operations, spending tracking, and budget alerts.
 /// Provides high-level methods for budget management beyond basic CRUD.
-class BudgetService extends BaseRepository<IsarBudget> {
+class BudgetService extends BaseRepository<Budgets, Budget> {
   static final BudgetService _instance = BudgetService._internal();
 
-  factory BudgetService(Isar isar) {
-    _instance.setIsar(isar);
+  factory BudgetService(AppDatabase db) {
+    _instance.setDatabase(db);
     return _instance;
   }
 
   BudgetService._internal() : super();
 
   @override
-  IsarCollection<IsarBudget> get collection => isar.isarBudgets;
+  TableInfo<Budgets, Budget> get table => db.budgets;
 
   /// Create a new budget for a category and period
   /// - Initializes spent to 0
@@ -29,30 +35,36 @@ class BudgetService extends BaseRepository<IsarBudget> {
     required double limit,
     required String period, // 'monthly', 'weekly', 'yearly'
   }) async {
-    final budget = IsarBudget(category: category, limit: limit, period: period, month: DateTime.now(), isActive: true);
+    final budget = BudgetsCompanion.insert(
+      category: category,
+      limit: limit,
+      period: period,
+      month: DateTime.now(),
+      isActive: const Value(true),
+      spent: const Value(0),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
 
-    budget.spent = 0;
     return await create(budget);
   }
 
   /// Get all active budgets
-  Stream<List<IsarBudget>> watchActiveBudgets() {
-    return isar.isarBudgets.where().filter().isActiveEqualTo(true).watch(fireImmediately: true);
+  Stream<List<Budget>> watchActiveBudgets() {
+    return (db.select(table)..where((b) => b.isActive.equals(true))).watch();
   }
 
   /// Get budgets for a specific month
-  Future<List<IsarBudget>> getBudgetsByMonth(DateTime month) async {
+  Future<List<Budget>> getBudgetsByMonth(DateTime month) async {
     final startOfMonth = DateTime(month.year, month.month, 1);
     final endOfMonth = DateTime(month.year, month.month + 1).subtract(const Duration(days: 1));
 
-    return await isar.isarBudgets.where().filter().monthBetween(startOfMonth, endOfMonth).findAll();
+    return await (db.select(table)..where((b) => b.month.isBetweenValues(startOfMonth, endOfMonth))).get();
   }
 
   /// Get budgets for a specific category
-  Future<List<IsarBudget>> getBudgetsByCategory(String category) async {
-    // Note: Isar doesn't support text equality in filter, use where query
-    final all = await getAll();
-    return all.where((b) => b.category == category).toList();
+  Future<List<Budget>> getBudgetsByCategory(String category) async {
+    return await (db.select(table)..where((b) => b.category.equals(category))).get();
   }
 
   /// Update the amount spent on a budget
@@ -63,13 +75,15 @@ class BudgetService extends BaseRepository<IsarBudget> {
     final budget = await getById(budgetId);
     if (budget == null) return false;
 
-    budget.spent += amount;
-    budget.updatedAt = DateTime.now();
+    final updatedBudget = budget.copyWith(
+      spent: budget.spent + amount,
+      updatedAt: DateTime.now(),
+    );
 
-    await update(budget);
+    await update(updatedBudget);
 
     // Return false if exceeded to signal alert
-    return budget.spent <= budget.limit;
+    return updatedBudget.spent <= updatedBudget.limit;
   }
 
   /// Set the exact spent amount for a budget
@@ -79,10 +93,7 @@ class BudgetService extends BaseRepository<IsarBudget> {
     final budget = await getById(budgetId);
     if (budget == null) return;
 
-    budget.spent = amount;
-    budget.updatedAt = DateTime.now();
-
-    await update(budget);
+    await update(budget.copyWith(spent: amount, updatedAt: DateTime.now()));
   }
 
   /// Check if budget is exceeded
@@ -110,14 +121,14 @@ class BudgetService extends BaseRepository<IsarBudget> {
 
   /// Get budgets that are over budget
   /// - Returns list of budgets where spent > limit
-  Future<List<IsarBudget>> getOverBudgets() async {
+  Future<List<Budget>> getOverBudgets() async {
     final all = await getAll();
     return all.where((b) => b.spent > b.limit).toList();
   }
 
   /// Get budgets with critical status (80%+ spent)
   /// - Returns list of budgets approaching or exceeding limits
-  Future<List<IsarBudget>> getCriticalBudgets() async {
+  Future<List<Budget>> getCriticalBudgets() async {
     final all = await getAll();
     return all.where((b) => b.percentageUsed >= 0.8).toList();
   }
@@ -140,7 +151,7 @@ class BudgetService extends BaseRepository<IsarBudget> {
   /// - Queries all expenses in the category for the period
   /// - Updates the budget's spent amount
   /// - Useful for syncing after data changes
-  Future<void> recalculateSpent(int budgetId, List<IsarTransaction> transactions) async {
+  Future<void> recalculateSpent(int budgetId, List<Transaction> transactions) async {
     final budget = await getById(budgetId);
     if (budget == null) return;
 
@@ -165,22 +176,37 @@ class BudgetService extends BaseRepository<IsarBudget> {
     final budget = await getById(budgetId);
     if (budget == null) return;
 
-    budget.isActive = false;
-    budget.updatedAt = DateTime.now();
-
-    await update(budget);
+    await update(budget.copyWith(isActive: false, updatedAt: DateTime.now()));
   }
 
   /// Reactivate a budget
-  /// - Marks budget as active again
   Future<void> reactivateBudget(int budgetId) async {
     final budget = await getById(budgetId);
     if (budget == null) return;
 
-    budget.isActive = true;
-    budget.updatedAt = DateTime.now();
+    await update(budget.copyWith(isActive: true, updatedAt: DateTime.now()));
+  }
 
-    await update(budget);
+  /// Get budget summary for the current month
+  /// - Total limit, total spent, and overall percentage
+  Future<Map<String, dynamic>> getCurrentMonthSummary() async {
+    final budgets = await getBudgetsByMonth(DateTime.now());
+
+    double totalLimit = 0;
+    double totalSpent = 0;
+
+    for (final b in budgets) {
+      totalLimit += b.limit;
+      totalSpent += b.spent;
+    }
+
+    return {
+      'totalLimit': totalLimit,
+      'totalSpent': totalSpent,
+      'percentage': totalLimit > 0 ? totalSpent / totalLimit : 0.0,
+      'count': budgets.length,
+      'exceeded': budgets.where((b) => b.spent > b.limit).length,
+    };
   }
 
   /// Reset budget for new period
@@ -190,11 +216,7 @@ class BudgetService extends BaseRepository<IsarBudget> {
     final budget = await getById(budgetId);
     if (budget == null) return;
 
-    budget.spent = 0;
-    budget.month = newMonth;
-    budget.updatedAt = DateTime.now();
-
-    await update(budget);
+    await update(budget.copyWith(spent: 0, month: newMonth, updatedAt: DateTime.now()));
   }
 
   /// Get budget summary statistics

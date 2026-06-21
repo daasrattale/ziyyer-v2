@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/database/isar_database.dart';
-import 'package:ziyyer/models/account.dart';
-import 'package:ziyyer/models/budget.dart';
-import 'package:ziyyer/models/transaction.dart';
+import 'package:ziyyer/database/database.dart';
+import 'package:ziyyer/services/service_locator.dart';
 
 class AppProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = '';
-
-  final _db = IsarDatabase();
 
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
@@ -29,10 +25,22 @@ class AppProvider with ChangeNotifier {
   }
 
   // Account Management
-  Future<int> createAccount(IsarAccount account) async {
+  Future<int> createAccount({
+    required String name,
+    required String accountType,
+    required double balance,
+    required String currency,
+    String? description,
+  }) async {
     try {
       setLoading(true);
-      int id = await _db.createAccount(account);
+      int id = await ServiceLocator.accounts.createAccount(
+        name: name,
+        accountType: accountType,
+        balance: balance,
+        currency: currency,
+        description: description,
+      );
       clearError();
       return id;
     } catch (e) {
@@ -43,10 +51,10 @@ class AppProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateAccount(IsarAccount account) async {
+  Future<void> updateAccount(Account account) async {
     try {
       setLoading(true);
-      await _db.updateAccount(account);
+      await ServiceLocator.accounts.update(account);
       clearError();
     } catch (e) {
       setError('Failed to update account: $e');
@@ -58,9 +66,9 @@ class AppProvider with ChangeNotifier {
   Future<bool> deleteAccount(int id) async {
     try {
       setLoading(true);
-      bool deleted = await _db.deleteAccount(id);
+      int deleted = await ServiceLocator.accounts.delete(id);
       clearError();
-      return deleted;
+      return deleted > 0;
     } catch (e) {
       setError('Failed to delete account: $e');
       return false;
@@ -70,19 +78,35 @@ class AppProvider with ChangeNotifier {
   }
 
   // Reactive Streams
-  Stream<List<IsarAccount>> get accountsStream => _db.watchAllAccounts();
+  Stream<List<Account>> get accountsStream => ServiceLocator.accounts.watchAll();
 
-  Stream<List<IsarTransaction>> getTransactionsStream(int accountId) {
-    return _db.watchTransactionsByAccount(accountId);
+  Stream<List<Transaction>> getTransactionsStream(int accountId) {
+    return ServiceLocator.transactions.watchTransactionsByAccount(accountId);
   }
 
-  Stream<List<IsarBudget>> get budgetsStream => _db.watchActiveBudgets();
+  Stream<List<Budget>> get budgetsStream => ServiceLocator.budgets.watchActiveBudgets();
 
   // Transaction Management
-  Future<int> createTransaction(IsarTransaction transaction) async {
+  Future<int> createTransaction({
+    required int accountId,
+    required String description,
+    required double amount,
+    required String type,
+    required DateTime date,
+    String? category,
+    String? notes,
+  }) async {
     try {
       setLoading(true);
-      int id = await _db.createTransaction(transaction);
+      int id = await ServiceLocator.transactions.createTransaction(
+        accountId: accountId,
+        description: description,
+        amount: amount,
+        type: type,
+        date: date,
+        category: category,
+        notes: notes,
+      );
       clearError();
       return id;
     } catch (e) {
@@ -93,10 +117,10 @@ class AppProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateTransaction(IsarTransaction transaction) async {
+  Future<void> updateTransaction(Transaction transaction) async {
     try {
       setLoading(true);
-      await _db.updateTransaction(transaction);
+      await ServiceLocator.transactions.update(transaction);
       clearError();
     } catch (e) {
       setError('Failed to update transaction: $e');
@@ -108,9 +132,9 @@ class AppProvider with ChangeNotifier {
   Future<bool> deleteTransaction(int id) async {
     try {
       setLoading(true);
-      bool deleted = await _db.deleteTransaction(id);
+      int deleted = await ServiceLocator.transactions.delete(id);
       clearError();
-      return deleted;
+      return deleted > 0;
     } catch (e) {
       setError('Failed to delete transaction: $e');
       return false;
@@ -120,10 +144,18 @@ class AppProvider with ChangeNotifier {
   }
 
   // Budget Management
-  Future<int> createBudget(IsarBudget budget) async {
+  Future<int> createBudget({
+    required String category,
+    required double limit,
+    required String period,
+  }) async {
     try {
       setLoading(true);
-      int id = await _db.createBudget(budget);
+      int id = await ServiceLocator.budgets.createBudget(
+        category: category,
+        limit: limit,
+        period: period,
+      );
       clearError();
       return id;
     } catch (e) {
@@ -134,10 +166,10 @@ class AppProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateBudget(IsarBudget budget) async {
+  Future<void> updateBudget(Budget budget) async {
     try {
       setLoading(true);
-      await _db.updateBudget(budget);
+      await ServiceLocator.budgets.update(budget);
       clearError();
     } catch (e) {
       setError('Failed to update budget: $e');
@@ -149,9 +181,9 @@ class AppProvider with ChangeNotifier {
   Future<bool> deleteBudget(int id) async {
     try {
       setLoading(true);
-      bool deleted = await _db.deleteBudget(id);
+      int deleted = await ServiceLocator.budgets.delete(id);
       clearError();
-      return deleted;
+      return deleted > 0;
     } catch (e) {
       setError('Failed to delete budget: $e');
       return false;
@@ -162,10 +194,10 @@ class AppProvider with ChangeNotifier {
 
   // Analytics
   Future<double> getTotalIncome(int accountId, {DateTime? startDate, DateTime? endDate}) async {
-    return await _db.getTotalIncomeByAccount(accountId, startDate: startDate, endDate: endDate);
+    return await ServiceLocator.transactions.getTotalIncome(accountId, start: startDate, end: endDate);
   }
 
   Future<double> getTotalExpense(int accountId, {DateTime? startDate, DateTime? endDate}) async {
-    return await _db.getTotalExpenseByAccount(accountId, startDate: startDate, endDate: endDate);
+    return await ServiceLocator.transactions.getTotalExpense(accountId, start: startDate, end: endDate);
   }
 }

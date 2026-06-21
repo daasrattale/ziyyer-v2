@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_router.dart';
 import 'package:ziyyer/config/theme.dart';
 import 'package:ziyyer/constants/app_constants.dart';
-import 'package:ziyyer/database/isar_database.dart';
+import 'package:ziyyer/database/database.dart';
 import 'package:ziyyer/services/service_locator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await IsarDatabase.initialize();
-  ServiceLocator.initialize(IsarDatabase.isar);
+  final database = AppDatabase();
+  ServiceLocator.initialize(database);
   runApp(const MyApp());
 }
 

@@ -1,9 +1,14 @@
 #variables:
-#  # Set this to the exact Flutter version you use locally (e.g. 3.44.0).
+#  # Set this to the exact Flutter version you use locally (e.g. 3.24.0).
 #  # Update this value to make CI match your local SDK.
-#  FLUTTER_VERSION: "3.44.0"
+#  FLUTTER_VERSION: "3.24.0"
 
-image: "ghcr.io/cirruslabs/flutter:3.38.4"
+image: "ghcr.io/cirruslabs/flutter:3.24.0"
+
+variables:
+  FLUTTER_VERSION: "3.24.0"
+  PUB_CACHE: "${CI_PROJECT_DIR}/.pub-cache"
+  GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
 
 workflow:
   auto_cancel:
@@ -17,10 +22,22 @@ stages:
   - release
   - publish
 
+cache:
+  key:
+    files:
+      - pubspec.lock
+      - android/build.gradle.kts
+      - android/app/build.gradle.kts
+  paths:
+    - .pub-cache/
+    - .gradle/caches/
+    - .gradle/wrapper/
+
 before_script:
+  - export PATH="$PATH:$PUB_CACHE/bin"
   - flutter --version
-  - flutter doctor -v || true
   - flutter pub get
+  - yes | sdkmanager --licenses || true
 
 # Lint only on feature/feat branches
 lint_feature:
@@ -49,12 +66,14 @@ build:apk:debug:
   stage: build:android
   interruptible: true
   script:
-    - flutter build apk --debug --no-shrink -v
+    - flutter build apk --debug --no-shrink
   artifacts:
     paths:
       - build/app/outputs/flutter-apk/app-debug.apk
     expire_in: 1 week
   rules:
+#    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+#    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - when: never
 
@@ -65,15 +84,7 @@ build:apk:release:
   needs:
     - build:apk:debug
   script:
-    - |
-      # Ensure Android SDK components for API 33 are available in CI
-      if command -v sdkmanager >/dev/null 2>&1; then
-        yes | sdkmanager --licenses || true
-        sdkmanager "platforms;android-33" "build-tools;33.0.2" "platform-tools" || true
-      else
-        echo "sdkmanager not found - assuming CI image has required SDK components"
-      fi
-      flutter build apk --release -v
+    - flutter build apk --release
   artifacts:
     paths:
       - build/app/outputs/flutter-apk/app-release.apk

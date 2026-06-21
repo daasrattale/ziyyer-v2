@@ -129,7 +129,6 @@ changelog:
 
 # Publish the release AAB to GitLab Generic Package Registry and update the release asset
 publish:aab:
-  extends: .flutter_job
   stage: publish
   image: curlimages/curl:latest
   needs:

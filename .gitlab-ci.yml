@@ -6,7 +6,27 @@ variables:
 default:
   interruptible: true
 
+stages:
+  - check
+  - build:android
+  - build:ios
+  - release
+  - publish
+
+# Global cache template for Flutter jobs
+.flutter_cache:
+  cache:
+    key:
+      files:
+        - pubspec.lock
+        - android/build.gradle.kts
+    paths:
+      - .pub-cache/
+      - .gradle/caches/
+      - .gradle/wrapper/
+
 .flutter_job:
+  extends: .flutter_cache
   image: "ghcr.io/cirruslabs/flutter:${FLUTTER_VERSION}"
   before_script:
     - export PATH="$PATH:$PUB_CACHE/bin"
@@ -17,50 +37,40 @@ default:
 workflow:
   auto_cancel:
     on_new_commit: interruptible
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - lib/**/*
+        - test/**/*
+        - pubspec.yaml
+        - pubspec.lock
+        - android/**/*
+        - ios/**/*
+        - .gitlab-ci.yml
+    - if: '$CI_COMMIT_BRANCH == "main"'
 
-stages:
-  - lint
-  - test
-  - build:android
-  - build:ios
-  - release
-  - publish
+# Jobs will explicitly extend .flutter_job or .flutter_cache
 
-cache:
-  key:
-    files:
-      - pubspec.lock
-      - android/build.gradle.kts
-  paths:
-    - .pub-cache/
-    - .gradle/caches/
-    - .gradle/wrapper/
-
-lint:
+check:
   extends: .flutter_job
-  stage: lint
+  stage: check
   script:
     - flutter analyze
+    - flutter test --coverage
+  cache:
+    policy: pull-push
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
     - when: never
 
-# Run tests on pushes and merge request pipelines for all branches
-test:
-  extends: .flutter_job
-  stage: test
-  script:
-    - flutter test --coverage
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - when: never
-
 # Build debug AAB on all branches/pushes and merge requests (except release branches)
 build:aab:debug:
   extends: .flutter_job
   stage: build:android
+  cache:
+    policy: pull
   script:
     - flutter build appbundle --debug
   artifacts:
@@ -76,6 +86,8 @@ build:aab:debug:
 build:aab:release:
   extends: .flutter_job
   stage: build:android
+  cache:
+    policy: pull
   script:
     - flutter build appbundle --release
     - VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
@@ -92,6 +104,8 @@ build:aab:release:
     expire_in: 1 week
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+      when: manual
+      allow_failure: false
     - when: never
 
 # When a release branch is merged into main, create a tag and release notes using
@@ -162,4 +176,3 @@ publish:aab:
            --data "$RELEASE_PAYLOAD"
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
-

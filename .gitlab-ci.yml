@@ -37,7 +37,7 @@ cache:
     - .gradle/wrapper/
 
 # Lint only on feature/feat branches
-lint_feature:
+lint:
   extends: .flutter_job
   stage: lint
   script:

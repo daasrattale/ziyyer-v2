@@ -168,7 +168,7 @@ class _CategoryItem extends StatelessWidget {
                       Container(
                         height: 6,
                         width: double.infinity,
-                        decoration: BoxDecoration(color: AppColors.divider(context).withOpacity(0.5), borderRadius: BorderRadius.circular(3.0)),
+                        decoration: BoxDecoration(color: AppColors.divider(context).withValues(alpha: 0.5), borderRadius: BorderRadius.circular(3.0)),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: progress,
@@ -189,7 +189,7 @@ class _CategoryItem extends StatelessWidget {
               height: 1,
               indent: 76, // Align with the start of the text
               endIndent: 20,
-              color: AppColors.divider(context).withOpacity(0.5),
+              color: AppColors.divider(context).withValues(alpha: 0.5),
             ),
         ],
       ),

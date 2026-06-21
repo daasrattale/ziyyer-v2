@@ -30,7 +30,7 @@ class TotalBalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.accentColor(context),
         borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-        boxShadow: [BoxShadow(color: const Color(0xFF233253).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 10))],
+        boxShadow: [BoxShadow(color: const Color(0xFF233253).withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

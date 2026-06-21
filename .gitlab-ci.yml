@@ -3,7 +3,16 @@ variables:
   PUB_CACHE: "${CI_PROJECT_DIR}/.pub-cache"
   GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
 
-image: "ghcr.io/cirruslabs/flutter:${FLUTTER_VERSION}"
+default:
+  interruptible: true
+
+.flutter_job:
+  image: "ghcr.io/cirruslabs/flutter:${FLUTTER_VERSION}"
+  before_script:
+    - export PATH="$PATH:$PUB_CACHE/bin"
+    - flutter --version
+    - flutter pub get
+    - yes | sdkmanager --licenses || true
 
 workflow:
   auto_cancel:
@@ -27,16 +36,10 @@ cache:
     - .gradle/caches/
     - .gradle/wrapper/
 
-before_script:
-  - export PATH="$PATH:$PUB_CACHE/bin"
-  - flutter --version
-  - flutter pub get
-  - yes | sdkmanager --licenses || true
-
 # Lint only on feature/feat branches
 lint_feature:
+  extends: .flutter_job
   stage: lint
-  interruptible: true
   script:
     - flutter analyze
   rules:
@@ -47,8 +50,8 @@ lint_feature:
 
 # Run tests on pushes and merge request pipelines for all branches
 test:
+  extends: .flutter_job
   stage: test
-  interruptible: true
   script:
     - flutter test --coverage
   rules:
@@ -57,8 +60,8 @@ test:
 
 # Build debug APK on all branches/pushes and merge requests (except release branches)
 build:apk:debug:
+  extends: .flutter_job
   stage: build:android
-  interruptible: true
   script:
     - flutter build apk --debug --no-shrink
   artifacts:
@@ -72,11 +75,15 @@ build:apk:debug:
 
 # Build release APK only on release branches
 build:apk:release:
+  extends: .flutter_job
   stage: build:android
-  interruptible: true
   script:
     - flutter build apk --release
+    - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    - echo "VERSION=$VERSION" >> build.env
   artifacts:
+    reports:
+      dotenv: build.env
     paths:
       - build/app/outputs/flutter-apk/app-release.apk
     expire_in: 1 week
@@ -91,6 +98,7 @@ changelog:
   stage: release
   interruptible: true
   image: curlimages/curl:latest
+  before_script: []
   variables:
     GIT_STRATEGY: fetch
   script:
@@ -115,54 +123,39 @@ changelog:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
-# Publish the release APK to GitLab Releases (upload + attach as release asset)
+# Publish the release APK to GitLab Generic Package Registry and update the release asset
 publish:apk:
   stage: publish
-  interruptible: true
-  image: alpine:3.18
+  image: curlimages/curl:latest
   needs:
     - job: build:apk:release
       artifacts: true
   variables:
     APK_PATH: "build/app/outputs/flutter-apk/app-release.apk"
-  script: |
-    set -euo pipefail
-    apk add --no-cache curl jq bash
-    if [ ! -f "$APK_PATH" ]; then
-      echo "Release APK not found at $APK_PATH"
-      exit 1
-    fi
-    echo "Uploading $APK_PATH to GitLab uploads API..."
-    UPLOAD_JSON=$(curl --silent --show-error --request POST --form "file=@${APK_PATH}" --header "JOB-TOKEN: $CI_JOB_TOKEN" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/uploads")
-    echo "Upload response: $UPLOAD_JSON"
-    UPLOAD_URL=$(echo "$UPLOAD_JSON" | jq -r .url)
-    if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
-      echo "Upload failed or returned no url"
-      exit 1
-    fi
-    ASSET_URL="${CI_PROJECT_URL}${UPLOAD_URL}"
-    echo "Asset available at: $ASSET_URL"
-    VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
-    TAG="v${VERSION}"
-    echo "Creating release ${TAG} (or updating if exists)"
-    CREATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","ref":"%s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
-    echo "Release payload: $CREATE_JSON"
-    # Try to create the release; capture HTTP status and response body
-    HTTP_STATUS=$(curl -s -w "%{http_code}" -o create_response.json --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases" \
-      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-      --header "Content-Type: application/json" \
-      --data "$CREATE_JSON" || true)
-    if [ "$HTTP_STATUS" = "201" ]; then
-      echo "Release created."
-      cat create_response.json
-      exit 0
-    fi
-    echo "Create returned status $HTTP_STATUS, attempting to update existing release..."
-    UPDATE_JSON=$(printf '{"name":"Release %s","tag_name":"%s","description":"Automated release for %s","assets":{"links":[{"name":"apk-%s","url":"%s"}]}}' "$VERSION" "$TAG" "$VERSION" "$VERSION" "$ASSET_URL")
-    curl --request PUT "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases/$TAG" \
-      --header "JOB-TOKEN: $CI_JOB_TOKEN" \
-      --header "Content-Type: application/json" \
-      --data "$UPDATE_JSON" || true
+    PACKAGE_NAME: "ziyyer-apk"
+  script:
+    - echo "Publishing version $VERSION"
+    - |
+      # Upload APK to GitLab Generic Package Registry
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --upload-file "${APK_PATH}" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.apk"
+    - |
+      # Create or Update Release with the asset link using GitLab Release CLI or API
+      # We use the API via curl for simplicity here since we already have curl in the image
+      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/app-release.apk"
+      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"apk-%s","url":"%s","link_type":"package"}]}}' \
+        "$VERSION" "$VERSION" "$VERSION" "$CI_COMMIT_SHA" "$VERSION" "$ASSET_URL")
+      
+      echo "Creating/Updating release v$VERSION..."
+      curl --request POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases" \
+           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --header "Content-Type: application/json" \
+           --data "$RELEASE_PAYLOAD" || \
+      curl --request PUT "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/v${VERSION}" \
+           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --header "Content-Type: application/json" \
+           --data "$RELEASE_PAYLOAD"
   rules:
     - if: '$CI_COMMIT_TAG'
     - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'

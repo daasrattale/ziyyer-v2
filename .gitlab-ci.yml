@@ -66,8 +66,8 @@ build:apk:debug:
       - build/app/outputs/flutter-apk/app-debug.apk
     expire_in: 1 week
   rules:
-#    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
-#    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - when: never
 

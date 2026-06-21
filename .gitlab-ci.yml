@@ -15,6 +15,7 @@ stages:
   - build:android
   - build:ios
   - release
+  - publish
 
 before_script:
   - flutter --version
@@ -104,8 +105,8 @@ changelog:
     - if: '$CI_COMMIT_BRANCH == "main"'
 
 # Publish the release APK to GitLab Releases (upload + attach as release asset)
-publish_release_apk:
-  stage: release
+publish:apk:
+  stage: publish
   interruptible: true
   image: alpine:3.18
   needs:

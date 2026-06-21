@@ -3,7 +3,7 @@
 #  # Update this value to make CI match your local SDK.
 #  FLUTTER_VERSION: "3.44.0"
 
-image: "cirrusci/flutter:3.38.4"
+image: "ghcr.io/cirruslabs/flutter:3.38.4"
 
 workflow:
   auto_cancel:

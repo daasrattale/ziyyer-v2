@@ -45,7 +45,7 @@ lint_feature:
   rules:
     - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
     - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
-#    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/' todo: consider linting release branches too
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
     - when: never
 
 # Run tests on pushes and merge request pipelines for all branches

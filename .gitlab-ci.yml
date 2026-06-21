@@ -3,12 +3,12 @@
 #  # Update this value to make CI match your local SDK.
 #  FLUTTER_VERSION: "3.24.0"
 
-image: "ghcr.io/cirruslabs/flutter:3.24.0"
-
 variables:
   FLUTTER_VERSION: "3.24.0"
   PUB_CACHE: "${CI_PROJECT_DIR}/.pub-cache"
   GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
+
+image: "ghcr.io/cirruslabs/flutter:${FLUTTER_VERSION}"
 
 workflow:
   auto_cancel:
@@ -27,7 +27,6 @@ cache:
     files:
       - pubspec.lock
       - android/build.gradle.kts
-      - android/app/build.gradle.kts
   paths:
     - .pub-cache/
     - .gradle/caches/

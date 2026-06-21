@@ -55,7 +55,7 @@ test:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - when: never
 
-# Build debug APK on all branches/pushes and merge requests
+# Build debug APK on all branches/pushes and merge requests (except release branches)
 build:apk:debug:
   stage: build:android
   interruptible: true
@@ -66,17 +66,15 @@ build:apk:debug:
       - build/app/outputs/flutter-apk/app-debug.apk
     expire_in: 1 week
   rules:
-    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
-    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+    - when: never
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
     - when: never
 
 # Build release APK only on release branches
 build:apk:release:
   stage: build:android
   interruptible: true
-  needs:
-    - build:apk:debug
   script:
     - flutter build apk --release
   artifacts:

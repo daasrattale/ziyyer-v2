@@ -57,8 +57,23 @@ tasks.register("copyDebugApk") {
     }
 }
 
+tasks.register("copyReleaseApk") {
+    doLast {
+        val src = file("$buildDir/outputs/flutter-apk/app-release.apk")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/flutter-apk")
+        destDir.mkdirs()
+        copy {
+            from(src)
+            into(destDir)
+        }
+    }
+}
+
 afterEvaluate {
     tasks.matching { it.name == "assembleDebug" }.configureEach {
         finalizedBy(tasks.named("copyDebugApk"))
+    }
+    tasks.matching { it.name == "assembleRelease" }.configureEach {
+        finalizedBy(tasks.named("copyReleaseApk"))
     }
 }

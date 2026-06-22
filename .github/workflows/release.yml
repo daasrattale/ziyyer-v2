@@ -1,114 +1,146 @@
-name: Release Pipeline
+name: Flutter Release
 
 on:
   push:
     branches:
-      - release/*
+      - 'release/**'
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/flutter.yml'
 
-permissions:
-  contents: write
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
+
+env:
+  FLUTTER_VERSION: "3.38.4"
+  PUB_CACHE: ${{ github.workspace }}/.pub-cache
+  GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+
+concurrency:
+  group: flutter-release-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build-and-release:
-    name: Build and Release
+  build_release_aab:
+    name: Build release AAB
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.version.outputs.version }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+
+      - name: Rename AAB
+        run: |
+          mkdir -p release-artifacts
+          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
+
+      - name: Upload release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.version.outputs.filename }}
+          path: release-artifacts/${{ steps.version.outputs.filename }}
+          retention-days: 7
+
+  create_tag_and_release:
+    name: Create tag and GitHub release
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      - name: Checkout merged commit
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
-      - name: Extract version from branch
+      - name: Extract version from pubspec
         id: version
+        shell: bash
         run: |
-          BRANCH_NAME=${GITHUB_REF##*/}
-          VERSION=${BRANCH_NAME#release/}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Release version: $VERSION"
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.version }}" "${{ github.event.pull_request.merge_commit_sha }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Create GitHub release with generated notes
+        uses: softprops/action-gh-release@v2
         with:
-          flutter-version: "3.10.3"
-          channel: "stable"
-          cache: true
-
-      - name: Force Flutter upgrade and verify version
-        run: |
-          flutter upgrade
-          flutter --version
-          dart --version
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build Android APK
-        run: flutter build apk --release
-
-      - name: Build iOS
-        run: flutter build ios --release --no-codesign
-
-      - name: Install git-cliff
-        run: |
-          curl -L https://github.com/orhun/git-cliff/releases/download/v0.13.0/git-cliff-v0.13.0-x86_64-unknown-linux-gnu.tar.gz | tar xz
-          sudo mv git-cliff /usr/local/bin/
-
-      - name: Generate changelog
-        run: |
-          git-cliff --tag ${{ steps.version.outputs.version }} > CHANGELOG_RELEASE.md
-
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          bodyFile: CHANGELOG_RELEASE.md
-          artifacts: build/app/outputs/apk/release/app-release.apk
-          makeLatest: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  build-ios-ipa:
-    name: Build iOS IPA
-    runs-on: macos-latest
-    needs: build-and-release
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.10.3"
-          channel: "stable"
-          cache: true
-
-      - name: Force Flutter upgrade and verify version
-        run: |
-          flutter upgrade
-          flutter --version
-          dart --version
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build iOS
-        run: flutter build ios --release
-
-      - name: Create iOS IPA
-        run: |
-          mkdir -p Payload
-          cp -r build/ios/iphoneos/Runner.app Payload/
-          zip -r app-release.ipa Payload/
-          rm -rf Payload
-
-      - name: Upload iOS IPA to Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ needs.build-and-release.outputs.version }}
-          artifacts: app-release.ipa
-          allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version_full }}
+          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
+          generate_release_notes: true

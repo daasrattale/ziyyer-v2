@@ -42,3 +42,38 @@ android {
 flutter {
     source = "../.."
 }
+
+// Ensure Flutter tooling can find the produced artifacts by copying them
+// into the root `build/app/outputs/...` location after build.
+tasks.register("copyDebugAab") {
+    doLast {
+        val src = file("$buildDir/outputs/bundle/debug/app-debug.aab")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/bundle/debug")
+        destDir.mkdirs()
+        copy {
+            from(src)
+            into(destDir)
+        }
+    }
+}
+
+tasks.register("copyReleaseAab") {
+    doLast {
+        val src = file("$buildDir/outputs/bundle/release/app-release.aab")
+        val destDir = File(rootProject.projectDir.parentFile, "build/app/outputs/bundle/release")
+        destDir.mkdirs()
+        copy {
+            from(src)
+            into(destDir)
+        }
+    }
+}
+
+afterEvaluate {
+    tasks.matching { it.name == "bundleDebug" }.configureEach {
+        finalizedBy(tasks.named("copyDebugAab"))
+    }
+    tasks.matching { it.name == "bundleRelease" }.configureEach {
+        finalizedBy(tasks.named("copyReleaseAab"))
+    }
+}

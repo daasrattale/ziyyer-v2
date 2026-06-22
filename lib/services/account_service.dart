@@ -1,24 +1,25 @@
-import 'package:isar/isar.dart';
+import 'package:drift/drift.dart';
 
 import '../database/base_repository.dart';
-import '../models/account.dart';
+import '../database/database.dart';
+import '../models/account_table.dart';
 
 /// Account Service: Business logic for account management
 ///
 /// Singleton service that handles account operations and account-related queries.
 /// Provides methods for account management beyond basic CRUD.
-class AccountService extends BaseRepository<IsarAccount> {
+class AccountService extends BaseRepository<Accounts, Account> {
   static final AccountService _instance = AccountService._internal();
 
-  factory AccountService(Isar isar) {
-    _instance.setIsar(isar);
+  factory AccountService(AppDatabase db) {
+    _instance.setDatabase(db);
     return _instance;
   }
 
   AccountService._internal() : super();
 
   @override
-  IsarCollection<IsarAccount> get collection => isar.isarAccounts;
+  TableInfo<Accounts, Account> get table => db.accounts;
 
   /// Create a new account
   /// - Validates account name is unique
@@ -30,39 +31,37 @@ class AccountService extends BaseRepository<IsarAccount> {
     required String currency,
     String? description,
   }) async {
-    final account = IsarAccount(
+    final account = AccountsCompanion.insert(
       name: name,
       accountType: accountType,
       balance: balance,
       currency: currency,
       initialBalance: balance,
-      description: description,
-      isActive: true,
+      description: Value(description),
+      isActive: const Value(true),
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
     return await create(account);
   }
 
   /// Get account by exact name (unique)
   /// - Returns null if not found
-  Future<IsarAccount?> getByName(String name) async {
-    final accounts = await getAll();
-    try {
-      return accounts.firstWhere((a) => a.name == name);
-    } catch (e) {
-      return null;
-    }
+  Future<Account?> getByName(String name) async {
+    final query = db.select(table)..where((a) => a.name.equals(name));
+    return await query.getSingleOrNull();
   }
 
   /// Get all active accounts
-  Stream<List<IsarAccount>> watchActiveAccounts() {
-    return isar.isarAccounts.where().filter().isActiveEqualTo(true).watch(fireImmediately: true);
+  Stream<List<Account>> watchActiveAccounts() {
+    return (db.select(table)..where((a) => a.isActive.equals(true))).watch();
   }
 
   /// Get all accounts of a specific type
   /// - Example: 'savings', 'checking', 'credit_card'
-  Future<List<IsarAccount>> getAccountsByType(String accountType) async {
-    final accounts = await getAll();
-    return accounts.where((a) => a.accountType == accountType).toList();
+  Future<List<Account>> getAccountsByType(String accountType) async {
+    final query = db.select(table)..where((a) => a.accountType.equals(accountType));
+    return await query.get();
   }
 
   /// Update account balance
@@ -71,10 +70,7 @@ class AccountService extends BaseRepository<IsarAccount> {
     final account = await getById(accountId);
     if (account == null) return;
 
-    account.balance = newBalance;
-    account.updatedAt = DateTime.now();
-
-    await update(account);
+    await update(account.copyWith(balance: newBalance, updatedAt: DateTime.now()));
   }
 
   /// Add to account balance
@@ -83,10 +79,7 @@ class AccountService extends BaseRepository<IsarAccount> {
     final account = await getById(accountId);
     if (account == null) return;
 
-    account.balance += amount;
-    account.updatedAt = DateTime.now();
-
-    await update(account);
+    await update(account.copyWith(balance: account.balance + amount, updatedAt: DateTime.now()));
   }
 
   /// Subtract from account balance
@@ -95,10 +88,7 @@ class AccountService extends BaseRepository<IsarAccount> {
     final account = await getById(accountId);
     if (account == null) return;
 
-    account.balance -= amount;
-    account.updatedAt = DateTime.now();
-
-    await update(account);
+    await update(account.copyWith(balance: account.balance - amount, updatedAt: DateTime.now()));
   }
 
   /// Get total balance across all active accounts
@@ -121,10 +111,7 @@ class AccountService extends BaseRepository<IsarAccount> {
     final account = await getById(accountId);
     if (account == null) return;
 
-    account.isActive = false;
-    account.updatedAt = DateTime.now();
-
-    await update(account);
+    await update(account.copyWith(isActive: false, updatedAt: DateTime.now()));
   }
 
   /// Reactivate an account
@@ -132,10 +119,7 @@ class AccountService extends BaseRepository<IsarAccount> {
     final account = await getById(accountId);
     if (account == null) return;
 
-    account.isActive = true;
-    account.updatedAt = DateTime.now();
-
-    await update(account);
+    await update(account.copyWith(isActive: true, updatedAt: DateTime.now()));
   }
 
   /// Get account summary statistics
@@ -148,7 +132,7 @@ class AccountService extends BaseRepository<IsarAccount> {
   }
 
   /// Group accounts by type for summary
-  Map<String, double> _groupByType(List<IsarAccount> accounts) {
+  Map<String, double> _groupByType(List<Account> accounts) {
     final grouped = <String, double>{};
     for (final account in accounts) {
       grouped[account.accountType] = (grouped[account.accountType] ?? 0) + account.balance;
@@ -156,3 +140,4 @@ class AccountService extends BaseRepository<IsarAccount> {
     return grouped;
   }
 }
+

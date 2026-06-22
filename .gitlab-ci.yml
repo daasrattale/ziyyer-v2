@@ -1,0 +1,178 @@
+variables:
+  FLUTTER_VERSION: "3.38.4"
+  PUB_CACHE: "${CI_PROJECT_DIR}/.pub-cache"
+  GRADLE_USER_HOME: "${CI_PROJECT_DIR}/.gradle"
+
+default:
+  interruptible: true
+
+stages:
+  - check
+  - build:android
+  - build:ios
+  - release
+  - publish
+
+# Global cache template for Flutter jobs
+.flutter_cache:
+  cache:
+    key:
+      files:
+        - pubspec.lock
+        - android/build.gradle.kts
+    paths:
+      - .pub-cache/
+      - .gradle/caches/
+      - .gradle/wrapper/
+
+.flutter_job:
+  extends: .flutter_cache
+  image: "ghcr.io/cirruslabs/flutter:${FLUTTER_VERSION}"
+  before_script:
+    - export PATH="$PATH:$PUB_CACHE/bin"
+    - flutter --version
+    - flutter pub get
+    - yes | sdkmanager --licenses || true
+
+workflow:
+  auto_cancel:
+    on_new_commit: interruptible
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - lib/**/*
+        - test/**/*
+        - pubspec.yaml
+        - pubspec.lock
+        - android/**/*
+        - ios/**/*
+        - .gitlab-ci.yml
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Jobs will explicitly extend .flutter_job or .flutter_cache
+
+check:
+  extends: .flutter_job
+  stage: check
+  script:
+    - flutter analyze
+    - flutter test --coverage
+  cache:
+    policy: pull-push
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+    - when: never
+
+# Build debug AAB on all branches/pushes and merge requests (except release branches)
+build:aab:debug:
+  extends: .flutter_job
+  stage: build:android
+  cache:
+    policy: pull
+  script:
+    - flutter build appbundle --debug
+  artifacts:
+    paths:
+      - build/app/outputs/bundle/debug/app-debug.aab
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^feature\/.*$/'
+    - if: '$CI_COMMIT_BRANCH =~ /^feat\/.*$/'
+    - when: never
+
+# Build release AAB only on release branches
+build:aab:release:
+  extends: .flutter_job
+  stage: build:android
+  cache:
+    policy: pull
+  script:
+    - flutter build appbundle --release
+    - VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+    - VERSION=$(echo $VERSION_FULL | cut -d'+' -f1)
+    - BUILD_NUMBER=$(echo $VERSION_FULL | cut -d'+' -f2)
+    - echo "VERSION=$VERSION" >> build.env
+    - echo "BUILD_NUMBER=$BUILD_NUMBER" >> build.env
+    - echo "VERSION_FULL=$VERSION_FULL" >> build.env
+  artifacts:
+    reports:
+      dotenv: build.env
+    paths:
+      - build/app/outputs/bundle/release/app-release.aab
+    expire_in: 1 week
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'
+      when: manual
+      allow_failure: false
+    - when: never
+
+# When a release branch is merged into main, create a tag and release notes using
+# the GitLab Releases API. This job runs on pushes to `main` where the commit
+# message contains a merge from a `release/` branch.
+changelog:
+  stage: release
+  interruptible: true
+  image: curlimages/curl:latest
+  before_script: []
+  variables:
+    GIT_STRATEGY: fetch
+  script:
+    - echo "Checking commit message for release merge..."
+    - >
+      if [[ "$CI_COMMIT_BRANCH" == "main" && "$CI_COMMIT_MESSAGE" =~ Merge.*release/ ]]; then
+        echo "Detected release merge"
+      else
+        echo "Not a release merge - skipping"
+        exit 0
+      fi
+    - VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+    - 'echo "Creating release for version: $VERSION"'
+    - >
+      RELEASE_DATA=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s"}' \
+      "$VERSION" "$VERSION" "$VERSION" "$CI_COMMIT_SHA")
+    - >
+      curl --request POST "$CI_API_V4_URL/projects/$CI_PROJECT_ID/releases"
+      --header "JOB-TOKEN: $CI_JOB_TOKEN"
+      --header "Content-Type: application/json"
+      --data "$RELEASE_DATA"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Publish the release AAB to GitLab Generic Package Registry and update the release asset
+publish:aab:
+  stage: publish
+  image: curlimages/curl:latest
+  needs:
+    - job: build:aab:release
+      artifacts: true
+  variables:
+    AAB_PATH: "build/app/outputs/bundle/release/app-release.aab"
+    PACKAGE_NAME: "ziyyer-aab"
+  script:
+    - echo "Publishing version $VERSION_FULL"
+    - FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+    - |
+      # Upload AAB to GitLab Generic Package Registry
+      curl --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --upload-file "${AAB_PATH}" \
+           "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/$FILENAME"
+    - |
+      # Create or Update Release with the asset link using GitLab Release CLI or API
+      # We use the API via curl for simplicity here since we already have curl in the image
+      ASSET_URL="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/generic/${PACKAGE_NAME}/${VERSION}/$FILENAME"
+      RELEASE_PAYLOAD=$(printf '{"name":"Release %s","tag_name":"v%s","description":"Automated release for v%s","ref":"%s","assets":{"links":[{"name":"%s","url":"%s","link_type":"package"}]}}' \
+        "$VERSION_FULL" "$VERSION" "$VERSION_FULL" "$CI_COMMIT_SHA" "$FILENAME" "$ASSET_URL")
+      
+      echo "Creating/Updating release v$VERSION..."
+      curl --request POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases" \
+           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --header "Content-Type: application/json" \
+           --data "$RELEASE_PAYLOAD" || \
+      curl --request PUT "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/v${VERSION}" \
+           --header "JOB-TOKEN: $CI_JOB_TOKEN" \
+           --header "Content-Type: application/json" \
+           --data "$RELEASE_PAYLOAD"
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /^release\/.*$/'

@@ -9,9 +9,9 @@ class AppColors {
   AppColors._();
 
   // Brand / Accent
-  static const accent = Color(0xFF4169E1); // Royal Blue
-  static const accentDark = Color(0xFF1E40AF); // Dark Royal Blue
-  static const accentLight = Color(0xFF60A5FA); // Light Royal Blue
+  static const accent = Color(0xFF60A5FA); // Royal Blue
+  static const accentDark = Color.fromARGB(255, 68, 207, 203); // Dark Royal Blue
+  static const accentLight = Color.fromARGB(255, 61, 187, 183); // Light Royal Blue
 
   // Balance card gradient
   static const gradientStart = Color(0xFF00C9A7);
@@ -44,6 +44,47 @@ class AppColors {
   static const lightTextSecondary = Color(0xFF5A6478);
   static const lightTextHint = Color(0xFF9AA3B2);
   static const lightNavBarBg = Color(0xFFFFFFFF);
+
+  // ── Theme-aware color getters ────────
+  static Color getColor(BuildContext context, {required Color light, required Color dark}) {
+    final brightness = Theme.of(context).brightness;
+    return brightness == Brightness.dark ? dark : light;
+  }
+
+  static Color background(BuildContext context) => getColor(context, light: lightBackground, dark: darkBackground);
+
+  static Color surface(BuildContext context) => getColor(context, light: lightSurface, dark: darkSurface);
+
+  static Color card(BuildContext context) => getColor(context, light: lightCard, dark: darkCard);
+
+  static Color cardAlt(BuildContext context) => getColor(context, light: lightCardAlt, dark: darkCardAlt);
+
+  static Color divider(BuildContext context) => getColor(context, light: lightDivider, dark: darkDivider);
+
+  static Color textPrimary(BuildContext context) => getColor(context, light: lightTextPrimary, dark: darkTextPrimary);
+
+  static Color textSecondary(BuildContext context) => getColor(context, light: lightTextSecondary, dark: darkTextSecondary);
+
+  static Color textHint(BuildContext context) => getColor(context, light: lightTextHint, dark: darkTextHint);
+
+  static Color navBarBg(BuildContext context) => getColor(context, light: lightNavBarBg, dark: darkNavBarBg);
+
+  // ── App-specific colors ───────────────
+  static Color accentColor(BuildContext context) => getColor(context, light: accentLight, dark: accentDark);
+
+  static Color accentLightColor(BuildContext context) => accentLight; // Same in both themes
+
+  static Color incomeColor(BuildContext context) => income; // Semantic colors stay the same
+
+  static Color expenseColor(BuildContext context) => expense; // Semantic colors stay the same
+
+  static Color warningColor(BuildContext context) => warning; // Semantic colors stay the same
+
+  static Color infoColor(BuildContext context) => info; // Semantic colors stay the same
+
+  static Color gradientStartColor(BuildContext context) => gradientStart; // Same in both themes
+
+  static Color gradientEndColor(BuildContext context) => gradientEnd; // Same in both themes
 }
 
 // ─────────────────────────────────────────

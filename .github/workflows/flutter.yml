@@ -1,0 +1,79 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'feat/**'
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/flutter.yml'
+      - '.github/workflows/release.yml'
+
+env:
+  FLUTTER_VERSION: "3.38.4"
+  PUB_CACHE: ${{ github.workspace }}/.pub-cache
+  GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+
+concurrency:
+  group: flutter-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test with coverage
+        run: flutter test --coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          retention-days: 7

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'release/**'
-      - main
     paths:
       - 'lib/**'
       - 'test/**'
@@ -14,10 +13,16 @@ on:
       - 'ios/**'
       - '.github/workflows/release.yml'
       - '.github/workflows/flutter.yml'
+      - '.github/actions/flutter-setup/action.yml'
 
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
     paths:
       - 'lib/**'
       - 'test/**'
@@ -27,6 +32,7 @@ on:
       - 'ios/**'
       - '.github/workflows/release.yml'
       - '.github/workflows/flutter.yml'
+      - '.github/actions/flutter-setup/action.yml'
 
 env:
   FLUTTER_VERSION: "3.38.4"
@@ -34,28 +40,48 @@ env:
   GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
 concurrency:
-  group: flutter-release-${{ github.ref }}
+  group: flutter-release-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  bump_build_number:
-    name: Bump pubspec build number
+  validate_release_pr:
+    name: Validate release PR
     if: |
-      startsWith(github.ref_name, 'release/') &&
-      github.actor != 'github-actions[bot]' &&
-      !contains(github.event.head_commit.message, '[skip ci]')
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      version: ${{ steps.bump.outputs.version }}
-      build_number: ${{ steps.bump.outputs.build_number }}
-      version_full: ${{ steps.bump.outputs.version_full }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
         with:
-          fetch-depth: 0
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
+  build_release_aab:
+    name: Build AAB on release branch
+    if: github.event_name == 'push' && startsWith(github.ref_name, 'release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Bump build number in pubspec.yaml
         id: bump
@@ -66,130 +92,76 @@ jobs:
           BUILD=$(echo "$CURRENT" | cut -d'+' -f2)
           NEW_BUILD=$((BUILD + 1))
           NEW_VERSION_FULL="${VERSION}+${NEW_BUILD}"
-
           sed -i "s/^version: .*/version: ${NEW_VERSION_FULL}/" pubspec.yaml
-
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$NEW_BUILD" >> "$GITHUB_OUTPUT"
           echo "version_full=$NEW_VERSION_FULL" >> "$GITHUB_OUTPUT"
+          echo "filename=ziyyer-${VERSION}+${NEW_BUILD}.aab" >> "$GITHUB_OUTPUT"
+          echo "tag_name=build-v${VERSION}" >> "$GITHUB_OUTPUT"
 
-      - name: Commit and push updated pubspec
+      - name: Commit bumped pubspec
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pubspec.yaml
           git diff --cached --quiet && exit 0
-          git commit -m "chore: bump build number"
+          git commit -m "chore: bump build number for release"
           git push origin HEAD:${{ github.ref_name }}
 
-  build_release_aab:
-    name: Build AAB on release branch
-    needs: bump_build_number
-    if: |
-      startsWith(github.ref_name, 'release/')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      version_full: ${{ steps.version.outputs.version_full }}
-      build_number: ${{ steps.version.outputs.build_number }}
-      filename: ${{ steps.version.outputs.filename }}
-      tag_name: ${{ steps.version.outputs.tag_name }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
       - name: Build release AAB
         run: flutter build appbundle --release
 
-      - name: Extract version info
-        id: version
-        shell: bash
-        run: |
-          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
-          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
-          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
-          TAG_NAME="build-v${VERSION}"
-
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
-          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
-          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
-
-      - name: Prepare release asset
+      - name: Prepare asset
         run: |
           mkdir -p release-artifacts
-          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
+          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.bump.outputs.filename }}"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.version.outputs.filename }}
-          path: release-artifacts/${{ steps.version.outputs.filename }}
+          name: ${{ steps.bump.outputs.filename }}
+          path: release-artifacts/${{ steps.bump.outputs.filename }}
           retention-days: 7
 
-      - name: Create or update prerelease with AAB
+      - name: Create or update draft prerelease
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.tag_name }}
-          name: Release build ${{ steps.version.outputs.version_full }}
+          tag_name: ${{ steps.bump.outputs.tag_name }}
+          name: Release build ${{ steps.bump.outputs.version_full }}
           body: |
             Automated release-branch build for `${{ github.ref_name }}`.
-            Contains Android AAB for version `${{ steps.version.outputs.version_full }}`.
+            Contains Android AAB for version `${{ steps.bump.outputs.version_full }}`.
           draft: true
           prerelease: true
           target_commitish: ${{ github.sha }}
           files: |
-            release-artifacts/${{ steps.version.outputs.filename }}
+            release-artifacts/${{ steps.bump.outputs.filename }}
 
   create_tag_and_release:
     name: Create final tag and GitHub release
     if: |
-      github.ref_name == 'main' &&
-      contains(github.event.head_commit.message, 'release/')
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: read
+
     steps:
-      - name: Checkout
+      - name: Checkout merged commit
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
       - name: Extract version from pubspec
@@ -199,7 +171,6 @@ jobs:
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
           FILENAME="ziyyer-${VERSION_FULL}.aab"
-
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
           echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
@@ -209,39 +180,16 @@ jobs:
         run: |
           if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
             echo "Tag already exists"
-            exit 0
+          else
+            git tag "v${{ steps.version.outputs.version }}"
+            git push origin "v${{ steps.version.outputs.version }}"
           fi
-          git tag "v${{ steps.version.outputs.version }}"
-          git push origin "v${{ steps.version.outputs.version }}"
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
       - name: Build final release AAB
         run: flutter build appbundle --release
@@ -259,52 +207,3 @@ jobs:
           generate_release_notes: true
           files: |
             release-artifacts/${{ steps.version.outputs.filename }}
-  validate_release_pr:
-    name: Validate release PR
-    if: |
-      github.event_name == 'pull_request' &&
-      github.event.pull_request.base.ref == 'main' &&
-      startsWith(github.event.pull_request.head.ref, 'release/')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Analyze
-        run: flutter analyze
-
-      - name: Test
-        run: flutter test
-
-      - name: Build release AAB
-        run: flutter build appbundle --release

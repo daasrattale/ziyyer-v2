@@ -1,0 +1,46 @@
+name: Flutter setup
+description: Setup Java, Flutter, Gradle cache, and dependencies
+
+inputs:
+  flutter-version:
+    required: true
+  gradle-user-home:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: stable
+        cache: true
+
+    - name: Cache Gradle
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ inputs.gradle-user-home }}/caches
+          ${{ inputs.gradle-user-home }}/wrapper
+        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
+        restore-keys: |
+          gradle-${{ runner.os }}-
+
+    - name: Flutter version
+      shell: bash
+      run: flutter --version
+
+    - name: Install dependencies
+      shell: bash
+      run: flutter pub get
+
+    - name: Accept Android licenses
+      shell: bash
+      run: yes | sdkmanager --licenses || true

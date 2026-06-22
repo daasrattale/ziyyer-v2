@@ -13,12 +13,26 @@ on:
       - 'ios/**'
       - '.github/workflows/release.yml'
       - '.github/workflows/flutter.yml'
+      - '.github/actions/flutter-setup/action.yml'
 
   pull_request:
     branches:
       - main
     types:
+      - opened
+      - synchronize
+      - reopened
       - closed
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/flutter.yml'
+      - '.github/actions/flutter-setup/action.yml'
 
 env:
   FLUTTER_VERSION: "3.38.4"
@@ -26,84 +40,123 @@ env:
   GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
 concurrency:
-  group: flutter-release-${{ github.ref }}
+  group: flutter-release-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build_release_aab:
-    name: Build release AAB
-    if: github.event_name == 'push'
+  validate_release_pr:
+    name: Validate release PR
+    if: |
+      github.event_name == 'pull_request' &&
+      github.event.action != 'closed' &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Build release AAB
-        run: flutter build appbundle --release
-
-      - name: Extract version
+      - name: Extract version info
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
-          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
-          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
 
-      - name: Rename AAB
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Build release AAB
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
+
+  build_release_aab:
+    name: Build AAB on release branch
+    if: github.event_name == 'push' && startsWith(github.ref_name, 'release/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
+
+      - name: Extract version info
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+          TAG_NAME="build-v${VERSION}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Build release AAB
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
+
+      - name: Prepare asset
         run: |
           mkdir -p release-artifacts
           cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
 
-      - name: Upload release AAB
+      - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.version.outputs.filename }}
           path: release-artifacts/${{ steps.version.outputs.filename }}
           retention-days: 7
 
+      - name: Create or update draft prerelease
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          name: Release build ${{ steps.version.outputs.version_full }}
+          body: |
+            Automated release-branch build for `${{ github.ref_name }}`.
+            Contains Android AAB for version `${{ steps.version.outputs.version_full }}`.
+          draft: true
+          prerelease: true
+          target_commitish: ${{ github.sha }}
+          files: |
+            release-artifacts/${{ steps.version.outputs.filename }}
+
   create_tag_and_release:
-    name: Create tag and GitHub release
+    name: Create final tag and GitHub release
     if: |
       github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
       github.event.pull_request.merged == true &&
       github.event.pull_request.base.ref == 'main' &&
       startsWith(github.event.pull_request.head.ref, 'release/')
@@ -119,28 +172,52 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
-      - name: Extract version from pubspec
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
+
+      - name: Extract version info
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
 
-      - name: Create tag
+      - name: Create tag if missing
         shell: bash
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git tag "v${{ steps.version.outputs.version }}" "${{ github.event.pull_request.merge_commit_sha }}"
-          git push origin "v${{ steps.version.outputs.version }}"
+          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag already exists"
+          else
+            git tag "v${{ steps.version.outputs.version }}"
+            git push origin "v${{ steps.version.outputs.version }}"
+          fi
 
-      - name: Create GitHub release with generated notes
+      - name: Build final release AAB
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
+
+      - name: Prepare final asset
+        run: |
+          mkdir -p release-artifacts
+          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
+
+      - name: Create GitHub release with notes and AAB
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
           name: Release ${{ steps.version.outputs.version_full }}
-          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
           generate_release_notes: true
+          files: |
+            release-artifacts/${{ steps.version.outputs.filename }}

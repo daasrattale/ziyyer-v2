@@ -80,7 +80,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add pubspec.yaml
           git diff --cached --quiet && exit 0
-          git commit -m "chore: bump build number [skip ci]"
+          git commit -m "chore: bump build number"
           git push origin HEAD:${{ github.ref_name }}
 
   build_release_aab:

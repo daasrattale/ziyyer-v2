@@ -27,6 +27,16 @@ on:
       - 'ios/**'
       - '.github/workflows/**'
   workflow_dispatch:
+    inputs:
+      manual_release:
+        description: 'Set to true to build release AAB'
+        required: false
+        default: 'false'
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   FLUTTER_VERSION: "3.38.4"
@@ -34,9 +44,10 @@ env:
 jobs:
   check:
     if: |
-      startsWith(github.ref, 'refs/heads/feature/') ||
-      startsWith(github.ref, 'refs/heads/feat/') ||
-      startsWith(github.ref, 'refs/heads/release/')
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_protected != true)) &&
+      (startsWith(github.ref, 'refs/heads/feature/') ||
+       startsWith(github.ref, 'refs/heads/feat/') ||
+       startsWith(github.ref, 'refs/heads/release/'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -64,8 +75,9 @@ jobs:
 
   build-debug:
     if: |
-      startsWith(github.ref, 'refs/heads/feature/') ||
-      startsWith(github.ref, 'refs/heads/feat/')
+      (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref_protected != true)) &&
+      (startsWith(github.ref, 'refs/heads/feature/') ||
+       startsWith(github.ref, 'refs/heads/feat/'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -93,7 +105,9 @@ jobs:
           retention-days: 7
 
   build-release:
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.manual_release == 'true') &&
+      startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     outputs:
       version_full: ${{ steps.get_version.outputs.version_full }}
@@ -132,7 +146,7 @@ jobs:
         with:
           name: app-release
           path: build/app/outputs/bundle/release/app-release.aab
-          retention-days: 7
+          retention-days: 120
 
   create-release:
     needs: build-release
@@ -167,7 +181,10 @@ jobs:
 
   publish-release:
     needs: [build-release]
-    if: startsWith(github.ref, 'refs/heads/release/')
+    if: |
+      github.event_name == 'workflow_dispatch' && 
+      github.event.inputs.manual_release == 'true' &&
+      startsWith(github.ref, 'refs/heads/release/')
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -63,6 +63,18 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
+      - name: Extract version info
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+
       - name: Analyze
         run: flutter analyze
 
@@ -70,7 +82,10 @@ jobs:
         run: flutter test
 
       - name: Build release AAB
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
 
   build_release_aab:
     name: Build AAB on release branch
@@ -83,66 +98,59 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Bump build number in pubspec.yaml
-        id: bump
-        shell: bash
-        run: |
-          CURRENT=$(grep "^version:" pubspec.yaml | awk '{print $2}')
-          VERSION=$(echo "$CURRENT" | cut -d'+' -f1)
-          BUILD=$(echo "$CURRENT" | cut -d'+' -f2)
-          NEW_BUILD=$((BUILD + 1))
-          NEW_VERSION_FULL="${VERSION}+${NEW_BUILD}"
-          sed -i "s/^version: .*/version: ${NEW_VERSION_FULL}/" pubspec.yaml
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "build_number=$NEW_BUILD" >> "$GITHUB_OUTPUT"
-          echo "version_full=$NEW_VERSION_FULL" >> "$GITHUB_OUTPUT"
-          echo "filename=ziyyer-${VERSION}+${NEW_BUILD}.aab" >> "$GITHUB_OUTPUT"
-          echo "tag_name=build-v${VERSION}" >> "$GITHUB_OUTPUT"
-
-      - name: Commit bumped pubspec
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pubspec.yaml
-          git diff --cached --quiet && exit 0
-          git commit -m "chore: bump build number for release"
-          git push origin HEAD:${{ github.ref_name }}
-
       - name: Setup project
         uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
+      - name: Extract version info
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+          TAG_NAME="build-v${VERSION}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+
       - name: Build release AAB
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
 
       - name: Prepare asset
         run: |
           mkdir -p release-artifacts
-          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.bump.outputs.filename }}"
+          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.bump.outputs.filename }}
-          path: release-artifacts/${{ steps.bump.outputs.filename }}
+          name: ${{ steps.version.outputs.filename }}
+          path: release-artifacts/${{ steps.version.outputs.filename }}
           retention-days: 7
 
       - name: Create or update draft prerelease
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.bump.outputs.tag_name }}
-          name: Release build ${{ steps.bump.outputs.version_full }}
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          name: Release build ${{ steps.version.outputs.version_full }}
           body: |
             Automated release-branch build for `${{ github.ref_name }}`.
-            Contains Android AAB for version `${{ steps.bump.outputs.version_full }}`.
+            Contains Android AAB for version `${{ steps.version.outputs.version_full }}`.
           draft: true
           prerelease: true
           target_commitish: ${{ github.sha }}
           files: |
-            release-artifacts/${{ steps.bump.outputs.filename }}
+            release-artifacts/${{ steps.version.outputs.filename }}
 
   create_tag_and_release:
     name: Create final tag and GitHub release
@@ -164,15 +172,24 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
-      - name: Extract version from pubspec
+      - name: Setup project
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
+
+      - name: Extract version info
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          FILENAME="ziyyer-${VERSION_FULL}.aab"
+          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
           echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Create tag if missing
@@ -185,14 +202,11 @@ jobs:
             git push origin "v${{ steps.version.outputs.version }}"
           fi
 
-      - name: Setup project
-        uses: ./.github/actions/flutter-setup
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          gradle-user-home: ${{ env.GRADLE_USER_HOME }}
-
       - name: Build final release AAB
-        run: flutter build appbundle --release
+        run: |
+          flutter build appbundle --release \
+            --build-name=${{ steps.version.outputs.version }} \
+            --build-number=${{ steps.version.outputs.build_number }}
 
       - name: Prepare final asset
         run: |

@@ -1,16 +1,24 @@
 name: Flutter Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      publish:
-        description: 'Publish AAB to GitHub Release'
-        required: true
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+  push:
+    branches:
+      - 'release/**'
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/release.yml'
+      - '.github/workflows/flutter.yml'
+
+  pull_request:
+    branches:
+      - main
+    types:
+      - closed
 
 env:
   FLUTTER_VERSION: "3.38.4"
@@ -24,13 +32,9 @@ concurrency:
 jobs:
   build_release_aab:
     name: Build release AAB
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    if: startsWith(github.ref_name, 'release/')
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      build_number: ${{ steps.version.outputs.build_number }}
-      version_full: ${{ steps.version.outputs.version_full }}
-      filename: ${{ steps.version.outputs.filename }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,7 +74,7 @@ jobs:
       - name: Build release AAB
         run: flutter build appbundle --release
 
-      - name: Extract version info
+      - name: Extract version
         id: version
         shell: bash
         run: |
@@ -96,28 +100,47 @@ jobs:
           path: release-artifacts/${{ steps.version.outputs.filename }}
           retention-days: 7
 
-  publish_aab:
-    name: Publish AAB to GitHub Release
-    runs-on: ubuntu-latest
-    needs: build_release_aab
+  create_tag_and_release:
+    name: Create tag and GitHub release
     if: |
-      startsWith(github.ref_name, 'release/') &&
-      github.event.inputs.publish == 'true'
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.base.ref == 'main' &&
+      startsWith(github.event.pull_request.head.ref, 'release/')
+    runs-on: ubuntu-latest
     permissions:
       contents: write
-    steps:
-      - name: Download release AAB
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.build_release_aab.outputs.filename }}
-          path: release-artifacts
+      pull-requests: read
 
-      - name: Create GitHub Release and upload asset
+    steps:
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Extract version from pubspec
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+
+      - name: Create tag
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.version.outputs.version }}" "${{ github.event.pull_request.merge_commit_sha }}"
+          git push origin "v${{ steps.version.outputs.version }}"
+
+      - name: Create GitHub release with generated notes
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ needs.build_release_aab.outputs.version }}
-          name: Release ${{ needs.build_release_aab.outputs.version_full }}
-          body: Automated release for v${{ needs.build_release_aab.outputs.version_full }}
-          target_commitish: ${{ github.sha }}
-          files: |
-            release-artifacts/${{ needs.build_release_aab.outputs.filename }}
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version_full }}
+          target_commitish: ${{ github.event.pull_request.merge_commit_sha }}
+          generate_release_notes: true

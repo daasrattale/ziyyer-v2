@@ -1,0 +1,311 @@
+name: Flutter CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'feat/**'
+      - 'release/**'
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/flutter-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - 'feature/**'
+      - 'feat/**'
+      - 'release/**'
+    paths:
+      - 'lib/**'
+      - 'test/**'
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+      - 'android/**'
+      - 'ios/**'
+      - '.github/workflows/flutter-ci.yml'
+  workflow_dispatch:
+    inputs:
+      release_build:
+        description: 'Run release AAB build'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+env:
+  FLUTTER_VERSION: "3.38.4"
+  PUB_CACHE: ${{ github.workspace }}/.pub-cache
+  GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
+
+concurrency:
+  group: flutter-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref_name, 'feature/') ||
+      startsWith(github.ref_name, 'feat/') ||
+      startsWith(github.ref_name, 'release/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('pubspec.lock', 'android/build.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Flutter version
+        run: flutter --version
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test with coverage
+        run: flutter test --coverage
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/lcov.info
+          retention-days: 7
+
+  build_aab_debug:
+    name: Build debug AAB
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref_name, 'feature/') ||
+      startsWith(github.ref_name, 'feat/')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('pubspec.lock', 'android/build.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build debug AAB
+        run: flutter build appbundle --debug
+
+      - name: Upload debug AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-aab
+          path: build/app/outputs/bundle/debug/app-debug.aab
+          retention-days: 7
+
+  build_aab_release:
+    name: Build release AAB
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref_name, 'release/') &&
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.release_build == 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: pub-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
+          restore-keys: |
+            pub-${{ runner.os }}-
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.GRADLE_USER_HOME }}/caches
+            ${{ env.GRADLE_USER_HOME }}/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('pubspec.lock', 'android/build.gradle.kts', 'android/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Accept Android licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Build release AAB
+        run: flutter build appbundle --release
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+
+      - name: Upload release AAB
+        uses: actions/upload-artifact@v4
+        with:
+          name: ziyyer-${{ steps.version.outputs.version }}+${{ steps.version.outputs.build_number }}.aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 7
+
+  changelog:
+    name: Create GitHub release
+    runs-on: ubuntu-latest
+    if: |
+      github.ref_name == 'main' &&
+      contains(github.event.head_commit.message, 'release/')
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: Automated release for v${{ steps.version.outputs.version }}
+          target_commitish: ${{ github.sha }}
+
+  publish_aab:
+    name: Publish AAB to release
+    runs-on: ubuntu-latest
+    if: |
+      startsWith(github.ref_name, 'release/') &&
+      github.event_name == 'workflow_dispatch' &&
+      github.event.inputs.release_build == 'true'
+    permissions:
+      contents: write
+    needs:
+      - build_aab_release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract version
+        id: version
+        shell: bash
+        run: |
+          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
+          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
+          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
+          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
+          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
+
+      - name: Download release AAB artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ziyyer-${{ steps.version.outputs.version }}+${{ steps.version.outputs.build_number }}.aab
+          path: release-artifacts
+
+      - name: Create or update release with asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version_full }}
+          body: Automated release for v${{ steps.version.outputs.version_full }}
+          target_commitish: ${{ github.sha }}
+          files: release-artifacts/app-release.aab

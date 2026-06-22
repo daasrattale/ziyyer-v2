@@ -15,6 +15,7 @@ on:
       - 'android/**'
       - 'ios/**'
       - '.github/workflows/flutter.yml'
+      - '.github/workflows/release.yml'
 
   pull_request:
     branches:
@@ -30,25 +31,7 @@ on:
       - 'android/**'
       - 'ios/**'
       - '.github/workflows/flutter.yml'
-
-  workflow_dispatch:
-    inputs:
-      run_release_build:
-        description: 'Build Android release AAB'
-        required: true
-        default: 'true'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
-      run_publish:
-        description: 'Publish release asset to GitHub Release'
-        required: true
-        default: 'false'
-        type: choice
-        options:
-          - 'true'
-          - 'false'
+      - '.github/workflows/release.yml'
 
 env:
   FLUTTER_VERSION: "3.38.4"
@@ -56,7 +39,7 @@ env:
   GRADLE_USER_HOME: ${{ github.workspace }}/.gradle
 
 concurrency:
-  group: flutter-${{ github.ref }}
+  group: flutter-ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -64,12 +47,9 @@ jobs:
     name: Check
     runs-on: ubuntu-latest
     if: |
-      github.event_name != 'workflow_dispatch' &&
-      (
-        startsWith(github.ref_name, 'feature/') ||
-        startsWith(github.ref_name, 'feat/') ||
-        startsWith(github.ref_name, 'release/')
-      )
+      startsWith(github.ref_name, 'feature/') ||
+      startsWith(github.ref_name, 'feat/') ||
+      startsWith(github.ref_name, 'release/')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -123,11 +103,8 @@ jobs:
     name: Build debug AAB
     runs-on: ubuntu-latest
     if: |
-      github.event_name != 'workflow_dispatch' &&
-      (
-        startsWith(github.ref_name, 'feature/') ||
-        startsWith(github.ref_name, 'feat/')
-      )
+      startsWith(github.ref_name, 'feature/') ||
+      startsWith(github.ref_name, 'feat/')
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -170,139 +147,3 @@ jobs:
           name: app-debug-aab
           path: build/app/outputs/bundle/debug/app-debug.aab
           retention-days: 7
-
-  build_aab_release:
-    name: Build release AAB
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' &&
-      startsWith(github.ref_name, 'release/') &&
-      github.event.inputs.run_release_build == 'true'
-    outputs:
-      version: ${{ steps.version.outputs.version }}
-      build_number: ${{ steps.version.outputs.build_number }}
-      version_full: ${{ steps.version.outputs.version_full }}
-      filename: ${{ steps.version.outputs.filename }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: stable
-          cache: true
-
-      - name: Cache Gradle
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.GRADLE_USER_HOME }}/caches
-            ${{ env.GRADLE_USER_HOME }}/wrapper
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Flutter version
-        run: flutter --version
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Accept Android licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Build release AAB
-        run: flutter build appbundle --release
-
-      - name: Extract version info
-        id: version
-        shell: bash
-        run: |
-          VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
-          VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
-          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
-
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
-          echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
-
-      - name: Rename AAB
-        run: |
-          mkdir -p release-artifacts
-          cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
-
-      - name: Upload release AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.version.outputs.filename }}
-          path: release-artifacts/${{ steps.version.outputs.filename }}
-          retention-days: 7
-
-  publish_aab:
-    name: Publish AAB to GitHub Release
-    runs-on: ubuntu-latest
-    needs: build_aab_release
-    if: |
-      github.event_name == 'workflow_dispatch' &&
-      startsWith(github.ref_name, 'release/') &&
-      github.event.inputs.run_release_build == 'true' &&
-      github.event.inputs.run_publish == 'true'
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download release AAB
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.build_aab_release.outputs.filename }}
-          path: release-artifacts
-
-      - name: Create GitHub Release and upload asset
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.build_aab_release.outputs.version }}
-          name: Release ${{ needs.build_aab_release.outputs.version_full }}
-          body: Automated release for v${{ needs.build_aab_release.outputs.version_full }}
-          target_commitish: ${{ github.sha }}
-          files: |
-            release-artifacts/${{ needs.build_aab_release.outputs.filename }}
-
-  changelog:
-    name: Create release on merge to main
-    runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'push' &&
-      github.ref_name == 'main' &&
-      contains(github.event.head_commit.message, 'release/')
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Extract version
-        id: version
-        shell: bash
-        run: |
-          VERSION=$(grep "^version:" pubspec.yaml | awk '{print $2}' | sed 's/+.*//')
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
-          body: Automated release for v${{ steps.version.outputs.version }}
-          target_commitish: ${{ github.sha }}

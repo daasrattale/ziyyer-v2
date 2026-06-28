@@ -63,17 +63,17 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
-      - name: Extract version info
+      - name: Read version from pubspec
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
 
       - name: Analyze
         run: flutter analyze
@@ -81,11 +81,8 @@ jobs:
       - name: Test
         run: flutter test
 
-      - name: Build release AAB
-        run: |
-          flutter build appbundle --release \
-            --build-name=${{ steps.version.outputs.version }} \
-            --build-number=${{ steps.version.outputs.build_number }}
+      - name: Build release AAB from pubspec version
+        run: flutter build appbundle --release
 
   build_release_aab:
     name: Build AAB on release branch
@@ -104,27 +101,24 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
-      - name: Extract version info
+      - name: Read version from pubspec
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
           FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
           TAG_NAME="build-v${VERSION}"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "version_full=$VERSION_FULL" >> "$GITHUB_OUTPUT"
           echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
           echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Build release AAB
-        run: |
-          flutter build appbundle --release \
-            --build-name=${{ steps.version.outputs.version }} \
-            --build-number=${{ steps.version.outputs.build_number }}
+      - name: Build release AAB from pubspec version
+        run: flutter build appbundle --release
 
       - name: Prepare asset
         run: |
@@ -178,18 +172,20 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           gradle-user-home: ${{ env.GRADLE_USER_HOME }}
 
-      - name: Extract version info
+      - name: Read version from merged pubspec
         id: version
         shell: bash
         run: |
           VERSION_FULL=$(grep "^version:" pubspec.yaml | awk '{print $2}')
           VERSION=$(echo "$VERSION_FULL" | cut -d'+' -f1)
-          BUILD_NUMBER=${GITHUB_RUN_NUMBER}
-          FILENAME="ziyyer-${VERSION}+${BUILD_NUMBER}.aab"
+          PUBSPEC_BUILD_NUMBER=$(echo "$VERSION_FULL" | cut -d'+' -f2)
+          FINAL_BUILD_NUMBER=${GITHUB_RUN_NUMBER}
+          FILENAME="ziyyer-${VERSION}+${FINAL_BUILD_NUMBER}.aab"
 
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "version_full=${VERSION}+${BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
+          echo "pubspec_build_number=$PUBSPEC_BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "final_build_number=$FINAL_BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "version_full=${VERSION}+${FINAL_BUILD_NUMBER}" >> "$GITHUB_OUTPUT"
           echo "filename=$FILENAME" >> "$GITHUB_OUTPUT"
 
       - name: Create tag if missing
@@ -202,22 +198,22 @@ jobs:
             git push origin "v${{ steps.version.outputs.version }}"
           fi
 
-      - name: Build final release AAB
+      - name: Build final release AAB with final build number
         run: |
           flutter build appbundle --release \
             --build-name=${{ steps.version.outputs.version }} \
-            --build-number=${{ steps.version.outputs.build_number }}
+            --build-number=${{ steps.version.outputs.final_build_number }}
 
       - name: Prepare final asset
         run: |
           mkdir -p release-artifacts
           cp build/app/outputs/bundle/release/app-release.aab "release-artifacts/${{ steps.version.outputs.filename }}"
 
-      - name: Create GitHub release with notes and AAB
+      - name: Create GitHub release with notes and final AAB
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version_full }}
+          name: Release ${{ steps.version.outputs.version }}+${{ steps.version.outputs.final_build_number }}
           generate_release_notes: true
           files: |
             release-artifacts/${{ steps.version.outputs.filename }}

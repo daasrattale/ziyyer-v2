@@ -9,7 +9,6 @@ class AppColors {
   AppColors._();
 
   // Brand / Accent
-  static const accent = Color(0xFF60A5FA); // Royal Blue
   static const accentDark = Color.fromARGB(255, 68, 207, 203); // Dark Royal Blue
   static const accentLight = Color.fromARGB(255, 61, 187, 183); // Light Royal Blue
 
@@ -50,6 +49,8 @@ class AppColors {
     final brightness = Theme.of(context).brightness;
     return brightness == Brightness.dark ? dark : light;
   }
+
+  static Color accent(BuildContext context) => getColor(context, light: accentLight, dark: accentDark);
 
   static Color background(BuildContext context) => getColor(context, light: lightBackground, dark: darkBackground);
 
@@ -130,7 +131,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.darkBackground,
 
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.accent,
+        primary: AppColors.accentDark,
         onPrimary: AppColors.darkBackground,
         primaryContainer: AppColors.darkCard,
         secondary: AppColors.accentDark,
@@ -148,16 +149,16 @@ class AppTheme {
 
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.darkNavBarBg,
-        indicatorColor: AppColors.accent.withAlpha(15),
+        indicatorColor: AppColors.accentDark.withAlpha(15),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppColors.accent, size: 24);
+            return const IconThemeData(color: AppColors.accentDark, size: 24);
           }
           return const IconThemeData(color: AppColors.darkTextSecondary, size: 22);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accent);
+            return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accentDark);
           }
           return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w400, color: AppColors.darkTextSecondary);
         }),
@@ -175,11 +176,11 @@ class AppTheme {
         titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.darkTextPrimary),
       ),
 
-      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accent, foregroundColor: AppColors.darkBackground),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accentDark, foregroundColor: AppColors.darkBackground),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
+          backgroundColor: AppColors.accentDark,
           foregroundColor: AppColors.darkBackground,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -196,10 +197,10 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.lightBackground,
 
       colorScheme: const ColorScheme.light(
-        primary: AppColors.accent,
+        primary: AppColors.accentLight,
         onPrimary: Colors.white,
         primaryContainer: AppColors.lightCardAlt,
-        secondary: AppColors.accentDark,
+        secondary: AppColors.accentLight,
         onSecondary: Colors.white,
         tertiary: AppColors.info,
         error: AppColors.expense,
@@ -214,16 +215,16 @@ class AppTheme {
 
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.lightNavBarBg,
-        indicatorColor: AppColors.accent.withAlpha(12),
+        indicatorColor: AppColors.accentLight.withAlpha(12),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppColors.accent, size: 24);
+            return const IconThemeData(color: AppColors.accentLight, size: 24);
           }
           return const IconThemeData(color: AppColors.lightTextSecondary, size: 22);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accent);
+            return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.accentLight);
           }
           return GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w400, color: AppColors.lightTextSecondary);
         }),
@@ -241,11 +242,11 @@ class AppTheme {
         titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary),
       ),
 
-      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accent, foregroundColor: Colors.white),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accentLight, foregroundColor: Colors.white),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.accent,
+          backgroundColor: AppColors.accentLight,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -257,7 +258,7 @@ class AppTheme {
   static CupertinoThemeData get cupertinoLight {
     return CupertinoThemeData(
       brightness: Brightness.light,
-      primaryColor: AppColors.accent,
+      primaryColor: AppColors.accentLight,
       scaffoldBackgroundColor: AppColors.lightBackground,
       textTheme: const CupertinoTextThemeData(primaryColor: CupertinoColors.black),
     );
@@ -266,7 +267,7 @@ class AppTheme {
   static CupertinoThemeData get cupertinoDark {
     return CupertinoThemeData(
       brightness: Brightness.dark,
-      primaryColor: AppColors.accent,
+      primaryColor: AppColors.accentLight,
       scaffoldBackgroundColor: AppColors.darkBackground,
       textTheme: const CupertinoTextThemeData(primaryColor: CupertinoColors.white),
     );

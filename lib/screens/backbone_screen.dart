@@ -71,9 +71,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                           isLandscape: isLandscape,
                         ),
                         AddExpenseButton(
-                          onPressed: () {
-                            // TODO: Open the Add Expense bottom sheet
-                          },
+                          onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)
                         ),
                         _NavItem(
                           icon: AppIcons.insights,

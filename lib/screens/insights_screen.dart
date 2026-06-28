@@ -3,11 +3,12 @@ import 'package:ziyyer/constants/app_icons.dart';
 
 import 'demo_screen.dart';
 
-class HistoryScreen extends StatelessWidget {
-  const HistoryScreen({super.key});
+class InsightsScreen extends StatelessWidget {
+  const InsightsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return DemoScreen(title: 'History Screen', iconData: AppIcons.history);
+    return DemoScreen(title: 'Insights Screen', iconData: AppIcons.insights);
   }
 }
+

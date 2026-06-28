@@ -117,7 +117,7 @@ static Future<void> runMigrations() async {
 
 ### How to Add New Fields
 
-1. **Update the model** in `lib/models/`:
+1. **Update the model** in `lib/tables/`:
 
    ```dart
    @Index()

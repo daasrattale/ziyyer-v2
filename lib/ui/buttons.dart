@@ -5,18 +5,35 @@ class Buttons {
   static Widget primaryButton({
     required String text,
     required VoidCallback onPressed,
+    required BuildContext context,
     bool isLoading = false,
     Color? backgroundColor,
     Color? textColor,
     double? width,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    EdgeInsets padding = const EdgeInsets.symmetric(
+      horizontal: 24,
+      vertical: 12,
+    ),
   }) {
     return ElevatedButton(
       onPressed: isLoading ? null : onPressed,
-      style: ElevatedButton.styleFrom(backgroundColor: backgroundColor, disabledBackgroundColor: Colors.grey[300], padding: padding),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: backgroundColor,
+        disabledBackgroundColor: Colors.grey[300],
+        padding: padding,
+      ),
       child: isLoading
-          ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
-          : Text(text, style: TextStyle(color: textColor)),
+          ? const SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Text(
+              text,
+              style: Theme.of(
+                context,
+              ).textTheme.labelLarge?.copyWith(color: textColor),
+            ),
     );
   }
 
@@ -24,10 +41,14 @@ class Buttons {
   static Widget secondaryButton({
     required String text,
     required VoidCallback onPressed,
+    required BuildContext context,
     Color? borderColor,
     Color? textColor,
     double? width,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+    EdgeInsets padding = const EdgeInsets.symmetric(
+      horizontal: 24,
+      vertical: 12,
+    ),
   }) {
     return OutlinedButton(
       onPressed: onPressed,
@@ -35,7 +56,12 @@ class Buttons {
         side: BorderSide(color: borderColor ?? Colors.grey[400]!),
         padding: padding,
       ),
-      child: Text(text, style: TextStyle(color: textColor)),
+      child: Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: textColor),
+      ),
     );
   }
 
@@ -43,18 +69,33 @@ class Buttons {
   static Widget textButton({
     required String text,
     required VoidCallback onPressed,
+    required BuildContext context,
     Color? textColor,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    EdgeInsets padding = const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 8,
+    ),
   }) {
     return TextButton(
       onPressed: onPressed,
       style: TextButton.styleFrom(padding: padding),
-      child: Text(text, style: TextStyle(color: textColor)),
+      child: Text(
+        text,
+        style: Theme.of(
+          context,
+        ).textTheme.labelLarge?.copyWith(color: textColor),
+      ),
     );
   }
 
   // Icon button
-  static Widget iconButton({required IconData icon, required VoidCallback onPressed, String? tooltip, Color? backgroundColor, Color? iconColor}) {
+  static Widget iconButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+    Color? backgroundColor,
+    Color? iconColor,
+  }) {
     return IconButton(
       icon: Icon(icon),
       onPressed: onPressed,
@@ -65,7 +106,17 @@ class Buttons {
   }
 
   // Floating action button
-  static Widget fab({required IconData icon, required VoidCallback onPressed, String? tooltip, Color? backgroundColor}) {
-    return FloatingActionButton(onPressed: onPressed, tooltip: tooltip, backgroundColor: backgroundColor, child: Icon(icon));
+  static Widget fab({
+    required IconData icon,
+    required VoidCallback onPressed,
+    String? tooltip,
+    Color? backgroundColor,
+  }) {
+    return FloatingActionButton(
+      onPressed: onPressed,
+      tooltip: tooltip,
+      backgroundColor: backgroundColor,
+      child: Icon(icon),
+    );
   }
 }

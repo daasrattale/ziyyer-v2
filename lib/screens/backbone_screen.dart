@@ -82,8 +82,8 @@ class _BackboneScreenState extends State<BackboneScreen> {
                           isLandscape: isLandscape,
                         ),
                         _NavItem(
-                          icon: AppIcons.wallet,
-                          label: 'Wallet',
+                          icon: AppIcons.budget,
+                          label: 'Budget',
                           isSelected: widget.navigationShell.currentIndex == 3,
                           onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
                           screenWidth: screenWidth,
@@ -146,11 +146,19 @@ class _NavItem extends StatelessWidget {
             SizedBox(height: spacing),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
-              style: TextStyle(
-                fontSize: fontSize,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: isSelected ? selectedColor : unselectedColor,
-              ),
+              style: (isSelected
+                      ? Theme.of(context).textTheme.labelLarge
+                      : Theme.of(context).textTheme.labelSmall)
+                  ?.copyWith(
+                    fontSize: fontSize,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? selectedColor : unselectedColor,
+                  ) ??
+                  TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? selectedColor : unselectedColor,
+                  ),
               child: Text(label),
             ),
           ],

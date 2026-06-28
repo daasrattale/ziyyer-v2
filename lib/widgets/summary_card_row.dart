@@ -13,7 +13,7 @@ class SummaryCardsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding),
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenMargin),
       child: Row(
         children: [
           Expanded(
@@ -26,7 +26,7 @@ class SummaryCardsRow extends StatelessWidget {
               iconBackgroundColor: AppColors.income.withAlpha(30),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: _SummaryCard(
               title: 'PAYMENTS',
@@ -65,8 +65,10 @@ class _SummaryCard extends StatelessWidget {
     final formattedAmount = amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
 
     return Container(
-      padding: const EdgeInsets.all(20.0),
-      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(24.0)),
+      padding: const EdgeInsets.all(AppConstants.spacingMedium),
+      decoration: BoxDecoration(
+          color: AppColors.surface(context),
+          borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -75,11 +77,11 @@ class _SummaryCard extends StatelessWidget {
             decoration: BoxDecoration(color: iconBackgroundColor, shape: BoxShape.circle),
             child: Icon(iconData, color: iconColor, size: 20),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: AppConstants.spacingMedium),
           Text(title, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.textSecondary(context), letterSpacing: 1.2)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppConstants.spacingSmall),
           Text('\$$formattedAmount', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppConstants.spacingSmall),
           Text(subtitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary(context))),
         ],
       ),

@@ -2,16 +2,15 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
-
-import '../models/account_table.dart';
-import '../models/budget_table.dart';
-import '../models/transaction_table.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:ziyyer/tables/budget_table.dart';
+import 'package:ziyyer/tables/category_table.dart';
+import 'package:ziyyer/tables/transaction_table.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [Accounts, Transactions, Budgets])
+@DriftDatabase(tables: [BudgetTable, CategoryTable, TransactionTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -22,7 +21,7 @@ class AppDatabase extends _$AppDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    final file = File(p.join(dbFolder.path, 'ziyyer.sqlite'));
     return NativeDatabase.createInBackground(file);
   });
 }

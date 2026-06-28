@@ -9,7 +9,7 @@ class SpendingCategorySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(AppConstants.defaultPadding),
+      padding: const EdgeInsets.all(AppConstants.screenMargin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -31,11 +31,11 @@ class SpendingCategorySection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppConstants.spacingMedium),
 
           // Container for the list to give it the grouped card look
           Column(
-            spacing: AppConstants.defaultPadding,
+            spacing: AppConstants.spacingMedium,
             children: [
               _CategoryItem(
                 iconData: AppIcons.home,
@@ -120,7 +120,7 @@ class _CategoryItem extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(AppConstants.spacingMedium),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -130,7 +130,7 @@ class _CategoryItem extends StatelessWidget {
                   decoration: BoxDecoration(color: baseColor.withAlpha(40), shape: BoxShape.circle),
                   child: Icon(iconData, color: baseColor, size: 16),
                 ),
-                const SizedBox(width: 20),
+                const SizedBox(width: AppConstants.spacingMedium),
 
                 // Text and Progress Bar Column
                 Expanded(
@@ -162,7 +162,7 @@ class _CategoryItem extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppConstants.spacingExtraSmall),
 
                       // Custom Progress Bar
                       Container(

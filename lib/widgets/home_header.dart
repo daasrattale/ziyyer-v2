@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/theme.dart';
+import 'package:ziyyer/constants/app_constants.dart';
 import 'package:ziyyer/constants/app_icons.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -10,8 +11,9 @@ class HomeHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenMargin, vertical: AppConstants.spacingMedium),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,15 +24,18 @@ class HomeHeader extends StatelessWidget {
             children: [
               Text(
                 'Welcome back',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context), letterSpacing: 0.3),
+                style: textTheme.labelLarge?.copyWith(
+                  color: AppColors.textSecondary(context),
+                  fontWeight: FontWeight.w500,
+                  letterSpacing: 0.3,
+                ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppConstants.spacingExtraSmall),
               Text(
                 userName,
-                style: TextStyle(
-                  fontSize: 24,
+                style: textTheme.displaySmall?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary(context), // Deep dark color for strong contrast
+                  color: AppColors.textPrimary(context),
                   letterSpacing: -0.5,
                 ),
               ),

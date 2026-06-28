@@ -15,7 +15,11 @@ class DemoScreen extends StatelessWidget {
             children: [
           Icon(iconData, size: 50, color: AppColors.accent(context)),
           SizedBox(height: 20),
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold))]),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+          )
+        ]),
       ),
     );
   }

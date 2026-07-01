@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/constants/app_icons.dart';
+import 'package:ziyyer/config/app_icons.dart';
 
 import 'demo_screen.dart';
 
@@ -11,4 +11,3 @@ class InsightsScreen extends StatelessWidget {
     return DemoScreen(title: 'Insights Screen', iconData: AppIcons.insights);
   }
 }
-

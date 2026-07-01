@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/config/theme.dart';
-import 'package:ziyyer/constants/app_constants.dart';
-import 'package:ziyyer/constants/app_icons.dart';
+import 'package:ziyyer/theme.dart';
+import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/config/app_icons.dart';
 
 class SummaryCardsRow extends StatelessWidget {
   final double incomeAmount;
@@ -66,9 +66,7 @@ class _SummaryCard extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
-      decoration: BoxDecoration(
-          color: AppColors.surface(context),
-          borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
+      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

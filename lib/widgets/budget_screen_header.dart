@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:ziyyer/config/theme.dart';
-import 'package:ziyyer/constants/app_constants.dart';
+import 'package:ziyyer/theme.dart';
+import 'package:ziyyer/config/app_constants.dart';
 
 class BudgetScreenHeader extends StatelessWidget {
   const BudgetScreenHeader({
@@ -29,19 +29,12 @@ class BudgetScreenHeader extends StatelessWidget {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
-    final usedRatio = totalBudget <= 0
-        ? 0.0
-        : (totalSpent / totalBudget).clamp(0.0, 1.0);
+    final usedRatio = totalBudget <= 0 ? 0.0 : (totalSpent / totalBudget).clamp(0.0, 1.0);
 
-    final allocatedRatio = totalBudget <= 0
-        ? 0.0
-        : (allocated / totalBudget).clamp(0.0, 1.0);
+    final allocatedRatio = totalBudget <= 0 ? 0.0 : (allocated / totalBudget).clamp(0.0, 1.0);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppConstants.screenMargin,
-        vertical: AppConstants.spacingMedium,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenMargin, vertical: AppConstants.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -72,20 +65,7 @@ class _BudgetHeaderTopBar extends StatelessWidget {
   String _formatMonth() {
     final date = DateTime.now();
 
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     return '${months[date.month - 1]} ${date.year}';
   }
 
@@ -104,20 +84,12 @@ class _BudgetHeaderTopBar extends StatelessWidget {
             children: [
               Text(
                 _formatMonth(),
-                style: textTheme.labelLarge?.copyWith(
-                  color: AppColors.textSecondary(context),
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.3,
-                ),
+                style: textTheme.labelLarge?.copyWith(color: AppColors.textSecondary(context), fontWeight: FontWeight.w500, letterSpacing: 0.3),
               ),
               const SizedBox(height: AppConstants.spacingExtraSmall),
               Text(
                 'Budgets',
-                style: textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary(context),
-                  letterSpacing: -0.5,
-                ),
+                style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary(context), letterSpacing: -0.5),
               ),
             ],
           ),
@@ -129,11 +101,7 @@ class _BudgetHeaderTopBar extends StatelessWidget {
             border: Border.all(color: AppColors.background(context), width: 1),
           ),
           child: IconButton(
-            icon: Icon(
-              Icons.add,
-              size: 20,
-              color: AppColors.textPrimary(context),
-            ),
+            icon: Icon(Icons.add, size: 20, color: AppColors.textPrimary(context)),
             onPressed: onAddPressed,
             splashRadius: 24,
             constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
@@ -193,13 +161,7 @@ class _BudgetSummaryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF233253).withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: const Color(0xFF233253).withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 10))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -209,19 +171,10 @@ class _BudgetSummaryCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   'TOTAL MONTHLY BUDGET',
-                  style: textTheme.labelSmall?.copyWith(
-                    color: AppColors.darkTextPrimary,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5,
-                  ),
+                  style: textTheme.labelSmall?.copyWith(color: AppColors.darkTextPrimary, fontWeight: FontWeight.w600, letterSpacing: 1.5),
                 ),
               ),
-              _EditPillButton(
-                label: 'Edit',
-                onPressed: onEditPressed,
-                backgroundColor: editChipColor,
-                foregroundColor: onCardColor,
-              ),
+              _EditPillButton(label: 'Edit', onPressed: onEditPressed, backgroundColor: editChipColor, foregroundColor: onCardColor),
             ],
           ),
           const SizedBox(height: AppConstants.spacingMedium),
@@ -231,45 +184,28 @@ class _BudgetSummaryCard extends StatelessWidget {
             children: [
               Text(
                 _currency(totalBudget).split('.')[0],
-                style: textTheme.displayLarge?.copyWith(
-                  color: onCardColor,
-                  fontWeight: FontWeight.w500,
-                  height: 1,
-                ),
+                style: textTheme.displayLarge?.copyWith(color: onCardColor, fontWeight: FontWeight.w500, height: 1),
               ),
               Text(
                 '.${_currency(totalBudget).split('.')[1]}',
-                style: textTheme.headlineSmall?.copyWith(
-                  color: onCardColor.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.w600,
-                ),
+                style: textTheme.headlineSmall?.copyWith(color: onCardColor.withValues(alpha: 0.8), fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: AppConstants.spacingExtraLarge),
-          _BudgetProgressBar(
-            value: usedRatio,
-            trackColor: progressTrackColor,
-            valueColor: progressValueColor,
-          ),
+          _BudgetProgressBar(value: usedRatio, trackColor: progressTrackColor, valueColor: progressValueColor),
           const SizedBox(height: AppConstants.spacingMedium),
           Row(
             children: [
               Expanded(
                 child: Text(
                   'Spent ${_currency(totalSpent)}',
-                  style: textTheme.labelMedium?.copyWith(
-                    color: mutedColor,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: textTheme.labelMedium?.copyWith(color: mutedColor, fontWeight: FontWeight.w500),
                 ),
               ),
               Text(
                 '${_percent(usedRatio)} used',
-                style: textTheme.labelMedium?.copyWith(
-                  color: mutedColor,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: textTheme.labelMedium?.copyWith(color: mutedColor, fontWeight: FontWeight.w500),
               ),
             ],
           ),
@@ -337,11 +273,7 @@ class _BudgetStatBlock extends StatelessWidget {
         Text(
           label,
           textAlign: isEnd ? TextAlign.end : TextAlign.start,
-          style: textTheme.labelLarge?.copyWith(
-            color: mutedColor,
-            letterSpacing: 2.2,
-            fontWeight: FontWeight.w500,
-          ),
+          style: textTheme.labelLarge?.copyWith(color: mutedColor, letterSpacing: 2.2, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 12),
         Row(
@@ -352,19 +284,12 @@ class _BudgetStatBlock extends StatelessWidget {
             Text(
               amountParts[0],
               textAlign: isEnd ? TextAlign.end : TextAlign.start,
-              style: textTheme.headlineSmall?.copyWith(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-                height: 1,
-              ),
+              style: textTheme.headlineSmall?.copyWith(color: textColor, fontWeight: FontWeight.bold, height: 1),
             ),
             if (amountParts.length > 1)
               Text(
                 '.${amountParts[1]}',
-                style: textTheme.labelMedium?.copyWith(
-                  color: textColor.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.bold,
-                ),
+                style: textTheme.labelMedium?.copyWith(color: textColor.withValues(alpha: 0.8), fontWeight: FontWeight.bold),
               ),
           ],
         ),
@@ -372,10 +297,7 @@ class _BudgetStatBlock extends StatelessWidget {
         Text(
           subtitle,
           textAlign: isEnd ? TextAlign.end : TextAlign.start,
-          style: textTheme.labelMedium?.copyWith(
-            color: mutedColor,
-            fontWeight: FontWeight.w500,
-          ),
+          style: textTheme.labelMedium?.copyWith(color: mutedColor, fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -383,11 +305,7 @@ class _BudgetStatBlock extends StatelessWidget {
 }
 
 class _BudgetProgressBar extends StatelessWidget {
-  const _BudgetProgressBar({
-    required this.value,
-    required this.trackColor,
-    required this.valueColor,
-  });
+  const _BudgetProgressBar({required this.value, required this.trackColor, required this.valueColor});
 
   final double value;
   final Color trackColor;
@@ -401,8 +319,7 @@ class _BudgetProgressBar extends StatelessWidget {
         height: 10,
         child: LayoutBuilder(
           builder: (context, constraints) {
-            final width =
-                constraints.maxWidth * math.max(0, math.min(1, value));
+            final width = constraints.maxWidth * math.max(0, math.min(1, value));
             return Stack(
               children: [
                 Container(color: trackColor),
@@ -410,10 +327,7 @@ class _BudgetProgressBar extends StatelessWidget {
                   duration: const Duration(milliseconds: 250),
                   curve: Curves.easeOut,
                   width: width,
-                  decoration: BoxDecoration(
-                    color: valueColor,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
+                  decoration: BoxDecoration(color: valueColor, borderRadius: BorderRadius.circular(999)),
                 ),
               ],
             );
@@ -454,12 +368,7 @@ class _HeaderCircleButton extends StatelessWidget {
 }
 
 class _EditPillButton extends StatelessWidget {
-  const _EditPillButton({
-    required this.label,
-    required this.onPressed,
-    required this.backgroundColor,
-    required this.foregroundColor,
-  });
+  const _EditPillButton({required this.label, required this.onPressed, required this.backgroundColor, required this.foregroundColor});
 
   final String label;
   final VoidCallback onPressed;
@@ -477,10 +386,7 @@ class _EditPillButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
         child: Ink(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(999),
-          ),
+          decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(999)),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -488,10 +394,7 @@ class _EditPillButton extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 label,
-                style: textTheme.labelLarge?.copyWith(
-                  color: foregroundColor,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: textTheme.labelLarge?.copyWith(color: foregroundColor, fontWeight: FontWeight.w600),
               ),
             ],
           ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ziyyer/config/theme.dart';
-import 'package:ziyyer/constants/app_constants.dart';
-import 'package:ziyyer/constants/app_icons.dart';
+import 'package:ziyyer/theme.dart';
+import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/widgets/add_expense_btn.dart';
 
 class BackboneScreen extends StatefulWidget {
@@ -70,9 +70,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                           screenWidth: screenWidth,
                           isLandscape: isLandscape,
                         ),
-                        AddExpenseButton(
-                          onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)
-                        ),
+                        AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
                         _NavItem(
                           icon: AppIcons.insights,
                           label: 'Insight',
@@ -146,10 +144,8 @@ class _NavItem extends StatelessWidget {
             SizedBox(height: spacing),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
-              style: (isSelected
-                      ? Theme.of(context).textTheme.labelLarge
-                      : Theme.of(context).textTheme.labelSmall)
-                  ?.copyWith(
+              style:
+                  (isSelected ? Theme.of(context).textTheme.labelLarge : Theme.of(context).textTheme.labelSmall)?.copyWith(
                     fontSize: fontSize,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? selectedColor : unselectedColor,

@@ -4,9 +4,9 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:ziyyer/tables/budget_table.dart';
-import 'package:ziyyer/tables/category_table.dart';
-import 'package:ziyyer/tables/transaction_table.dart';
+import 'package:ziyyer/shared/database/tables/budget_table.dart';
+import 'package:ziyyer/shared/database/tables/category_table.dart';
+import 'package:ziyyer/shared/database/tables/transaction_table.dart';
 
 part 'database.g.dart';
 

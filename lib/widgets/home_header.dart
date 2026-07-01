@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/config/theme.dart';
-import 'package:ziyyer/constants/app_constants.dart';
-import 'package:ziyyer/constants/app_icons.dart';
+import 'package:ziyyer/theme.dart';
+import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/config/app_icons.dart';
 
 class HomeHeader extends StatelessWidget {
   final String userName;
@@ -24,20 +24,12 @@ class HomeHeader extends StatelessWidget {
             children: [
               Text(
                 'Welcome back',
-                style: textTheme.labelLarge?.copyWith(
-                  color: AppColors.textSecondary(context),
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.3,
-                ),
+                style: textTheme.labelLarge?.copyWith(color: AppColors.textSecondary(context), fontWeight: FontWeight.w500, letterSpacing: 0.3),
               ),
               const SizedBox(height: AppConstants.spacingExtraSmall),
               Text(
                 userName,
-                style: textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary(context),
-                  letterSpacing: -0.5,
-                ),
+                style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary(context), letterSpacing: -0.5),
               ),
             ],
           ),

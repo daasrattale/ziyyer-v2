@@ -1,5 +1,5 @@
-class CategoryDetails {
-  const CategoryDetails({
+class CategoryModel {
+  const CategoryModel({
     required this.id,
     required this.budgetId,
     required this.name,

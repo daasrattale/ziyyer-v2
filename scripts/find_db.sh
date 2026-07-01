@@ -1,0 +1,1 @@
+find /Users/saadelattar/Library/Developer/CoreSimulator/Devices/ -name "ziyyer.sqlite"

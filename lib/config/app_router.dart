@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ziyyer/screens/add_expense_screen.dart';
-import 'package:ziyyer/screens/backbone_screen.dart';
-import 'package:ziyyer/screens/budget_screen.dart';
-import 'package:ziyyer/screens/history_screen.dart';
-import 'package:ziyyer/screens/home_screen.dart';
-import 'package:ziyyer/screens/insights_screen.dart';
+import 'package:ziyyer/shared/screens/add_expense_screen.dart';
+import 'package:ziyyer/shared/screens/backbone_screen.dart';
+import 'package:ziyyer/shared/screens/budget_screen.dart';
+import 'package:ziyyer/shared/screens/history_screen.dart';
+import 'package:ziyyer/shared/screens/home_screen.dart';
+import 'package:ziyyer/shared/screens/insights_screen.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 

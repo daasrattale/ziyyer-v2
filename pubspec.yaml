@@ -28,6 +28,7 @@ dependencies:
   rxdart: ^0.28.0
   intl: ^0.20.3
   loading_animation_widget: ^1.3.0
+  flutter_floating_bottom_bar: ^2.0.2
 
 dev_dependencies:
   flutter_test:

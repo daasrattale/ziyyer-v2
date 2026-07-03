@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/widgets/add_expense_btn.dart';
 
 class BackboneScreen extends StatefulWidget {
@@ -23,7 +24,6 @@ class _BackboneScreenState extends State<BackboneScreen> {
     final isLandscape = screenWidth > screenHeight;
 
     final horizontalMargin = screenWidth * 0.04;
-    final bottomMargin = screenHeight * 0.02;
 
     final containerPadding = EdgeInsets.symmetric(horizontal: screenWidth * 0.02, vertical: screenHeight * 0.008);
 
@@ -31,71 +31,125 @@ class _BackboneScreenState extends State<BackboneScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            widget.navigationShell,
-            Positioned(
-              left: horizontalMargin,
-              right: horizontalMargin,
-              bottom: bottomMargin,
-              child: Center(
-                child: Container(
-                  constraints: BoxConstraints(maxWidth: maxWidth),
-                  decoration: BoxDecoration(
-                    color: AppColors.surface(context),
-                    boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
-                    borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
-                    border: Border.all(color: AppColors.card(context)),
-                  ),
-                  child: Padding(
-                    padding: containerPadding,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _NavItem(
-                          icon: AppIcons.home,
-                          label: 'Home',
-                          isSelected: widget.navigationShell.currentIndex == 0,
-                          onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
-                          screenWidth: screenWidth,
-                          isLandscape: isLandscape,
-                        ),
-                        _NavItem(
-                          icon: AppIcons.history,
-                          label: 'History',
-                          isSelected: widget.navigationShell.currentIndex == 1,
-                          onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
-                          screenWidth: screenWidth,
-                          isLandscape: isLandscape,
-                        ),
-                        AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
-                        _NavItem(
-                          icon: AppIcons.insights,
-                          label: 'Insight',
-                          isSelected: widget.navigationShell.currentIndex == 2,
-                          onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
-                          screenWidth: screenWidth,
-                          isLandscape: isLandscape,
-                        ),
-                        _NavItem(
-                          icon: AppIcons.budget,
-                          label: 'Budget',
-                          isSelected: widget.navigationShell.currentIndex == 3,
-                          onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
-                          screenWidth: screenWidth,
-                          isLandscape: isLandscape,
-                        ),
-                      ],
-                    ),
-                  ),
+      bottomNavigationBar: BottomBar(
+        layout: BottomBarLayout(width: maxWidth, borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius)),
+        body: widget.navigationShell,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          decoration: BoxDecoration(
+            color: AppColors.surface(context),
+            boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
+            borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
+            border: Border.all(color: AppColors.card(context)),
+          ),
+          child: Padding(
+            padding: containerPadding,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  icon: AppIcons.home,
+                  label: 'Home',
+                  isSelected: widget.navigationShell.currentIndex == 0,
+                  onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
+                  screenWidth: screenWidth,
+                  isLandscape: isLandscape,
                 ),
-              ),
+                _NavItem(
+                  icon: AppIcons.history,
+                  label: 'History',
+                  isSelected: widget.navigationShell.currentIndex == 1,
+                  onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
+                  screenWidth: screenWidth,
+                  isLandscape: isLandscape,
+                ),
+                AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
+                _NavItem(
+                  icon: AppIcons.insights,
+                  label: 'Insight',
+                  isSelected: widget.navigationShell.currentIndex == 2,
+                  onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
+                  screenWidth: screenWidth,
+                  isLandscape: isLandscape,
+                ),
+                _NavItem(
+                  icon: AppIcons.budget,
+                  label: 'Budget',
+                  isSelected: widget.navigationShell.currentIndex == 3,
+                  onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                  screenWidth: screenWidth,
+                  isLandscape: isLandscape,
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
+      // body: SafeArea(
+      //   bottom: false,
+      //   child: Stack(
+      //     children: [
+      //       widget.navigationShell,
+      //       Positioned(
+      //         left: horizontalMargin,
+      //         right: horizontalMargin,
+      //         bottom: bottomMargin,
+      //         child: Center(
+      //           child: Container(
+      //             constraints: BoxConstraints(maxWidth: maxWidth),
+      //             decoration: BoxDecoration(
+      //               color: AppColors.surface(context),
+      //               boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
+      //               borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
+      //               border: Border.all(color: AppColors.card(context)),
+      //             ),
+      //             child: Padding(
+      //               padding: containerPadding,
+      //               child: Row(
+      //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+      //                 children: [
+      //                   _NavItem(
+      //                     icon: AppIcons.home,
+      //                     label: 'Home',
+      //                     isSelected: widget.navigationShell.currentIndex == 0,
+      //                     onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
+      //                     screenWidth: screenWidth,
+      //                     isLandscape: isLandscape,
+      //                   ),
+      //                   _NavItem(
+      //                     icon: AppIcons.history,
+      //                     label: 'History',
+      //                     isSelected: widget.navigationShell.currentIndex == 1,
+      //                     onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
+      //                     screenWidth: screenWidth,
+      //                     isLandscape: isLandscape,
+      //                   ),
+      //                   AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
+      //                   _NavItem(
+      //                     icon: AppIcons.insights,
+      //                     label: 'Insight',
+      //                     isSelected: widget.navigationShell.currentIndex == 2,
+      //                     onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
+      //                     screenWidth: screenWidth,
+      //                     isLandscape: isLandscape,
+      //                   ),
+      //                   _NavItem(
+      //                     icon: AppIcons.budget,
+      //                     label: 'Budget',
+      //                     isSelected: widget.navigationShell.currentIndex == 3,
+      //                     onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
+      //                     screenWidth: screenWidth,
+      //                     isLandscape: isLandscape,
+      //                   ),
+      //                 ],
+      //               ),
+      //             ),
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }

@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_widget.dart';
 import 'package:ziyyer/widgets/custom_stepper.dart';
 
-class BudgetSetupWidget extends StatefulWidget {
-  const BudgetSetupWidget({super.key});
-
+class SetupStepper extends StatefulWidget {
+  const SetupStepper({super.key});
   @override
-  State<BudgetSetupWidget> createState() => _BudgetSetupWidgetState();
+  State<SetupStepper> createState() => _SetupStepperState();
 }
 
-class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
+class _SetupStepperState extends State<SetupStepper> {
   int _currentIndex = 0;
   @override
   Widget build(BuildContext context) {
@@ -33,9 +32,9 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
               }
             },
             steps: [
-              CustomStepperStep(title: '1', content: BudgetAmountCurrencySetupWidget()),
-              CustomStepperStep(title: '2', content: const Text("Location Details")),
-              CustomStepperStep(title: '3', content: const Text("Order Details")),
+              CustomStepperStep(title: 'Budget', content: BudgetAmountCurrencySetupWidget()),
+              CustomStepperStep(title: 'Budget', content: const Text("Location Details")),
+              CustomStepperStep(title: 'Budget', content: const Text("Order Details")),
             ],
           ),
         ],

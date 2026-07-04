@@ -13,7 +13,7 @@ class _StepsSectionState extends State<StepsSection> {
   Widget build(BuildContext context) {
     const double circleSize = 32;
     int stepIndex = 0;
-    final int totalSteps = 5;
+    final int totalSteps = 3;
 
     return Column(
       children: [

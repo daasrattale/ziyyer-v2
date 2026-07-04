@@ -1,4 +1,6 @@
+import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/shared/database/database.dart';
+import 'package:ziyyer/shared/models/currency_model.dart';
 
 import 'category_model.dart';
 
@@ -27,18 +29,14 @@ class BudgetModel {
       realAmount: budget.realAmount,
       allocatedAmount: allocatedAmount,
       unallocatedAmount: unallocatedAmount,
-      currency: budget.currency,
+      currency: AppConstants.supportedCurrencies.where((c) => c.code == budget.currency).first,
       categories: categories,
       createdAt: budget.createdAt,
       updatedAt: budget.updatedAt,
     );
   }
 
-  BudgetModel copyWith({
-    List<CategoryModel>? categories,
-    double? allocatedAmount,
-    double? unallocatedAmount,
-  }) {
+  BudgetModel copyWith({List<CategoryModel>? categories, double? allocatedAmount, double? unallocatedAmount}) {
     return BudgetModel(
       id: id,
       definedAmount: definedAmount,
@@ -57,7 +55,7 @@ class BudgetModel {
   final double realAmount;
   final double allocatedAmount;
   final double unallocatedAmount;
-  final String currency;
+  final CurrencyModel currency;
   final List<CategoryModel> categories;
   final DateTime createdAt;
   final DateTime updatedAt;

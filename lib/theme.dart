@@ -183,7 +183,7 @@ class AppTheme {
           backgroundColor: AppColors.accentDark,
           foregroundColor: AppColors.darkBackground,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         ),
       ),
     );
@@ -249,7 +249,7 @@ class AppTheme {
           backgroundColor: AppColors.accentLight,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
         ),
       ),
     );

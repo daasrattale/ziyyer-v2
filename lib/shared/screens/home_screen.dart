@@ -17,25 +17,22 @@ class _HomeScreenState extends State<HomeScreen> {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            HomeHeader(userName: "Super User", onNotificationTap: () {}),
-
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    TotalBalanceCard(income: 1000, payments: 400, totalBalance: 5498.87, currency: 'EUR', percentageChange: 44),
-                    SummaryCardsRow(incomeAmount: 8762.34, paymentsAmount: 7654.89, incomeSources: 4),
-                    SpendingCategorySection(),
-                    SizedBox(height: screenSize.height * 0.1),
-                  ],
-                ),
+      body: Column(
+        children: [
+          HomeHeader(userName: "Super User", onNotificationTap: () {}),
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TotalBalanceCard(income: 1000, payments: 400, totalBalance: 5498.87, currency: 'EUR', percentageChange: 44),
+                  SummaryCardsRow(incomeAmount: 8762.34, paymentsAmount: 7654.89, incomeSources: 4),
+                  SpendingCategorySection(),
+                  SizedBox(height: screenSize.height * 0.1),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/theme.dart';
 
 class TotalBalanceCard extends StatelessWidget {
   final double totalBalance;
@@ -70,7 +70,7 @@ class TotalBalanceCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppConstants.spacingExtraLarge),
+          SizedBox(height: AppConstants.spacingExtraLarge),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.10), borderRadius: BorderRadius.circular(16.0)),

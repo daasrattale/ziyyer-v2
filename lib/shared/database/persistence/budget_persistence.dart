@@ -33,13 +33,26 @@ class BudgetPersistence {
 
   /// Stream of the current budget, or null if none exists.
   Stream<BudgetModel?> watchBudget() {
-    return _db
-        .select(_db.budgetTable)
-        .watchSingleOrNull()
-        .where((event) => event != null)
-        // Calculation and categories retrieval are done on the service layer
-        .map((event) => BudgetModel.fromBudget(event!, allocatedAmount: 0, unallocatedAmount: 0, categories: List.empty()));
+    return _db.select(_db.budgetTable).watchSingleOrNull().map((budget) {
+      if (budget == null) return null;
+      return BudgetModel.fromBudget(budget, allocatedAmount: 0, unallocatedAmount: 0, categories: List.empty());
+    });
   }
 
-  // todo: create a function that saves a budget
+  /// Creates a new budget row in the database.
+  Future<void> createBudget({
+    required double definedAmount,
+    required String currency,
+  }) async {
+    final now = DateTime.now();
+
+    await _db.into(_db.budgetTable).insert(
+          BudgetTableCompanion.insert(
+            definedAmount: definedAmount,
+            currency: currency,
+            createdAt: now,
+            updatedAt: now,
+          ),
+        );
+  }
 }

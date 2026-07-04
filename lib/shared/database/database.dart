@@ -19,9 +19,11 @@ class AppDatabase extends _$AppDatabase {
 }
 
 LazyDatabase _openConnection() {
+  final String databaseName = 'ziyyer.sqlite';
+
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'ziyyer.sqlite'));
+    final file = File(p.join(dbFolder.path, databaseName));
     return NativeDatabase.createInBackground(file);
   });
 }

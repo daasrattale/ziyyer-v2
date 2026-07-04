@@ -192,7 +192,7 @@ class _BudgetSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppConstants.spacingExtraLarge),
+          SizedBox(height: AppConstants.spacingExtraLarge),
           _BudgetProgressBar(value: usedRatio, trackColor: progressTrackColor, valueColor: progressValueColor),
           const SizedBox(height: AppConstants.spacingMedium),
           Row(

@@ -31,11 +31,11 @@ class _BackboneScreenState extends State<BackboneScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      bottomNavigationBar: BottomBar(
+      body: BottomBar(
         layout: BottomBarLayout(width: maxWidth, borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius)),
-        body: widget.navigationShell,
+        body: SafeArea(bottom: false, child: widget.navigationShell),
+        motion: const BottomBarMotion.cupertino(preset: BottomBarCupertinoMotion.interactive, duration: Duration(milliseconds: 360)),
         child: Container(
-          constraints: BoxConstraints(maxWidth: maxWidth),
           decoration: BoxDecoration(
             color: AppColors.surface(context),
             boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
@@ -85,71 +85,6 @@ class _BackboneScreenState extends State<BackboneScreen> {
           ),
         ),
       ),
-      // body: SafeArea(
-      //   bottom: false,
-      //   child: Stack(
-      //     children: [
-      //       widget.navigationShell,
-      //       Positioned(
-      //         left: horizontalMargin,
-      //         right: horizontalMargin,
-      //         bottom: bottomMargin,
-      //         child: Center(
-      //           child: Container(
-      //             constraints: BoxConstraints(maxWidth: maxWidth),
-      //             decoration: BoxDecoration(
-      //               color: AppColors.surface(context),
-      //               boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
-      //               borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
-      //               border: Border.all(color: AppColors.card(context)),
-      //             ),
-      //             child: Padding(
-      //               padding: containerPadding,
-      //               child: Row(
-      //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-      //                 children: [
-      //                   _NavItem(
-      //                     icon: AppIcons.home,
-      //                     label: 'Home',
-      //                     isSelected: widget.navigationShell.currentIndex == 0,
-      //                     onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
-      //                     screenWidth: screenWidth,
-      //                     isLandscape: isLandscape,
-      //                   ),
-      //                   _NavItem(
-      //                     icon: AppIcons.history,
-      //                     label: 'History',
-      //                     isSelected: widget.navigationShell.currentIndex == 1,
-      //                     onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
-      //                     screenWidth: screenWidth,
-      //                     isLandscape: isLandscape,
-      //                   ),
-      //                   AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
-      //                   _NavItem(
-      //                     icon: AppIcons.insights,
-      //                     label: 'Insight',
-      //                     isSelected: widget.navigationShell.currentIndex == 2,
-      //                     onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
-      //                     screenWidth: screenWidth,
-      //                     isLandscape: isLandscape,
-      //                   ),
-      //                   _NavItem(
-      //                     icon: AppIcons.budget,
-      //                     label: 'Budget',
-      //                     isSelected: widget.navigationShell.currentIndex == 3,
-      //                     onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
-      //                     screenWidth: screenWidth,
-      //                     isLandscape: isLandscape,
-      //                   ),
-      //                 ],
-      //               ),
-      //             ),
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
     );
   }
 }

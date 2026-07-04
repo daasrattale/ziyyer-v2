@@ -82,4 +82,15 @@ class BudgetService {
 
     return controller.stream;
   }
+
+  /// Creates a new budget row in the database.
+  Future<void> createBudget({
+    required double definedAmount,
+    required String currency,
+  }) async {
+    await _budgetPersistence.createBudget(
+      definedAmount: definedAmount,
+      currency: currency,
+    );
+  }
 }

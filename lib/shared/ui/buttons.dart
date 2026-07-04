@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart' show Colors;
 
 class Buttons {
   // Primary button
@@ -10,30 +11,17 @@ class Buttons {
     Color? backgroundColor,
     Color? textColor,
     double? width,
-    EdgeInsets padding = const EdgeInsets.symmetric(
-      horizontal: 24,
-      vertical: 12,
-    ),
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
   }) {
-    return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: backgroundColor,
-        disabledBackgroundColor: Colors.grey[300],
+    return SizedBox(
+      width: width,
+      child: CupertinoButton.filled(
         padding: padding,
+        onPressed: isLoading ? null : onPressed,
+        child: isLoading
+            ? const SizedBox(height: 20, width: 20, child: CupertinoActivityIndicator())
+            : Text(text, style: DefaultTextStyle.of(context).style.copyWith(color: textColor)),
       ),
-      child: isLoading
-          ? const SizedBox(
-              height: 20,
-              width: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
-          : Text(
-              text,
-              style: Theme.of(
-                context,
-              ).textTheme.labelLarge?.copyWith(color: textColor),
-            ),
     );
   }
 
@@ -45,22 +33,22 @@ class Buttons {
     Color? borderColor,
     Color? textColor,
     double? width,
-    EdgeInsets padding = const EdgeInsets.symmetric(
-      horizontal: 24,
-      vertical: 12,
-    ),
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
   }) {
-    return OutlinedButton(
-      onPressed: onPressed,
-      style: OutlinedButton.styleFrom(
-        side: BorderSide(color: borderColor ?? Colors.grey[400]!),
-        padding: padding,
-      ),
-      child: Text(
-        text,
-        style: Theme.of(
-          context,
-        ).textTheme.labelLarge?.copyWith(color: textColor),
+    return SizedBox(
+      width: width,
+      child: GestureDetector(
+        onTap: onPressed,
+        child: Container(
+          padding: padding,
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            border: Border.all(color: borderColor ?? Colors.grey[400]!),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          alignment: Alignment.center,
+          child: Text(text, style: DefaultTextStyle.of(context).style.copyWith(color: textColor)),
+        ),
       ),
     );
   }
@@ -71,51 +59,31 @@ class Buttons {
     required VoidCallback onPressed,
     required BuildContext context,
     Color? textColor,
-    EdgeInsets padding = const EdgeInsets.symmetric(
-      horizontal: 16,
-      vertical: 8,
-    ),
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
   }) {
-    return TextButton(
+    return CupertinoButton(
+      padding: padding,
       onPressed: onPressed,
-      style: TextButton.styleFrom(padding: padding),
-      child: Text(
-        text,
-        style: Theme.of(
-          context,
-        ).textTheme.labelLarge?.copyWith(color: textColor),
-      ),
+      child: Text(text, style: DefaultTextStyle.of(context).style.copyWith(color: textColor)),
     );
   }
 
   // Icon button
-  static Widget iconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    String? tooltip,
-    Color? backgroundColor,
-    Color? iconColor,
-  }) {
-    return IconButton(
-      icon: Icon(icon),
+  static Widget iconButton({required IconData icon, required VoidCallback onPressed, String? tooltip, Color? backgroundColor, Color? iconColor}) {
+    return CupertinoButton(
+      padding: const EdgeInsets.all(8),
       onPressed: onPressed,
-      tooltip: tooltip,
-      color: iconColor,
-      style: IconButton.styleFrom(backgroundColor: backgroundColor),
+      child: Icon(icon, color: iconColor),
     );
   }
 
   // Floating action button
-  static Widget fab({
-    required IconData icon,
-    required VoidCallback onPressed,
-    String? tooltip,
-    Color? backgroundColor,
-  }) {
-    return FloatingActionButton(
+  static Widget fab({required IconData icon, required VoidCallback onPressed, String? tooltip, Color? backgroundColor}) {
+    return CupertinoButton(
       onPressed: onPressed,
-      tooltip: tooltip,
-      backgroundColor: backgroundColor,
+      padding: const EdgeInsets.all(12),
+      borderRadius: BorderRadius.circular(32),
+      color: backgroundColor,
       child: Icon(icon),
     );
   }

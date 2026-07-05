@@ -44,16 +44,22 @@ class BudgetService {
       categorySubscription?.cancel();
 
       final budget = latestBudget;
-      if (budget == null) {
+      if (budget == null || budget.id == null) {
         controller.add(null);
         return;
       }
 
-      categorySubscription = _categoryPersistence.watchCategoriesForBudget(budget.id).listen((categories) {
+      categorySubscription = _categoryPersistence.watchCategoriesForBudget(budget.id!).listen((categories) {
         final allocatedAmount = categories.fold<double>(0, (sum, category) => sum + category.definedAmount);
         final unallocatedAmount = budget.definedAmount - allocatedAmount;
 
-        controller.add(budget.copyWith(allocatedAmount: allocatedAmount, unallocatedAmount: unallocatedAmount, categories: categories));
+        controller.add(
+          budget.copyWith(
+            allocatedAmount: allocatedAmount,
+            unallocatedAmount: unallocatedAmount,
+            categories: categories,
+          ),
+        );
       }, onError: controller.addError);
     }
 
@@ -84,13 +90,7 @@ class BudgetService {
   }
 
   /// Creates a new budget row in the database.
-  Future<void> createBudget({
-    required double definedAmount,
-    required String currency,
-  }) async {
-    await _budgetPersistence.createBudget(
-      definedAmount: definedAmount,
-      currency: currency,
-    );
+  Future<void> createBudget({required double definedAmount, required String currency}) async {
+    await _budgetPersistence.createBudget(definedAmount: definedAmount, currency: currency);
   }
 }

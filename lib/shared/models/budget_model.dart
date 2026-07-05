@@ -5,7 +5,7 @@ import 'package:ziyyer/shared/models/currency_model.dart';
 import 'category_model.dart';
 
 class BudgetModel {
-  const BudgetModel({
+  BudgetModel({
     required this.id,
     required this.definedAmount,
     required this.realAmount,
@@ -50,13 +50,27 @@ class BudgetModel {
     );
   }
 
-  final int id;
-  final double definedAmount;
-  final double realAmount;
-  final double allocatedAmount;
-  final double unallocatedAmount;
-  final CurrencyModel currency;
-  final List<CategoryModel> categories;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  factory BudgetModel.init() {
+    return BudgetModel(
+      id: null,
+      definedAmount: 0.0,
+      realAmount: 0.0,
+      allocatedAmount: 0.0,
+      unallocatedAmount: 0.0,
+      currency: AppConstants.defaultCurrency,
+      categories: [],
+      createdAt: null,
+      updatedAt: null,
+    );
+  }
+
+  int? id;
+  double definedAmount;
+  double realAmount;
+  double allocatedAmount;
+  double unallocatedAmount;
+  CurrencyModel currency;
+  List<CategoryModel> categories;
+  DateTime? createdAt;
+  DateTime? updatedAt;
 }

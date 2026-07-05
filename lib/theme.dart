@@ -64,7 +64,8 @@ class AppColors {
 
   static Color textPrimary(BuildContext context) => getColor(context, light: lightTextPrimary, dark: darkTextPrimary);
 
-  static Color textSecondary(BuildContext context) => getColor(context, light: lightTextSecondary, dark: darkTextSecondary);
+  static Color textSecondary(BuildContext context) =>
+      getColor(context, light: lightTextSecondary, dark: darkTextSecondary);
 
   static Color textHint(BuildContext context) => getColor(context, light: lightTextHint, dark: darkTextHint);
 
@@ -176,7 +177,10 @@ class AppTheme {
         titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.darkTextPrimary),
       ),
 
-      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accentDark, foregroundColor: AppColors.darkBackground),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.accentDark,
+        foregroundColor: AppColors.darkBackground,
+      ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -242,7 +246,10 @@ class AppTheme {
         titleTextStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: AppColors.lightTextPrimary),
       ),
 
-      floatingActionButtonTheme: FloatingActionButtonThemeData(backgroundColor: AppColors.accentLight, foregroundColor: Colors.white),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: AppColors.accentLight,
+        foregroundColor: Colors.white,
+      ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(

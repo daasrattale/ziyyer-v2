@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_widget.dart';
+import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/widgets/custom_stepper.dart';
 
 class BudgetSetupWidget extends StatefulWidget {
@@ -11,6 +12,7 @@ class BudgetSetupWidget extends StatefulWidget {
 
 class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
   int _currentIndex = 0;
+  BudgetModel budgetModel = BudgetModel.init();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,6 +27,9 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                 });
               }
             },
+            goToDoneStep: () {
+              // todo: define the done process to create the budget
+            },
             goToPreviousStep: () {
               if (_currentIndex > 0) {
                 setState(() {
@@ -33,9 +38,21 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
               }
             },
             steps: [
-              CustomStepperStep(title: '1', content: BudgetAmountCurrencySetupWidget()),
-              CustomStepperStep(title: '2', content: const Text("Location Details")),
-              CustomStepperStep(title: '3', content: const Text("Order Details")),
+              CustomStepperStep(
+                title: 'Budget Income',
+                content: BudgetAmountCurrencySetupWidget(
+                  onAmountChanged: (amount) {
+                    setState(() {
+                      budgetModel.definedAmount = amount;
+                    });
+                  },
+                  onCurrencyChanged: (currency) {
+                    budgetModel.currency = currency;
+                  },
+                ),
+              ),
+              CustomStepperStep(title: 'Budget Payements', content: const Text("Location Details")),
+              CustomStepperStep(title: 'Spending categories', content: const Text("Order Details")),
             ],
           ),
         ],

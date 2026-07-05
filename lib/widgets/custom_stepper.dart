@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/theme.dart';
 
 class CustomStepper extends StatefulWidget {
@@ -7,7 +8,15 @@ class CustomStepper extends StatefulWidget {
   final int initialActiveIndex;
   final VoidCallback goToNextStep;
   final VoidCallback goToPreviousStep;
-  const CustomStepper({super.key, required this.steps, this.initialActiveIndex = 0, required this.goToNextStep, required this.goToPreviousStep});
+  final VoidCallback goToDoneStep;
+  const CustomStepper({
+    super.key,
+    required this.steps,
+    this.initialActiveIndex = 0,
+    required this.goToNextStep,
+    required this.goToPreviousStep,
+    required this.goToDoneStep,
+  });
   @override
   State<CustomStepper> createState() => _CustomStepperState();
 }
@@ -15,6 +24,7 @@ class CustomStepper extends StatefulWidget {
 class _CustomStepperState extends State<CustomStepper> {
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -25,25 +35,18 @@ class _CustomStepperState extends State<CustomStepper> {
               int index = entry.key;
               CustomStepperStep step = entry.value;
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // Step Circle
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    // width: 38,
-                    // height: 38,
+                    width: (screenWidth / widget.steps.length) - (screenWidth * 0.05),
+                    height: 8,
                     decoration: BoxDecoration(
-                      // shape: BoxShape.circle,
+                      color: index <= widget.initialActiveIndex
+                          ? step.color ?? Theme.of(context).primaryColor
+                          : AppColors.textHint(context),
                       borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-                      color: index <= widget.initialActiveIndex ? step.color ?? Theme.of(context).primaryColor : AppColors.surface(context),
-                    ),
-                    child: Center(
-                      child: Text(
-                        step.title,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: index <= widget.initialActiveIndex ? step.color ?? Colors.white : AppColors.textHint(context),
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -58,9 +61,43 @@ class _CustomStepperState extends State<CustomStepper> {
             mainAxisAlignment: widget.initialActiveIndex > 0 ? MainAxisAlignment.spaceBetween : MainAxisAlignment.end,
             children: [
               if (widget.initialActiveIndex > 0) ...[
-                ElevatedButton(onPressed: widget.initialActiveIndex > 0 ? widget.goToPreviousStep : null, child: const Text("Back")),
+                ElevatedButton(
+                  onPressed: widget.initialActiveIndex > 0 ? widget.goToPreviousStep : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.surface(context),
+                    foregroundColor: AppColors.textPrimary(context),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 4,
+                    children: [Icon(AppIcons.arrowLeft), Text("Previous")],
+                  ),
+                ),
               ],
-              ElevatedButton(onPressed: widget.initialActiveIndex < widget.steps.length - 1 ? widget.goToNextStep : null, child: const Text("Next")),
+              if (widget.initialActiveIndex < widget.steps.length - 1) ...[
+                ElevatedButton(
+                  onPressed: widget.goToNextStep,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 4,
+                    children: [Text(widget.steps[widget.initialActiveIndex + 1].title), Icon(AppIcons.arrowRight)],
+                  ),
+                ),
+              ] else ...[
+                ElevatedButton(
+                  onPressed: widget.goToDoneStep,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    spacing: 4,
+                    children: [Text("Done"), Icon(AppIcons.check)],
+                  ),
+                ),
+              ],
             ],
           ),
         ],

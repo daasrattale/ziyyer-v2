@@ -9,25 +9,22 @@ class TotalBudgetSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-    return Column(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(currency.symbol, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: screenWidth * 0.7,
-              child: TextField(
-                controller: amountController,
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w800, letterSpacing: 1.2),
-                decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
-              ),
-            ),
-          ],
+        Expanded(
+          child: Text(currency.symbol, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+        ),
+        SizedBox(
+          width: screenWidth * 0.8,
+          child: TextField(
+            controller: amountController,
+            keyboardType: TextInputType.number,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 42, fontWeight: FontWeight.w800, letterSpacing: 1.2),
+            decoration: const InputDecoration(border: InputBorder.none, isDense: true, contentPadding: EdgeInsets.zero),
+          ),
         ),
       ],
     );

@@ -8,7 +8,10 @@ import 'package:ziyyer/features/budget_setup/widgets/fragments/total_budget_sect
 import 'package:ziyyer/shared/models/currency_model.dart';
 
 class BudgetAmountCurrencySetupWidget extends StatefulWidget {
-  const BudgetAmountCurrencySetupWidget({super.key});
+  final Function(double amount) onAmountChanged;
+  final Function(CurrencyModel currency) onCurrencyChanged;
+
+  const BudgetAmountCurrencySetupWidget({super.key, required this.onAmountChanged, required this.onCurrencyChanged});
 
   @override
   State<BudgetAmountCurrencySetupWidget> createState() => _BudgetAmountCurrencySetupState();
@@ -31,7 +34,9 @@ class _BudgetAmountCurrencySetupState extends State<BudgetAmountCurrencySetupWid
 
   void _onAmountChanged() {
     setState(() {
-      amount = double.tryParse(amountController.text) ?? 0.0;
+      double newAmountValue = double.tryParse(amountController.text) ?? 0.0;
+      amount = newAmountValue;
+      widget.onAmountChanged.call(newAmountValue);
     });
   }
 
@@ -72,6 +77,7 @@ class _BudgetAmountCurrencySetupState extends State<BudgetAmountCurrencySetupWid
                   onCurrencyUpdated: (currency) {
                     setState(() {
                       this.currency = currency;
+                      widget.onCurrencyChanged.call(currency);
                     });
                   },
                 ),

@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:feather_icons/feather_icons.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppIcons {
@@ -19,4 +19,7 @@ class AppIcons {
   static const IconData trendingDown = FeatherIcons.trendingDown;
   static const IconData arrowUpRight = FeatherIcons.arrowUpRight;
   static const IconData arrowDownRight = FeatherIcons.arrowDownRight;
+  static const IconData arrowRight = LucideIcons.moveRight;
+  static const IconData arrowLeft = LucideIcons.moveLeft;
+  static const IconData check = LucideIcons.check;
 }

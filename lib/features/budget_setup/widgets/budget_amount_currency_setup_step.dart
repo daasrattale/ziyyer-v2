@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/features/budget_setup/controllers/budget_setup_controller.dart';
-import 'package:ziyyer/features/budget_setup/widgets/fragments/currency_selector_section.dart';
-import 'package:ziyyer/features/budget_setup/widgets/fragments/quickset_section.dart';
-import 'package:ziyyer/features/budget_setup/widgets/fragments/title_section.dart';
-import 'package:ziyyer/features/budget_setup/widgets/fragments/total_budget_section.dart';
+import 'package:ziyyer/features/budget_setup/widgets/sections/currency_selector_section.dart';
+import 'package:ziyyer/features/budget_setup/widgets/sections/quickset_section.dart';
+import 'package:ziyyer/features/budget_setup/widgets/sections/title_section.dart';
+import 'package:ziyyer/features/budget_setup/widgets/sections/total_budget_section.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
 
-class BudgetAmountCurrencySetupWidget extends StatefulWidget {
+class BudgetAmountCurrencySetupStep extends StatefulWidget {
   final Function(double amount) onAmountChanged;
   final Function(CurrencyModel currency) onCurrencyChanged;
 
-  const BudgetAmountCurrencySetupWidget({super.key, required this.onAmountChanged, required this.onCurrencyChanged});
+  const BudgetAmountCurrencySetupStep({super.key, required this.onAmountChanged, required this.onCurrencyChanged});
 
   @override
-  State<BudgetAmountCurrencySetupWidget> createState() => _BudgetAmountCurrencySetupState();
+  State<BudgetAmountCurrencySetupStep> createState() => _BudgetAmountCurrencySetupStepState();
 }
 
-class _BudgetAmountCurrencySetupState extends State<BudgetAmountCurrencySetupWidget> {
+class _BudgetAmountCurrencySetupStepState extends State<BudgetAmountCurrencySetupStep> {
   late CurrencyModel currency;
   late double amount;
   late final TextEditingController amountController;

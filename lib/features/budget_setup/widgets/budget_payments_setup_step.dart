@@ -5,17 +5,17 @@ import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/payement_model.dart';
 import 'package:ziyyer/theme.dart';
 
-class BudgetPaymentsSetupWidget extends StatefulWidget {
+class BudgetPaymentsSetupStep extends StatefulWidget {
   final Function(List<PaymentModel> payments) onPaymentsChanged;
   final BudgetModel budgetModel;
 
-  const BudgetPaymentsSetupWidget({super.key, required this.onPaymentsChanged, required this.budgetModel});
+  const BudgetPaymentsSetupStep({super.key, required this.onPaymentsChanged, required this.budgetModel});
 
   @override
-  State<BudgetPaymentsSetupWidget> createState() => _BudgetPaymentsSetupWidgetState();
+  State<BudgetPaymentsSetupStep> createState() => _BudgetPaymentsSetupStepState();
 }
 
-class _BudgetPaymentsSetupWidgetState extends State<BudgetPaymentsSetupWidget> {
+class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
   final List<_PaymentRowData> _rows = [];
 
   @override

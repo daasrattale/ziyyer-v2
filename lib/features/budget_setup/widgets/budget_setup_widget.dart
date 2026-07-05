@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_widget.dart';
-import 'package:ziyyer/features/budget_setup/widgets/budget_payments_setup_widget.dart';
+import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_step.dart';
+import 'package:ziyyer/features/budget_setup/widgets/budget_payments_setup_step.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/widgets/custom_stepper.dart';
 
@@ -41,7 +41,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
         steps: [
           CustomStepperStep(
             title: 'Budget Income',
-            content: BudgetAmountCurrencySetupWidget(
+            content: BudgetAmountCurrencySetupStep(
               onAmountChanged: (amount) {
                 setState(() {
                   budgetModel.definedAmount = amount;
@@ -54,7 +54,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
           ),
           CustomStepperStep(
             title: 'Budget Payements',
-            content: BudgetPaymentsSetupWidget(
+            content: BudgetPaymentsSetupStep(
               budgetModel: budgetModel,
               onPaymentsChanged: (payments) {
                 setState(() {

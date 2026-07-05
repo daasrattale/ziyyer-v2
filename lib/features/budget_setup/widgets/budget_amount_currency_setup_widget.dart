@@ -26,7 +26,7 @@ class _BudgetAmountCurrencySetupState extends State<BudgetAmountCurrencySetupWid
   void initState() {
     super.initState();
     amount = BudgetSetupController.instance.defaultBudgetAmount;
-    currency = AppConstants.supportedCurrencies.first;
+    currency = AppConstants.defaultCurrency;
     amountController = TextEditingController(text: amount.toString());
 
     amountController.addListener(_onAmountChanged);
@@ -49,54 +49,37 @@ class _BudgetAmountCurrencySetupState extends State<BudgetAmountCurrencySetupWid
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Padding(
-        //   padding: const EdgeInsets.symmetric(horizontal: 16),
-        //   child: Center(
-        //     child: const Text(
-        //       'Budget & Currency',
-        //       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        //       textAlign: TextAlign.center,
-        //     ),
-        //   ),
-        // ),
-        // const SizedBox(height: 32),
-        // StepsSection(),
-        // const SizedBox(height: 32),
-        SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TitleSection(),
-                const SizedBox(height: 24),
-                CurrencySelectorSection(
-                  currency: currency,
-                  onCurrencyUpdated: (currency) {
-                    setState(() {
-                      this.currency = currency;
-                      widget.onCurrencyChanged.call(currency);
-                    });
-                  },
-                ),
-                const SizedBox(height: 24),
-                TotalBudgetSection(currency: currency, amountController: amountController),
-                const SizedBox(height: 24),
-                QuicksetSection(
-                  amount: amount,
-                  currency: currency,
-                  onAmountSelected: (value) {
-                    amountController.text = value.toString();
-                  },
-                ),
-                const SizedBox(height: 24),
-              ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TitleSection(),
+            const SizedBox(height: 24),
+            CurrencySelectorSection(
+              currency: currency,
+              onCurrencyUpdated: (currency) {
+                setState(() {
+                  this.currency = currency;
+                  widget.onCurrencyChanged.call(currency);
+                });
+              },
             ),
-          ),
+            const SizedBox(height: 24),
+            TotalBudgetSection(currency: currency, amountController: amountController),
+            const SizedBox(height: 24),
+            QuicksetSection(
+              amount: amount,
+              currency: currency,
+              onAmountSelected: (value) {
+                amountController.text = value.toString();
+              },
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

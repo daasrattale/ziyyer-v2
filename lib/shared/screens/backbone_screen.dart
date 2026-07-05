@@ -22,6 +22,8 @@ class _BackboneScreenState extends State<BackboneScreen> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     final isLandscape = screenWidth > screenHeight;
+    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomSafe = MediaQuery.of(context).padding.bottom;
 
     final horizontalMargin = screenWidth * 0.04;
 
@@ -32,20 +34,39 @@ class _BackboneScreenState extends State<BackboneScreen> {
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: BottomBar(
-        layout: BottomBarLayout(width: maxWidth, borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius)),
-        body: SafeArea(bottom: false, child: widget.navigationShell),
-        motion: const BottomBarMotion.cupertino(preset: BottomBarCupertinoMotion.interactive, duration: Duration(milliseconds: 360)),
+        layout: BottomBarLayout(
+          width: maxWidth,
+          respectSafeArea: false,
+          borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
+          offset: 20,
+        ),
+        body: SafeArea(
+          child: Container(
+            margin: EdgeInsets.only(top: 16, bottom: bottomSafe + bottomInset + 30),
+            child: widget.navigationShell,
+          ),
+        ),
+        motion: const BottomBarMotion.cupertino(
+          preset: BottomBarCupertinoMotion.interactive,
+          duration: Duration(milliseconds: 360),
+        ),
         child: Container(
           decoration: BoxDecoration(
             color: AppColors.surface(context),
-            boxShadow: [BoxShadow(blurRadius: 20, offset: const Offset(0, -5), color: AppColors.textPrimary(context).withAlpha(15))],
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 20,
+                offset: const Offset(0, -5),
+                color: AppColors.textPrimary(context).withAlpha(15),
+              ),
+            ],
             borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
             border: Border.all(color: AppColors.card(context)),
           ),
           child: Padding(
             padding: containerPadding,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _NavItem(
                   icon: AppIcons.home,
@@ -128,17 +149,23 @@ class _NavItem extends StatelessWidget {
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: Icon(icon, key: ValueKey(isSelected), size: iconSize, color: isSelected ? selectedColor : unselectedColor),
+              child: Icon(
+                icon,
+                key: ValueKey(isSelected),
+                size: iconSize,
+                color: isSelected ? selectedColor : unselectedColor,
+              ),
             ),
             SizedBox(height: spacing),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 200),
               style:
-                  (isSelected ? Theme.of(context).textTheme.labelLarge : Theme.of(context).textTheme.labelSmall)?.copyWith(
-                    fontSize: fontSize,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? selectedColor : unselectedColor,
-                  ) ??
+                  (isSelected ? Theme.of(context).textTheme.labelLarge : Theme.of(context).textTheme.labelSmall)
+                      ?.copyWith(
+                        fontSize: fontSize,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        color: isSelected ? selectedColor : unselectedColor,
+                      ) ??
                   TextStyle(
                     fontSize: fontSize,
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,

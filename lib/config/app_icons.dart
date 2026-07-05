@@ -22,4 +22,6 @@ class AppIcons {
   static const IconData arrowRight = LucideIcons.moveRight;
   static const IconData arrowLeft = LucideIcons.moveLeft;
   static const IconData check = LucideIcons.check;
+  static const IconData receipt = LucideIcons.receiptText;
+  static const IconData trash = LucideIcons.trash;
 }

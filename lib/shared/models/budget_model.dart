@@ -1,10 +1,23 @@
 import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/features/budget_setup/controllers/budget_setup_controller.dart';
 import 'package:ziyyer/shared/database/database.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
+import 'package:ziyyer/shared/models/payement_model.dart';
 
 import 'category_model.dart';
 
 class BudgetModel {
+  int? id;
+  double definedAmount;
+  double realAmount;
+  double allocatedAmount;
+  double unallocatedAmount;
+  CurrencyModel currency;
+  List<CategoryModel> categories;
+  List<PaymentModel>? payements;
+  DateTime? createdAt;
+  DateTime? updatedAt;
+
   BudgetModel({
     required this.id,
     required this.definedAmount,
@@ -53,7 +66,7 @@ class BudgetModel {
   factory BudgetModel.init() {
     return BudgetModel(
       id: null,
-      definedAmount: 0.0,
+      definedAmount: BudgetSetupController.instance.defaultBudgetAmount,
       realAmount: 0.0,
       allocatedAmount: 0.0,
       unallocatedAmount: 0.0,
@@ -63,14 +76,4 @@ class BudgetModel {
       updatedAt: null,
     );
   }
-
-  int? id;
-  double definedAmount;
-  double realAmount;
-  double allocatedAmount;
-  double unallocatedAmount;
-  CurrencyModel currency;
-  List<CategoryModel> categories;
-  DateTime? createdAt;
-  DateTime? updatedAt;
 }

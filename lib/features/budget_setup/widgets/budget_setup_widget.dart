@@ -24,10 +24,6 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
 
   BudgetService budgetService = ServiceLocator.budgetService;
 
-  void syncBudget(BudgetModel budgetModel) {
-    budgetService.persist(budgetModel);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

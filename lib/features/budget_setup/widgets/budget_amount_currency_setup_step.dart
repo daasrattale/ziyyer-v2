@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/config/app_constants.dart';
-import 'package:ziyyer/features/budget_setup/controllers/budget_setup_controller.dart';
 import 'package:ziyyer/features/budget_setup/widgets/sections/currency_selector_section.dart';
 import 'package:ziyyer/features/budget_setup/widgets/sections/quickset_section.dart';
 import 'package:ziyyer/features/budget_setup/widgets/sections/title_section.dart';
 import 'package:ziyyer/features/budget_setup/widgets/sections/total_budget_section.dart';
+import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
 
 class BudgetAmountCurrencySetupStep extends StatefulWidget {
+  final BudgetModel budgetModel;
   final Function(double amount) onAmountChanged;
   final Function(CurrencyModel currency) onCurrencyChanged;
 
-  const BudgetAmountCurrencySetupStep({super.key, required this.onAmountChanged, required this.onCurrencyChanged});
+  const BudgetAmountCurrencySetupStep({
+    super.key,
+    required this.onAmountChanged,
+    required this.onCurrencyChanged,
+    required this.budgetModel,
+  });
 
   @override
   State<BudgetAmountCurrencySetupStep> createState() => _BudgetAmountCurrencySetupStepState();
@@ -25,9 +30,9 @@ class _BudgetAmountCurrencySetupStepState extends State<BudgetAmountCurrencySetu
   @override
   void initState() {
     super.initState();
-    amount = BudgetSetupController.instance.defaultBudgetAmount;
-    currency = AppConstants.defaultCurrency;
-    amountController = TextEditingController(text: amount.toString());
+    amount = widget.budgetModel.definedAmount;
+    currency = widget.budgetModel.currency;
+    amountController = TextEditingController(text: widget.budgetModel.definedAmount.toString());
 
     amountController.addListener(_onAmountChanged);
   }
@@ -54,6 +59,7 @@ class _BudgetAmountCurrencySetupStepState extends State<BudgetAmountCurrencySetu
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TitleSection(),
             const SizedBox(height: 24),

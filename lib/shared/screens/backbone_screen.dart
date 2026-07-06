@@ -94,8 +94,8 @@ class _BackboneScreenState extends State<BackboneScreen> {
                   isLandscape: isLandscape,
                 ),
                 _NavItem(
-                  icon: AppIcons.budget,
-                  label: 'Budget',
+                  icon: AppIcons.settings,
+                  label: 'Settings',
                   isSelected: widget.navigationShell.currentIndex == 3,
                   onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
                   screenWidth: screenWidth,

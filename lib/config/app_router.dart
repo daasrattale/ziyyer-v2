@@ -26,10 +26,12 @@ final GoRouter appRouter = GoRouter(
           routes: [GoRoute(path: '/insights', name: 'insights', builder: (context, state) => const InsightsScreen())],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/wallet', name: 'wallet', builder: (context, state) => const BudgetScreen())],
+          routes: [
+            GoRoute(path: '/add-expense', name: 'add-expense', builder: (context, state) => const AddExpenseScreen()),
+          ],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/add-expense', name: 'add-expense', builder: (context, state) => const AddExpenseScreen())],
+          routes: [GoRoute(path: '/budget', name: 'budget', builder: (context, state) => const BudgetScreen())],
         ),
       ],
     ),

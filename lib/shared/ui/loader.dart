@@ -11,6 +11,8 @@ class Loader extends StatelessWidget {
     Color defaultColor = color ?? Theme.of(context).primaryColor;
     double defaultSize = size ?? MediaQuery.of(context).size.width * .1;
 
-    return LoadingAnimationWidget.threeRotatingDots(color: defaultColor, size: defaultSize);
+    return Center(
+      child: LoadingAnimationWidget.threeRotatingDots(color: defaultColor, size: defaultSize),
+    );
   }
 }

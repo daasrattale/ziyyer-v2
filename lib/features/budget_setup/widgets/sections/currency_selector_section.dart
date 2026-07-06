@@ -50,7 +50,10 @@ class _CurrencySelectorSectionState extends State<CurrencySelectorSection> {
           // keeps the sheet floating & centered, similar to your mock
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 360),
-            child: _CurrencyBottomSheet(currentCurrency: currency, supportedCurrencies: AppConstants.supportedCurrencies),
+            child: _CurrencyBottomSheet(
+              currentCurrency: currency,
+              supportedCurrencies: AppConstants.supportedCurrencies,
+            ),
           ),
         );
       },
@@ -58,6 +61,7 @@ class _CurrencySelectorSectionState extends State<CurrencySelectorSection> {
 
     if (selected != null) {
       widget.onCurrencyUpdated.call(selected);
+      currency = selected;
     }
   }
 }

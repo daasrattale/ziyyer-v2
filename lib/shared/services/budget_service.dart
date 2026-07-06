@@ -1,96 +1,116 @@
 import 'dart:async';
 
+import 'package:drift/drift.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:ziyyer/shared/database/database.dart';
 import 'package:ziyyer/shared/database/persistence/budget_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/category_persistence.dart';
+import 'package:ziyyer/shared/database/persistence/payment_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
+import 'package:ziyyer/shared/models/payement_model.dart';
 
 class BudgetService {
   BudgetService();
 
   final BudgetPersistence _budgetPersistence = PersistenceLocator.budgetPersistence;
   final CategoryPersistence _categoryPersistence = PersistenceLocator.categoryPersistence;
+  final PaymentPersistence _paymentPersistence = PersistenceLocator.paymentPersistence;
 
-  /// Returns `true` if a budget row exists in the database.
-  ///
-  /// This method performs a one-time query against the budget table and
-  /// returns `false` if no budget record is found.
-  Future<bool> budgetExists() async {
-    return _budgetPersistence.budgetExists();
-  }
+  Future<int> persist(BudgetModel model) {
+    return _budgetPersistence.transaction(() async {
+      final now = DateTime.now();
+      final existingBudget = await _budgetPersistence.watch().first;
 
-  /// Watches whether a budget row exists in the database.
-  ///
-  /// The returned stream emits `true` when the budget table contains a budget
-  /// record and `false` when it is empty. It updates automatically whenever
-  /// the underlying budget table changes.
-  Stream<bool> watchBudgetExists() {
-    return _budgetPersistence.watchBudgetExists();
-  }
+      final int budgetId;
 
-  /// Watches the current budget and enriches it with category details.
-  ///
-  /// The returned stream emits a `BudgetModel` containing the latest budget
-  /// values along with category allocations, allocated amount, and
-  /// unallocated amount. If no budget exists, the stream emits `null`.
-  Stream<BudgetModel?> watchBudgetWithCategories() {
-    final controller = StreamController<BudgetModel?>();
-    StreamSubscription<BudgetModel?>? budgetSubscription;
-    StreamSubscription<List<CategoryModel>>? categorySubscription;
-    BudgetModel? latestBudget;
-
-    void subscribeToCategories() {
-      categorySubscription?.cancel();
-
-      final budget = latestBudget;
-      if (budget == null || budget.id == null) {
-        controller.add(null);
-        return;
-      }
-
-      categorySubscription = _categoryPersistence.watchCategoriesForBudget(budget.id!).listen((categories) {
-        final allocatedAmount = categories.fold<double>(0, (sum, category) => sum + category.definedAmount);
-        final unallocatedAmount = budget.definedAmount - allocatedAmount;
-
-        controller.add(
-          budget.copyWith(
-            allocatedAmount: allocatedAmount,
-            unallocatedAmount: unallocatedAmount,
-            categories: categories,
+      if (existingBudget == null) {
+        budgetId = await _budgetPersistence.create(
+          BudgetTableCompanion.insert(
+            definedAmount: model.definedAmount,
+            currency: model.currency.code,
+            createdAt: now,
+            updatedAt: now,
           ),
         );
-      }, onError: controller.addError);
-    }
+      } else {
+        budgetId = existingBudget.id;
 
-    controller.onListen = () {
-      budgetSubscription = _budgetPersistence.watchBudget().listen(
-        (budget) {
-          latestBudget = budget;
-          if (budget == null) {
-            categorySubscription?.cancel();
-            categorySubscription = null;
-            controller.add(null);
-            return;
-          }
+        await _budgetPersistence.update(
+          existingBudget.id,
+          BudgetTableCompanion(
+            definedAmount: Value(model.definedAmount),
+            currency: Value(model.currency.code),
+            updatedAt: Value(now),
+          ),
+        );
+      }
 
-          subscribeToCategories();
-        },
-        onError: controller.addError,
-        onDone: controller.close,
-      );
-    };
+      final paymentCompanions = model.payments
+          .map(
+            (payment) => PaymentTableCompanion.insert(budgetId: budgetId, name: payment.name, amount: payment.amount),
+          )
+          .toList();
 
-    controller.onCancel = () async {
-      await budgetSubscription?.cancel();
-      await categorySubscription?.cancel();
-    };
+      final categoryCompanions = model.categories
+          .map(
+            (category) => CategoryTableCompanion.insert(
+              budgetId: budgetId,
+              name: category.name,
+              definedAmount: category.definedAmount,
+              realAmount: Value(category.realAmount),
+              createdAt: category.createdAt,
+              updatedAt: category.updatedAt,
+            ),
+          )
+          .toList();
 
-    return controller.stream;
+      await _paymentPersistence.update(budgetId, paymentCompanions);
+      await _categoryPersistence.update(budgetId, categoryCompanions);
+
+      return budgetId;
+    });
   }
 
-  /// Creates a new budget row in the database.
-  Future<void> createBudget({required double definedAmount, required String currency}) async {
-    await _budgetPersistence.createBudget(definedAmount: definedAmount, currency: currency);
+  Stream<BudgetModel?> watch() {
+    return _budgetPersistence.watch().switchMap((budget) {
+      if (budget == null) {
+        return Stream.value(null);
+      }
+
+      return Rx.combineLatest2<List<Category>, List<Payment>, BudgetModel>(
+        _categoryPersistence.watch().startWith(const []),
+        _paymentPersistence.watch().startWith(const []),
+        (categories, payments) {
+          final mappedCategories = categories
+              .where((category) => category.budgetId == budget.id)
+              .map(
+                (category) => CategoryModel(
+                  id: category.id,
+                  name: category.name,
+                  definedAmount: category.definedAmount,
+                  realAmount: category.realAmount,
+                  createdAt: category.createdAt,
+                  updatedAt: category.updatedAt,
+                ),
+              )
+              .toList();
+
+          final mappedPayments = payments
+              .where((payment) => payment.budgetId == budget.id)
+              .map((payment) => PaymentModel(id: payment.id, name: payment.name, amount: payment.amount))
+              .toList();
+
+          return BudgetModel.fromBudget(
+            budget,
+            categories: mappedCategories,
+            payments: mappedPayments,
+            allocatedAmount: 0,
+            unallocatedAmount: 0,
+          );
+        },
+      );
+    });
   }
 }

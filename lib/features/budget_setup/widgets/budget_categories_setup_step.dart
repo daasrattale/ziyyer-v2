@@ -2,62 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
-import 'package:ziyyer/shared/models/payement_model.dart';
+import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/theme.dart';
 
-class BudgetPaymentsSetupStep extends StatefulWidget {
-  final Function(List<PaymentModel> payments) onPaymentsChanged;
+class BudgetCategoriesSetupStep extends StatefulWidget {
+  final Function(List<CategoryModel> categories) onCategoriesChanged;
   final BudgetModel budgetModel;
 
-  const BudgetPaymentsSetupStep({super.key, required this.onPaymentsChanged, required this.budgetModel});
+  const BudgetCategoriesSetupStep({super.key, required this.onCategoriesChanged, required this.budgetModel});
 
   @override
-  State<BudgetPaymentsSetupStep> createState() => _BudgetPaymentsSetupStepState();
+  State<BudgetCategoriesSetupStep> createState() => _BudgetCategoriesSetupStepState();
 }
 
-class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
-  final List<_PaymentRowData> _rows = [];
+class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
+  final List<_CategoryRowData> _rows = [];
 
   @override
   void initState() {
     super.initState();
 
-    final existingPayments = widget.budgetModel.payments;
+    final existingCategories = widget.budgetModel.categories;
 
-    if (existingPayments.isNotEmpty) {
+    if (existingCategories.isNotEmpty) {
       _rows.addAll(
-        existingPayments.map(
-          (payment) => _PaymentRowData(
+        existingCategories.map(
+          (category) => _CategoryRowData(
             onChanged: _handleRowChanged,
-            initialName: payment.name,
-            initialAmount: _amountToText(payment.amount),
+            initialAmount: category.definedAmount.toString(),
+            initialName: category.name,
           ),
         ),
       );
-    } else {
-      _rows.add(_PaymentRowData(onChanged: _handleRowChanged));
     }
+
+    _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _notifyParent();
     });
-  }
-
-  static String _amountToText(double value) {
-    if (value == 0) return '';
-    if (value == value.roundToDouble()) {
-      return value.toInt().toString();
-    }
-    return value.toStringAsFixed(2);
-  }
-
-  @override
-  void dispose() {
-    for (final row in _rows) {
-      row.dispose();
-    }
-    super.dispose();
   }
 
   void _handleRowChanged() {
@@ -67,7 +51,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
 
   void _addEmptyRow() {
     setState(() {
-      _rows.add(_PaymentRowData(onChanged: _handleRowChanged));
+      _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
     });
     _notifyParent();
   }
@@ -89,30 +73,23 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
   }
 
   void _notifyParent() {
-    final payments = _rows
+    final now = DateTime.now();
+
+    final categories = _rows
         .map(
-          (row) => PaymentModel(
-            id: null,
+          (row) => CategoryModel(
+            id: 0,
             name: row.nameController.text.trim(),
-            amount: double.tryParse(row.amountController.text.trim().replaceAll(',', '.')) ?? 0.0,
+            definedAmount: double.tryParse(row.amountController.text.trim().replaceAll(',', '.')) ?? 0.0,
+            realAmount: 0.0,
+            createdAt: now,
+            updatedAt: now,
           ),
         )
-        .where((payment) => payment.name.isNotEmpty || payment.amount > 0)
+        .where((category) => category.name.isNotEmpty || category.definedAmount > 0)
         .toList();
 
-    widget.onPaymentsChanged(payments);
-  }
-
-  double get _fixedTotal {
-    return _rows.fold(0.0, (sum, row) {
-      final amount = double.tryParse(row.amountController.text.trim().replaceAll(',', '.')) ?? 0.0;
-      return sum + amount;
-    });
-  }
-
-  double get _leftToAllocate {
-    final left = widget.budgetModel.definedAmount - _fixedTotal;
-    return left < 0 ? 0 : left;
+    widget.onCategoriesChanged(categories);
   }
 
   String _formatAmount(double value) {
@@ -129,13 +106,13 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
       children: [
         const SizedBox(height: 8),
         Text(
-          'Recurring payments',
+          'Spending categories',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
         ),
         const SizedBox(height: 8),
         Text(
-          'Add recurring bills like rent or subscriptions.',
+          'Split your budget into categories like groceries or transport.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontWeight: FontWeight.w400),
         ),
@@ -152,15 +129,15 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
             children: [
               Expanded(
                 child: _SummaryValue(
-                  label: 'FIXED TOTAL',
-                  value: _formatAmount(_fixedTotal),
+                  label: 'CATEGORIES TOTAL',
+                  value: _formatAmount(widget.budgetModel.allocatedCategoriesAmount),
                   alignment: CrossAxisAlignment.start,
                 ),
               ),
               Expanded(
                 child: _SummaryValue(
                   label: 'LEFT TO ALLOCATE',
-                  value: _formatAmount(_leftToAllocate),
+                  value: _formatAmount(widget.budgetModel.unallocatedAmount),
                   alignment: CrossAxisAlignment.end,
                   textAlign: TextAlign.right,
                 ),
@@ -193,7 +170,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                         height: 40,
                         decoration: BoxDecoration(color: AppColors.background(context), shape: BoxShape.circle),
                         alignment: Alignment.center,
-                        child: Icon(AppIcons.receipt, color: AppColors.textHint(context), size: 18),
+                        child: Icon(AppIcons.category, color: AppColors.textHint(context), size: 18),
                       ),
                       const SizedBox(width: 14),
 
@@ -207,7 +184,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                             color: AppColors.textPrimary(context),
                           ),
                           decoration: InputDecoration(
-                            hintText: 'e.g. Netflix',
+                            hintText: 'e.g. Groceries',
                             hintStyle: TextStyle(
                               color: AppColors.textHint(context),
                               fontSize: 14,
@@ -232,10 +209,10 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                           children: [
                             Text(
                               widget.budgetModel.currency.symbol,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textSecondary(context),
+                                color: Color(0xFF5B6170),
                               ),
                             ),
                             Expanded(
@@ -289,7 +266,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                 Icon(AppIcons.add, color: AppColors.textSecondary(context), size: 22),
                 const SizedBox(width: 10),
                 Text(
-                  'Add another payment',
+                  'Add another category',
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context)),
                 ),
               ],
@@ -298,7 +275,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
         ),
         const SizedBox(height: 18),
         Text(
-          'Optional · skip if you have no recurring bills',
+          'Optional · adjust categories later anytime',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
         ),
@@ -346,13 +323,13 @@ class _SummaryValue extends StatelessWidget {
   }
 }
 
-class _PaymentRowData {
+class _CategoryRowData {
   final VoidCallback onChanged;
 
   final TextEditingController nameController;
   final TextEditingController amountController;
 
-  _PaymentRowData({required this.onChanged, String initialName = '', String initialAmount = ''})
+  _CategoryRowData({required this.onChanged, String initialName = '', String initialAmount = ''})
     : nameController = TextEditingController(text: initialName),
       amountController = TextEditingController(text: initialAmount) {
     nameController.addListener(onChanged);

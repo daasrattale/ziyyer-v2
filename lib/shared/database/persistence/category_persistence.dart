@@ -1,48 +1,29 @@
 import 'package:ziyyer/shared/database/database.dart';
-import 'package:ziyyer/shared/models/category_model.dart';
 
 class CategoryPersistence {
-  CategoryPersistence(this._db);
+  CategoryPersistence(this.db);
 
-  final AppDatabase _db;
+  final AppDatabase db;
 
-  /// Returns all categories for the given budget id.
-  Future<List<CategoryModel>> getCategoriesForBudget(int budgetId) async {
-    final categories = await (_db.select(_db.categoryTable)..where((tbl) => tbl.budgetId.equals(budgetId))).get();
+  Future<void> create(List<CategoryTableCompanion> companions) async {
+    if (companions.isEmpty) return;
 
-    return categories
-        .map(
-          (category) => CategoryModel(
-            id: category.id,
-            budgetId: category.budgetId,
-            name: category.name,
-            definedAmount: category.definedAmount,
-            realAmount: category.realAmount,
-            createdAt: category.createdAt,
-            updatedAt: category.updatedAt,
-          ),
-        )
-        .toList();
+    await db.batch((batch) {
+      batch.insertAll(db.categoryTable, companions);
+    });
   }
 
-  /// Streams all categories for the given budget id.
-  Stream<List<CategoryModel>> watchCategoriesForBudget(int budgetId) {
-    return (_db.select(_db.categoryTable)..where((tbl) => tbl.budgetId.equals(budgetId))).watch().map(
-      (categories) => categories
-          .map(
-            (category) => CategoryModel(
-              id: category.id,
-              budgetId: category.budgetId,
-              name: category.name,
-              definedAmount: category.definedAmount,
-              realAmount: category.realAmount,
-              createdAt: category.createdAt,
-              updatedAt: category.updatedAt,
-            ),
-          )
-          .toList(),
-    );
+  Future<void> update(int budgetId, List<CategoryTableCompanion> companions) async {
+    await (db.delete(db.categoryTable)..where((t) => t.budgetId.equals(budgetId))).go();
+
+    if (companions.isEmpty) return;
+
+    await db.batch((batch) {
+      batch.insertAll(db.categoryTable, companions);
+    });
   }
 
-  // todo: create a function that saves a category and bulk of categories
+  Stream<List<Category>> watch() {
+    return db.select(db.categoryTable).watch();
+  }
 }

@@ -1031,6 +1031,255 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
   }
 }
 
+class $PaymentTableTable extends PaymentTable
+    with TableInfo<$PaymentTableTable, Payment> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PaymentTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _budgetIdMeta =
+      const VerificationMeta('budgetId');
+  @override
+  late final GeneratedColumn<int> budgetId = GeneratedColumn<int>(
+      'budget_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES budget_table (id)'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _amountMeta = const VerificationMeta('amount');
+  @override
+  late final GeneratedColumn<double> amount = GeneratedColumn<double>(
+      'amount', aliasedName, false,
+      type: DriftSqlType.double, requiredDuringInsert: true);
+  @override
+  List<GeneratedColumn> get $columns => [id, budgetId, name, amount];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'payment_table';
+  @override
+  VerificationContext validateIntegrity(Insertable<Payment> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('budget_id')) {
+      context.handle(_budgetIdMeta,
+          budgetId.isAcceptableOrUnknown(data['budget_id']!, _budgetIdMeta));
+    } else if (isInserting) {
+      context.missing(_budgetIdMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('amount')) {
+      context.handle(_amountMeta,
+          amount.isAcceptableOrUnknown(data['amount']!, _amountMeta));
+    } else if (isInserting) {
+      context.missing(_amountMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Payment map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Payment(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      budgetId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}budget_id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      amount: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}amount'])!,
+    );
+  }
+
+  @override
+  $PaymentTableTable createAlias(String alias) {
+    return $PaymentTableTable(attachedDatabase, alias);
+  }
+}
+
+class Payment extends DataClass implements Insertable<Payment> {
+  final int id;
+  final int budgetId;
+  final String name;
+  final double amount;
+  const Payment(
+      {required this.id,
+      required this.budgetId,
+      required this.name,
+      required this.amount});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['budget_id'] = Variable<int>(budgetId);
+    map['name'] = Variable<String>(name);
+    map['amount'] = Variable<double>(amount);
+    return map;
+  }
+
+  PaymentTableCompanion toCompanion(bool nullToAbsent) {
+    return PaymentTableCompanion(
+      id: Value(id),
+      budgetId: Value(budgetId),
+      name: Value(name),
+      amount: Value(amount),
+    );
+  }
+
+  factory Payment.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Payment(
+      id: serializer.fromJson<int>(json['id']),
+      budgetId: serializer.fromJson<int>(json['budgetId']),
+      name: serializer.fromJson<String>(json['name']),
+      amount: serializer.fromJson<double>(json['amount']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'budgetId': serializer.toJson<int>(budgetId),
+      'name': serializer.toJson<String>(name),
+      'amount': serializer.toJson<double>(amount),
+    };
+  }
+
+  Payment copyWith({int? id, int? budgetId, String? name, double? amount}) =>
+      Payment(
+        id: id ?? this.id,
+        budgetId: budgetId ?? this.budgetId,
+        name: name ?? this.name,
+        amount: amount ?? this.amount,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('Payment(')
+          ..write('id: $id, ')
+          ..write('budgetId: $budgetId, ')
+          ..write('name: $name, ')
+          ..write('amount: $amount')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, budgetId, name, amount);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Payment &&
+          other.id == this.id &&
+          other.budgetId == this.budgetId &&
+          other.name == this.name &&
+          other.amount == this.amount);
+}
+
+class PaymentTableCompanion extends UpdateCompanion<Payment> {
+  final Value<int> id;
+  final Value<int> budgetId;
+  final Value<String> name;
+  final Value<double> amount;
+  const PaymentTableCompanion({
+    this.id = const Value.absent(),
+    this.budgetId = const Value.absent(),
+    this.name = const Value.absent(),
+    this.amount = const Value.absent(),
+  });
+  PaymentTableCompanion.insert({
+    this.id = const Value.absent(),
+    required int budgetId,
+    required String name,
+    required double amount,
+  })  : budgetId = Value(budgetId),
+        name = Value(name),
+        amount = Value(amount);
+  static Insertable<Payment> custom({
+    Expression<int>? id,
+    Expression<int>? budgetId,
+    Expression<String>? name,
+    Expression<double>? amount,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (budgetId != null) 'budget_id': budgetId,
+      if (name != null) 'name': name,
+      if (amount != null) 'amount': amount,
+    });
+  }
+
+  PaymentTableCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? budgetId,
+      Value<String>? name,
+      Value<double>? amount}) {
+    return PaymentTableCompanion(
+      id: id ?? this.id,
+      budgetId: budgetId ?? this.budgetId,
+      name: name ?? this.name,
+      amount: amount ?? this.amount,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (budgetId.present) {
+      map['budget_id'] = Variable<int>(budgetId.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (amount.present) {
+      map['amount'] = Variable<double>(amount.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PaymentTableCompanion(')
+          ..write('id: $id, ')
+          ..write('budgetId: $budgetId, ')
+          ..write('name: $name, ')
+          ..write('amount: $amount')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   _$AppDatabaseManager get managers => _$AppDatabaseManager(this);
@@ -1038,12 +1287,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CategoryTableTable categoryTable = $CategoryTableTable(this);
   late final $TransactionTableTable transactionTable =
       $TransactionTableTable(this);
+  late final $PaymentTableTable paymentTable = $PaymentTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [budgetTable, categoryTable, transactionTable];
+      [budgetTable, categoryTable, transactionTable, paymentTable];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules(
         [
@@ -1186,6 +1436,19 @@ class $$BudgetTableTableFilterComposer
         builder: (joinBuilder, parentComposers) =>
             $$CategoryTableTableFilterComposer(ComposerState($state.db,
                 $state.db.categoryTable, joinBuilder, parentComposers)));
+    return f(composer);
+  }
+
+  ComposableFilter paymentTableRefs(
+      ComposableFilter Function($$PaymentTableTableFilterComposer f) f) {
+    final $$PaymentTableTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $state.db.paymentTable,
+        getReferencedColumn: (t) => t.budgetId,
+        builder: (joinBuilder, parentComposers) =>
+            $$PaymentTableTableFilterComposer(ComposerState($state.db,
+                $state.db.paymentTable, joinBuilder, parentComposers)));
     return f(composer);
   }
 }
@@ -1591,6 +1854,141 @@ class $$TransactionTableTableOrderingComposer
   }
 }
 
+typedef $$PaymentTableTableInsertCompanionBuilder = PaymentTableCompanion
+    Function({
+  Value<int> id,
+  required int budgetId,
+  required String name,
+  required double amount,
+});
+typedef $$PaymentTableTableUpdateCompanionBuilder = PaymentTableCompanion
+    Function({
+  Value<int> id,
+  Value<int> budgetId,
+  Value<String> name,
+  Value<double> amount,
+});
+
+class $$PaymentTableTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PaymentTableTable,
+    Payment,
+    $$PaymentTableTableFilterComposer,
+    $$PaymentTableTableOrderingComposer,
+    $$PaymentTableTableProcessedTableManager,
+    $$PaymentTableTableInsertCompanionBuilder,
+    $$PaymentTableTableUpdateCompanionBuilder> {
+  $$PaymentTableTableTableManager(_$AppDatabase db, $PaymentTableTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$PaymentTableTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$PaymentTableTableOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) =>
+              $$PaymentTableTableProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            Value<int> budgetId = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<double> amount = const Value.absent(),
+          }) =>
+              PaymentTableCompanion(
+            id: id,
+            budgetId: budgetId,
+            name: name,
+            amount: amount,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<int> id = const Value.absent(),
+            required int budgetId,
+            required String name,
+            required double amount,
+          }) =>
+              PaymentTableCompanion.insert(
+            id: id,
+            budgetId: budgetId,
+            name: name,
+            amount: amount,
+          ),
+        ));
+}
+
+class $$PaymentTableTableProcessedTableManager extends ProcessedTableManager<
+    _$AppDatabase,
+    $PaymentTableTable,
+    Payment,
+    $$PaymentTableTableFilterComposer,
+    $$PaymentTableTableOrderingComposer,
+    $$PaymentTableTableProcessedTableManager,
+    $$PaymentTableTableInsertCompanionBuilder,
+    $$PaymentTableTableUpdateCompanionBuilder> {
+  $$PaymentTableTableProcessedTableManager(super.$state);
+}
+
+class $$PaymentTableTableFilterComposer
+    extends FilterComposer<_$AppDatabase, $PaymentTableTable> {
+  $$PaymentTableTableFilterComposer(super.$state);
+  ColumnFilters<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get amount => $state.composableBuilder(
+      column: $state.table.amount,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  $$BudgetTableTableFilterComposer get budgetId {
+    final $$BudgetTableTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.budgetId,
+        referencedTable: $state.db.budgetTable,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$BudgetTableTableFilterComposer(ComposerState($state.db,
+                $state.db.budgetTable, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
+class $$PaymentTableTableOrderingComposer
+    extends OrderingComposer<_$AppDatabase, $PaymentTableTable> {
+  $$PaymentTableTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get name => $state.composableBuilder(
+      column: $state.table.name,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get amount => $state.composableBuilder(
+      column: $state.table.amount,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $$BudgetTableTableOrderingComposer get budgetId {
+    final $$BudgetTableTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.budgetId,
+        referencedTable: $state.db.budgetTable,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder, parentComposers) =>
+            $$BudgetTableTableOrderingComposer(ComposerState($state.db,
+                $state.db.budgetTable, joinBuilder, parentComposers)));
+    return composer;
+  }
+}
+
 class _$AppDatabaseManager {
   final _$AppDatabase _db;
   _$AppDatabaseManager(this._db);
@@ -1600,4 +1998,6 @@ class _$AppDatabaseManager {
       $$CategoryTableTableTableManager(_db, _db.categoryTable);
   $$TransactionTableTableTableManager get transactionTable =>
       $$TransactionTableTableTableManager(_db, _db.transactionTable);
+  $$PaymentTableTableTableManager get paymentTable =>
+      $$PaymentTableTableTableManager(_db, _db.paymentTable);
 }

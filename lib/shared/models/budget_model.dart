@@ -1,5 +1,4 @@
 import 'package:ziyyer/config/app_constants.dart';
-import 'package:ziyyer/features/budget_setup/controllers/budget_setup_controller.dart';
 import 'package:ziyyer/shared/database/database.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
 import 'package:ziyyer/shared/models/payement_model.dart';
@@ -9,23 +8,18 @@ import 'category_model.dart';
 class BudgetModel {
   int? id;
   double definedAmount;
-  double realAmount;
-  double allocatedAmount;
-  double unallocatedAmount;
   CurrencyModel currency;
   List<CategoryModel> categories;
-  List<PaymentModel>? payements;
+  List<PaymentModel> payments;
   DateTime? createdAt;
   DateTime? updatedAt;
 
   BudgetModel({
     required this.id,
     required this.definedAmount,
-    required this.realAmount,
-    required this.allocatedAmount,
-    required this.unallocatedAmount,
     required this.currency,
     required this.categories,
+    required this.payments,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -35,29 +29,31 @@ class BudgetModel {
     required double allocatedAmount,
     required double unallocatedAmount,
     required List<CategoryModel> categories,
+    required List<PaymentModel> payments,
   }) {
     return BudgetModel(
       id: budget.id,
       definedAmount: budget.definedAmount,
-      realAmount: budget.realAmount,
-      allocatedAmount: allocatedAmount,
-      unallocatedAmount: unallocatedAmount,
       currency: AppConstants.supportedCurrencies.where((c) => c.code == budget.currency).first,
       categories: categories,
+      payments: payments,
       createdAt: budget.createdAt,
       updatedAt: budget.updatedAt,
     );
   }
 
-  BudgetModel copyWith({List<CategoryModel>? categories, double? allocatedAmount, double? unallocatedAmount}) {
+  BudgetModel copyWith({
+    List<CategoryModel>? categories,
+    double? allocatedAmount,
+    double? unallocatedAmount,
+    List<PaymentModel>? payments,
+  }) {
     return BudgetModel(
       id: id,
       definedAmount: definedAmount,
-      realAmount: realAmount,
-      allocatedAmount: allocatedAmount ?? this.allocatedAmount,
-      unallocatedAmount: unallocatedAmount ?? this.unallocatedAmount,
       currency: currency,
       categories: categories ?? this.categories,
+      payments: payments ?? this.payments,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -66,14 +62,23 @@ class BudgetModel {
   factory BudgetModel.init() {
     return BudgetModel(
       id: null,
-      definedAmount: BudgetSetupController.instance.defaultBudgetAmount,
-      realAmount: 0.0,
-      allocatedAmount: 0.0,
-      unallocatedAmount: 0.0,
+      definedAmount: 2500,
       currency: AppConstants.defaultCurrency,
       categories: [],
+      payments: [],
       createdAt: null,
       updatedAt: null,
     );
+  }
+
+  // Getters
+  double get allocatedCategoriesAmount => categories.fold<double>(0, (sum, category) => sum + category.definedAmount);
+  double get allocatedPayementsAmount => payments.fold<double>(0, (sum, payment) => sum + payment.amount);
+  double get allocatedAmount => allocatedCategoriesAmount + allocatedPayementsAmount;
+  double get unallocatedAmount => definedAmount - allocatedAmount;
+
+  @override
+  String toString() {
+    return 'id=$id definedAmount=$definedAmount allocatedAmount=$allocatedAmount unallocatedAmount=$unallocatedAmount currency=$currency categories=$categories payments=$payments createdAt=$createdAt updatedAt=$updatedAt';
   }
 }

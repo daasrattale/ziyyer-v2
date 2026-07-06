@@ -24,4 +24,8 @@ class AppIcons {
   static const IconData check = LucideIcons.check;
   static const IconData receipt = LucideIcons.receiptText;
   static const IconData trash = LucideIcons.trash;
+  static const IconData category = LucideIcons.squareStack;
+  static const IconData x = LucideIcons.x;
+  static const IconData edit = LucideIcons.pencil;
+  static const IconData settings = LucideIcons.settings;
 }

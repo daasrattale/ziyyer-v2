@@ -6,11 +6,12 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:ziyyer/shared/database/tables/budget_table.dart';
 import 'package:ziyyer/shared/database/tables/category_table.dart';
+import 'package:ziyyer/shared/database/tables/payment_table.dart';
 import 'package:ziyyer/shared/database/tables/transaction_table.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [BudgetTable, CategoryTable, TransactionTable])
+@DriftDatabase(tables: [BudgetTable, CategoryTable, TransactionTable, PaymentTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 

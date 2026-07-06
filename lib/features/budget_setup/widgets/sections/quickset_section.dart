@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/features/budget_setup/controllers/budget_setup_controller.dart';
+import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
 import 'package:ziyyer/shared/utils/amount_formatter.dart';
 import 'package:ziyyer/theme.dart';
@@ -13,7 +13,7 @@ class QuicksetSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double defaultAmount = BudgetSetupController.instance.defaultBudgetAmount;
+    double defaultAmount = BudgetModel.init().definedAmount;
     final quickSetValues = [defaultAmount / 2, defaultAmount, defaultAmount + (defaultAmount * 0.6)];
 
     return Column(
@@ -41,7 +41,11 @@ class QuicksetSection extends StatelessWidget {
                     ),
                     child: Text(
                       '${currency.symbol} ${AmountFormatter.formatAmount(value)}',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: isSelected ? Colors.white : AppColors.textPrimary(context)),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: isSelected ? Colors.white : AppColors.textPrimary(context),
+                      ),
                     ),
                   ),
                 ),

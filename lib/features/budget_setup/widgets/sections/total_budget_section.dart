@@ -4,20 +4,24 @@ import 'package:ziyyer/shared/models/currency_model.dart';
 class TotalBudgetSection extends StatelessWidget {
   final CurrencyModel currency;
   final TextEditingController amountController;
+
   const TotalBudgetSection({super.key, required this.currency, required this.amountController});
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Expanded(
-          child: Text(currency.symbol, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-        ),
         SizedBox(
-          width: screenWidth * 0.8,
+          width: 32,
+          child: Text(
+            currency.symbol,
+            textAlign: TextAlign.end,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+          ),
+        ),
+        Expanded(
           child: TextField(
             controller: amountController,
             keyboardType: TextInputType.number,

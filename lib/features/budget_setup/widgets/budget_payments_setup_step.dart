@@ -103,18 +103,6 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
     widget.onPaymentsChanged(payments);
   }
 
-  double get _fixedTotal {
-    return _rows.fold(0.0, (sum, row) {
-      final amount = double.tryParse(row.amountController.text.trim().replaceAll(',', '.')) ?? 0.0;
-      return sum + amount;
-    });
-  }
-
-  double get _leftToAllocate {
-    final left = widget.budgetModel.definedAmount - _fixedTotal;
-    return left < 0 ? 0 : left;
-  }
-
   String _formatAmount(double value) {
     if (value == value.roundToDouble()) {
       return '${widget.budgetModel.currency.symbol} ${value.toInt()}';
@@ -152,15 +140,15 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
             children: [
               Expanded(
                 child: _SummaryValue(
-                  label: 'FIXED TOTAL',
-                  value: _formatAmount(_fixedTotal),
+                  label: 'TOTAL PAYMENTS',
+                  value: _formatAmount(widget.budgetModel.allocatedPayementsAmount),
                   alignment: CrossAxisAlignment.start,
                 ),
               ),
               Expanded(
                 child: _SummaryValue(
                   label: 'LEFT TO ALLOCATE',
-                  value: _formatAmount(_leftToAllocate),
+                  value: _formatAmount(widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount),
                   alignment: CrossAxisAlignment.end,
                   textAlign: TextAlign.right,
                 ),

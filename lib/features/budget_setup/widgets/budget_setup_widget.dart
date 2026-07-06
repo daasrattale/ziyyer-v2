@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toastification/toastification.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_step.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_categories_setup_step.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_payments_setup_step.dart';
@@ -10,6 +9,7 @@ import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/services/budget_service.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
 import 'package:ziyyer/shared/ui/loader.dart';
+import 'package:ziyyer/shared/utils/toaster.dart';
 import 'package:ziyyer/widgets/custom_stepper.dart';
 
 class BudgetSetupWidget extends StatefulWidget {
@@ -34,7 +34,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
       body: StreamBuilder<BudgetModel?>(
         stream: budgetService.watch(),
         builder: (context, budgetSnapshot) {
-          if (budgetSnapshot.connectionState == ConnectionState.waiting) {
+          if (budgetSnapshot.connectionState == ConnectionState.waiting && _currentIndex == 0) {
             return Loader();
           }
 
@@ -45,23 +45,27 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
           return CustomStepper(
             initialActiveIndex: _currentIndex,
             goToNextStep: () {
-              if (_currentIndex < 2) {
-                if (budgetModel.definedAmount <= 0) {
-                  toastification.show(
-                    context: context,
-                    type: ToastificationType.error,
-                    style: ToastificationStyle.fillColored,
-                    title: Text('Budget amount must be greater than 0.00'),
-                    autoCloseDuration: const Duration(seconds: 5),
-                  );
-                  return;
-                }
-                budgetService.persist(budgetModel);
-
-                setState(() {
-                  _currentIndex++;
-                });
+              if (_currentIndex > 2) return;
+              // Amount Step
+              if (_currentIndex == 0 && budgetModel.definedAmount <= 0) {
+                Toaster.error('Budget amount must be greater than 0');
+                return;
               }
+              // Payments Step
+              if (_currentIndex == 1 && budgetModel.definedAmount - budgetModel.allocatedPayementsAmount < 0) {
+                Toaster.error('Budget unallocated must be greater than 0');
+                return;
+              }
+              // Categories Step
+              if (_currentIndex == 2 && budgetModel.unallocatedAmount < 0) {
+                Toaster.error('Budget unallocated must be greater than 0');
+                return;
+              }
+              budgetService.persist(budgetModel);
+
+              setState(() {
+                _currentIndex++;
+              });
             },
             goToDoneStep: () {
               budgetService.persist(budgetModel);

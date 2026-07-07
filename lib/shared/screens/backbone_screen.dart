@@ -84,7 +84,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                   screenWidth: screenWidth,
                   isLandscape: isLandscape,
                 ),
-                AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(4, initialLocation: true)),
+                AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true)),
                 _NavItem(
                   icon: AppIcons.insights,
                   label: 'Insight',

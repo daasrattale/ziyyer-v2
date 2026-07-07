@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/theme.dart';
 
 class SummaryCardsRow extends StatelessWidget {
   final double incomeAmount;
-  final int incomeSources;
-  final double paymentsAmount;
+  final double transactionsAmount;
 
-  const SummaryCardsRow({super.key, required this.incomeAmount, required this.incomeSources, required this.paymentsAmount});
+  const SummaryCardsRow({super.key, required this.incomeAmount, required this.transactionsAmount});
 
   @override
   Widget build(BuildContext context) {
@@ -20,21 +19,21 @@ class SummaryCardsRow extends StatelessWidget {
             child: _SummaryCard(
               title: 'INCOME',
               amount: incomeAmount,
-              subtitle: '$incomeSources sources',
+              subtitle: 'Allocated',
               iconData: AppIcons.trendingUp,
               iconColor: AppColors.income,
-              iconBackgroundColor: AppColors.income.withAlpha(30),
+              iconBackgroundColor: AppColors.income.withAlpha(20),
             ),
           ),
           const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: _SummaryCard(
-              title: 'PAYMENTS',
-              amount: paymentsAmount,
+              title: 'TRANSACTIONS',
+              amount: transactionsAmount,
               subtitle: 'This month',
               iconData: AppIcons.trendingDown,
               iconColor: AppColors.expense,
-              iconBackgroundColor: AppColors.expense.withAlpha(30),
+              iconBackgroundColor: AppColors.expense.withAlpha(20),
             ),
           ),
         ],
@@ -62,11 +61,17 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedAmount = amount.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},');
+    final formattedAmount = amount.toInt().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
 
     return Container(
       padding: const EdgeInsets.all(AppConstants.spacingMedium),
-      decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius)),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius - 4),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -76,11 +81,22 @@ class _SummaryCard extends StatelessWidget {
             child: Icon(iconData, color: iconColor, size: 20),
           ),
           const SizedBox(height: AppConstants.spacingMedium),
-          Text(title, style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.textSecondary(context), letterSpacing: 1.2)),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(color: AppColors.textSecondary(context), letterSpacing: 1.2),
+          ),
           const SizedBox(height: AppConstants.spacingSmall),
-          Text('\$$formattedAmount', style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700)),
+          Text(
+            '\$$formattedAmount',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
           const SizedBox(height: AppConstants.spacingSmall),
-          Text(subtitle, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary(context))),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary(context)),
+          ),
         ],
       ),
     );

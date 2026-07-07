@@ -76,6 +76,10 @@ class BudgetModel {
   double get allocatedPayementsAmount => payments.fold<double>(0, (sum, payment) => sum + payment.amount);
   double get allocatedAmount => allocatedCategoriesAmount + allocatedPayementsAmount;
   double get unallocatedAmount => definedAmount - allocatedAmount;
+  double get balance => definedAmount - realAmount;
+  bool get isSetup => definedAmount > 0 && categories.isNotEmpty;
+
+  double get realAmount => categories.fold<double>(0, (sum, category) => sum + category.realAmount);
 
   @override
   String toString() {

@@ -65,6 +65,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                     key: const ValueKey('stepper'),
                     child: CustomStepper(
                       activeIndex: _currentIndex,
+                      previousHidden: _currentIndex == 0 && GoRouterState.of(context).uri.toString() == '/',
                       goToNextStep: () {
                         if (_currentIndex > 2) return;
 

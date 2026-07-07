@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/widgets/home_header.dart';
-import 'package:ziyyer/widgets/spending_category_section.dart';
-import 'package:ziyyer/widgets/summary_card_row.dart';
-import 'package:ziyyer/widgets/total_balance_card.dart';
+import 'package:ziyyer/features/budget_overview/widgets/budget_overview_widget.dart';
+import 'package:ziyyer/features/budget_setup/widgets/budget_setup_widget.dart';
+import 'package:ziyyer/shared/models/budget_model.dart';
+import 'package:ziyyer/shared/services/budget_service.dart';
+import 'package:ziyyer/shared/services/service_locator.dart';
+import 'package:ziyyer/shared/ui/loader.dart';
+import 'package:ziyyer/shared/utils/toaster.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,28 +15,39 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  BudgetService budgetService = ServiceLocator.budgetService;
+  bool didShowBudgetSetupToast = false;
+
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    return StreamBuilder(
+      stream: budgetService.watch(),
+      builder: (context, budgetSnapshot) {
+        if (budgetSnapshot.connectionState == ConnectionState.waiting) {
+          return Loader();
+        }
 
-    return Scaffold(
-      body: Column(
-        children: [
-          HomeHeader(userName: "Super User", onNotificationTap: () {}),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TotalBalanceCard(income: 1000, payments: 400, totalBalance: 5498.87, currency: 'EUR', percentageChange: 44),
-                  SummaryCardsRow(incomeAmount: 8762.34, paymentsAmount: 7654.89, incomeSources: 4),
-                  SpendingCategorySection(),
-                  SizedBox(height: screenSize.height * 0.1),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        BudgetModel budgetModel;
+
+        if (!budgetSnapshot.hasData) {
+          return const BudgetSetupWidget();
+        }
+
+        budgetModel = budgetSnapshot.data!;
+
+        if (!budgetModel.isSetup) {
+          if (!didShowBudgetSetupToast) {
+            didShowBudgetSetupToast = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (!mounted) return;
+              Toaster.info("You didn't setup your budget, you'll be redirected to the budget setup wizard");
+            });
+          }
+          return const BudgetSetupWidget();
+        }
+
+        return BudgetOverviewWidget(budgetModel: budgetModel);
+      },
     );
   }
 }

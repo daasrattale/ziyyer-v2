@@ -9,6 +9,7 @@ class CustomStepper extends StatelessWidget {
   final VoidCallback goToNextStep;
   final VoidCallback goToPreviousStep;
   final VoidCallback goToDoneStep;
+  final bool previousHidden;
 
   const CustomStepper({
     super.key,
@@ -17,6 +18,7 @@ class CustomStepper extends StatelessWidget {
     required this.goToNextStep,
     required this.goToPreviousStep,
     required this.goToDoneStep,
+    this.previousHidden = false,
   });
 
   @override
@@ -72,20 +74,23 @@ class CustomStepper extends StatelessWidget {
                 switchOutCurve: Curves.easeIn,
                 child: Row(
                   key: ValueKey(activeIndex),
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: previousHidden ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
                   children: [
-                    FilledButton.icon(
-                      onPressed: goToPreviousStep,
-                      style: OutlinedButton.styleFrom(
-                        backgroundColor: AppColors.surface(context),
-                        foregroundColor: AppColors.textPrimary(context),
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                    if (!previousHidden) ...[
+                      FilledButton.icon(
+                        onPressed: goToPreviousStep,
+                        style: OutlinedButton.styleFrom(
+                          backgroundColor: AppColors.surface(context),
+                          foregroundColor: AppColors.textPrimary(context),
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                        ),
+                        icon: Icon(AppIcons.arrowLeft),
+                        label: const Text('Previous'),
                       ),
-                      icon: Icon(AppIcons.arrowLeft),
-                      label: const Text('Previous'),
-                    ),
+                    ],
+
                     FilledButton.icon(
                       onPressed: isLastStep ? goToDoneStep : goToNextStep,
                       style: FilledButton.styleFrom(

@@ -2,29 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/theme.dart';
 
-class TotalBalanceCard extends StatelessWidget {
-  final double totalBalance;
-  final double income;
-  final double payments;
-  final double percentageChange;
-  final String currency;
+class BudgetSummary extends StatelessWidget {
+  final BudgetModel budgetModel;
 
-  const TotalBalanceCard({
-    super.key,
-    required this.totalBalance,
-    required this.income,
-    required this.payments,
-    required this.percentageChange,
-    this.currency = 'USD',
-  });
+  const BudgetSummary({super.key, required this.budgetModel});
 
   @override
   Widget build(BuildContext context) {
-    final String balanceStr =
-        '\$${totalBalance.toStringAsFixed(2).replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (Match m) => "${m[1]},")}';
+    final String balanceStr = budgetModel.balance
+        .toStringAsFixed(2)
+        .replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (Match m) => "${m[1]},");
     final List<String> balanceParts = balanceStr.split('.');
+
     final textTheme = Theme.of(context).textTheme;
 
     return Container(
@@ -33,18 +25,10 @@ class TotalBalanceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.accentColor(context),
         borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF233253).withValues(alpha: 0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row: Title and Currency Selector
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -74,6 +58,15 @@ class TotalBalanceCard extends StatelessWidget {
             textBaseline: TextBaseline.alphabetic,
             children: [
               Text(
+                budgetModel.currency.symbol,
+                style: textTheme.displayLarge?.copyWith(
+                  color: AppColors.darkTextPrimary,
+                  fontWeight: FontWeight.w500,
+                  height: 1,
+                ),
+              ),
+              SizedBox(width: 4),
+              Text(
                 balanceParts[0],
                 style: textTheme.displayLarge?.copyWith(
                   color: AppColors.darkTextPrimary,
@@ -100,14 +93,10 @@ class TotalBalanceCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  percentageChange >= 0 ? AppIcons.arrowUpRight : AppIcons.arrowDownRight,
-                  color: Colors.white,
-                  size: 14,
-                ),
+                Icon(AppIcons.arrowUpRight, color: Colors.white, size: 14),
                 const SizedBox(width: 6),
                 Text(
-                  '${percentageChange >= 0 ? '+' : ''}${percentageChange.toStringAsFixed(1)}% from last month',
+                  '+20% from last month',
                   style: textTheme.labelMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
@@ -117,16 +106,23 @@ class TotalBalanceCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          // Subtle Divider
           Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
           const SizedBox(height: 24),
-          // Bottom Row: Income and Payments breakdown
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(child: _buildSummaryColumn(context, 'INCOME', income, CrossAxisAlignment.start)),
+              Expanded(
+                child: _buildSummaryColumn(context, 'INCOME', budgetModel.definedAmount, CrossAxisAlignment.start),
+              ),
               const SizedBox(width: 16),
-              Expanded(child: _buildSummaryColumn(context, 'PAYMENTS', payments, CrossAxisAlignment.end)),
+              Expanded(
+                child: _buildSummaryColumn(
+                  context,
+                  'PAYMENTS',
+                  budgetModel.allocatedPayementsAmount,
+                  CrossAxisAlignment.end,
+                ),
+              ),
             ],
           ),
         ],

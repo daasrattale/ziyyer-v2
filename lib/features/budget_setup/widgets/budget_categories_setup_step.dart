@@ -18,11 +18,15 @@ class BudgetCategoriesSetupStep extends StatefulWidget {
 class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
   final List<_CategoryRowData> _rows = [];
 
+  int otherRowsCount() {
+    return _rows.map((row) => row.nameController.text.toLowerCase()).where((row) => row == 'other').length;
+  }
+
   @override
   void initState() {
     super.initState();
 
-    final existingCategories = widget.budgetModel.categories;
+    final List<CategoryModel> existingCategories = widget.budgetModel.categories;
 
     if (existingCategories.isNotEmpty) {
       _rows.addAll(
@@ -36,6 +40,7 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
       );
     } else {
       _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
+      _rows.add(_CategoryRowData(initialName: 'Other', onChanged: _handleRowChanged));
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -80,13 +85,13 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
           (row) => CategoryModel(
             id: 0,
             name: row.nameController.text.trim(),
+            transactions: [],
             definedAmount: double.tryParse(row.amountController.text.trim().replaceAll(',', '.')) ?? 0.0,
-            realAmount: 0.0,
             createdAt: now,
             updatedAt: now,
           ),
         )
-        .where((category) => category.name.isNotEmpty || category.definedAmount > 0)
+        .where((category) => category.name.isNotEmpty)
         .toList();
 
     widget.onCategoriesChanged(categories);
@@ -192,6 +197,7 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
                             ),
                             border: InputBorder.none,
                             isDense: true,
+                            enabled: otherRowsCount() > 1 || _rows[index].nameController.text.toLowerCase() != 'other',
                           ),
                         ),
                       ),
@@ -240,10 +246,12 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => _removeRow(index),
-                        icon: Icon(AppIcons.trash, color: AppColors.expenseColor(context), size: 18),
-                      ),
+                      if (otherRowsCount() > 1 || _rows[index].nameController.text.toLowerCase() != 'other') ...[
+                        IconButton(
+                          onPressed: () => _removeRow(index),
+                          icon: Icon(AppIcons.trash, color: AppColors.expenseColor(context), size: 18),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -276,6 +284,12 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
         const SizedBox(height: 18),
         Text(
           'Optional · adjust categories later anytime',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'The \'Other\' category will be automatically created',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
         ),

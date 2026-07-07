@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/shared/extensions/string_extensions.dart';
+import 'package:ziyyer/shared/models/category_model.dart';
+import 'package:ziyyer/theme.dart';
 
 class SpendingCategorySection extends StatelessWidget {
-  const SpendingCategorySection({super.key});
+  final List<CategoryModel> categories;
+  const SpendingCategorySection({super.key, required this.categories});
 
   @override
   Widget build(BuildContext context) {
@@ -19,16 +22,19 @@ class SpendingCategorySection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [
-              Text('Spending by category', style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
-              GestureDetector(
-                onTap: () {
-                  // TODO: Navigate to view all categories
-                },
-                child: Text(
-                  'View all',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.accentColor(context), fontWeight: FontWeight.w600),
-                ),
+              Text(
+                'Spending by category',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
+              // GestureDetector(
+              //   onTap: () {
+              //     // TODO: Navigate to view all categories
+              //   },
+              //   child: Text(
+              //     'View all',
+              //     style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.accentColor(context), fontWeight: FontWeight.w600),
+              //   ),
+              // ),
             ],
           ),
           const SizedBox(height: AppConstants.spacingMedium),
@@ -36,45 +42,18 @@ class SpendingCategorySection extends StatelessWidget {
           // Container for the list to give it the grouped card look
           Column(
             spacing: AppConstants.spacingMedium,
-            children: [
-              _CategoryItem(
-                iconData: AppIcons.home,
-                title: 'Housing',
-                spent: 1200,
-                budget: 1500,
-                baseColor: const Color(0xFF2E8B57), // Green tone
-                isFirst: true,
-              ),
-              _CategoryItem(
-                iconData: AppIcons.coffee,
-                title: 'Food & Dining',
-                spent: 420,
-                budget: 500,
-                baseColor: const Color(0xFFDAA520), // Orange/Yellow tone
-              ),
-              _CategoryItem(
-                iconData: AppIcons.truck,
-                title: 'Transport',
-                spent: 280,
-                budget: 350,
-                baseColor: const Color(0xFF2E8B57), // Green tone
-              ),
-              _CategoryItem(
-                iconData: AppIcons.shoppingBag,
-                title: 'Shopping',
-                spent: 510,
-                budget: 400,
-                baseColor: AppColors.expense, // Red tone for over budget
-              ),
-              _CategoryItem(
-                iconData: AppIcons.film,
-                title: 'Entertainment',
-                spent: 95,
-                budget: 200,
-                baseColor: const Color(0xFF2E8B57), // Green tone
-                isLast: true,
-              ),
-            ],
+            children: categories.reversed
+                .map(
+                  (category) => _CategoryItem(
+                    iconData: AppIcons.home,
+                    title: category.name.capitalizeFirst(),
+                    spent: category.realAmount,
+                    budget: category.definedAmount,
+                    baseColor: const Color(0xFF2E8B57), // Green tone
+                    isFirst: true,
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -103,12 +82,9 @@ class _CategoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Calculate progress ratio, capped at 1.0
-    final double progress = (spent / budget).clamp(0.0, 1.0);
+    final double progress = spent == 0 ? 0 : (spent / budget).clamp(0.0, 1.0);
 
-    // Check if over budget
     final bool isOverBudget = spent > budget;
-    // Use the explicit base color unless it's over budget, then force the warning/expense color
     final Color barColor = isOverBudget ? AppColors.expense : baseColor;
 
     return Container(
@@ -142,7 +118,10 @@ class _CategoryItem extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
+                          Text(
+                            title,
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                          ),
                           RichText(
                             text: TextSpan(
                               children: [
@@ -155,7 +134,9 @@ class _CategoryItem extends StatelessWidget {
                                 ),
                                 TextSpan(
                                   text: ' / \$${budget.toInt()}',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary(context)),
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary(context)),
                                 ),
                               ],
                             ),
@@ -168,7 +149,10 @@ class _CategoryItem extends StatelessWidget {
                       Container(
                         height: 6,
                         width: double.infinity,
-                        decoration: BoxDecoration(color: AppColors.divider(context).withValues(alpha: 0.5), borderRadius: BorderRadius.circular(3.0)),
+                        decoration: BoxDecoration(
+                          color: AppColors.divider(context).withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(3.0),
+                        ),
                         child: FractionallySizedBox(
                           alignment: Alignment.centerLeft,
                           widthFactor: progress,

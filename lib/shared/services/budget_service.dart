@@ -7,6 +7,7 @@ import 'package:ziyyer/shared/database/persistence/budget_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/category_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/payment_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
+import 'package:ziyyer/shared/extensions/string_extensions.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/payement_model.dart';
@@ -49,7 +50,11 @@ class BudgetService {
 
       final paymentCompanions = model.payments
           .map(
-            (payment) => PaymentTableCompanion.insert(budgetId: budgetId, name: payment.name, amount: payment.amount),
+            (payment) => PaymentTableCompanion.insert(
+              budgetId: budgetId,
+              name: payment.name.capitalizeFirst(),
+              amount: payment.amount,
+            ),
           )
           .toList();
 
@@ -57,7 +62,7 @@ class BudgetService {
           .map(
             (category) => CategoryTableCompanion.insert(
               budgetId: budgetId,
-              name: category.name,
+              name: category.name.capitalizeFirst(),
               definedAmount: category.definedAmount,
               realAmount: Value(category.realAmount),
               createdAt: category.createdAt,

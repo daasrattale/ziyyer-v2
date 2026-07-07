@@ -9,8 +9,8 @@ class AppColors {
   AppColors._();
 
   // Brand / Accent
-  static const accentDark = Color.fromARGB(255, 68, 207, 203); // Dark Royal Blue
-  static const accentLight = Color.fromARGB(255, 61, 187, 183); // Light Royal Blue
+  static const accentDark = Color(0xFF846267); // Dark Royal Blue
+  static const accentLight = Color(0xFF846267); // Light Royal Blue
 
   // Balance card gradient
   static const gradientStart = Color(0xFF00C9A7);

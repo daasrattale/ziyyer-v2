@@ -7,11 +7,15 @@ import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
 import 'package:ziyyer/theme.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void initializeDependencies() {
   final database = AppDatabase();
   PersistenceLocator.initialize(database);
   ServiceLocator.initialize();
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  initializeDependencies();
   runApp(const ZiyyerApp());
 }
 

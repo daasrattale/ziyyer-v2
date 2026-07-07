@@ -34,9 +34,9 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
           ),
         ),
       );
+    } else {
+      _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
     }
-
-    _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;

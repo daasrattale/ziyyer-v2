@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_step.dart';
@@ -21,96 +19,126 @@ class BudgetSetupWidget extends StatefulWidget {
 
 class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
   int _currentIndex = 0;
+  final BudgetService budgetService = ServiceLocator.budgetService;
 
-  BudgetService budgetService = ServiceLocator.budgetService;
+  late final Stream<BudgetModel?> _budgetStream;
+
+  BudgetModel _budgetModel = BudgetModel.init();
+  bool _initialLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _budgetStream = budgetService.watch();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<BudgetModel?>(
-        stream: budgetService.watch(),
-        builder: (context, budgetSnapshot) {
-          if (budgetSnapshot.connectionState == ConnectionState.waiting && _currentIndex == 0) {
-            return Loader();
+        stream: _budgetStream,
+        initialData: _budgetModel,
+        builder: (context, snapshot) {
+          final data = snapshot.data;
+          if (data != null) {
+            _budgetModel = data;
           }
 
-          BudgetModel budgetModel = budgetSnapshot.data!;
-
-          log("budget: $budgetModel");
-
-          return CustomStepper(
-            initialActiveIndex: _currentIndex,
-            goToNextStep: () {
-              if (_currentIndex > 2) return;
-              // Amount Step
-              if (_currentIndex == 0 && budgetModel.definedAmount <= 0) {
-                Toaster.error('Budget amount must be greater than 0');
-                return;
-              }
-              // Payments Step
-              if (_currentIndex == 1 && budgetModel.definedAmount - budgetModel.allocatedPayementsAmount < 0) {
-                Toaster.error('Budget unallocated must be greater than 0');
-                return;
-              }
-              // Categories Step
-              if (_currentIndex == 2 && budgetModel.unallocatedAmount < 0) {
-                Toaster.error('Budget unallocated must be greater than 0');
-                return;
-              }
-              budgetService.persist(budgetModel);
-
-              setState(() {
-                _currentIndex++;
-              });
-            },
-            goToDoneStep: () {
-              budgetService.persist(budgetModel);
-              _currentIndex = 0;
-              context.go("/");
-            },
-            goToPreviousStep: () {
-              if (_currentIndex > 0) {
-                budgetService.persist(budgetModel);
+          final hasData = snapshot.hasData;
+          if (_initialLoading && hasData) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
                 setState(() {
-                  _currentIndex--;
+                  _initialLoading = false;
                 });
               }
-            },
-            steps: [
-              CustomStepperStep(
-                title: 'Budget Income',
-                content: BudgetAmountCurrencySetupStep(
-                  budgetModel: budgetModel,
-                  onAmountChanged: (amount) {
-                    if (!mounted) return;
-                    budgetModel.definedAmount = amount;
-                  },
-                  onCurrencyChanged: (currency) {
-                    budgetModel.currency = currency;
-                  },
-                ),
-              ),
-              CustomStepperStep(
-                title: 'Budget Payements',
-                content: BudgetPaymentsSetupStep(
-                  budgetModel: budgetModel,
-                  onPaymentsChanged: (payments) {
-                    if (!mounted) return;
-                    budgetModel.payments = payments;
-                  },
-                ),
-              ),
-              CustomStepperStep(
-                title: 'Spending categories',
-                content: BudgetCategoriesSetupStep(
-                  budgetModel: budgetModel,
-                  onCategoriesChanged: (categories) {
-                    if (!mounted) return;
-                    budgetModel.categories = categories;
-                  },
-                ),
-              ),
-            ],
+            });
+          }
+
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 250),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            child: _initialLoading
+                ? const Center(key: ValueKey('loader'), child: Loader())
+                : KeyedSubtree(
+                    key: const ValueKey('stepper'),
+                    child: CustomStepper(
+                      activeIndex: _currentIndex,
+                      goToNextStep: () {
+                        if (_currentIndex > 2) return;
+
+                        if (_currentIndex == 0 && _budgetModel.definedAmount <= 0) {
+                          Toaster.error('Budget amount must be greater than 0');
+                          return;
+                        }
+
+                        if (_currentIndex == 1 &&
+                            _budgetModel.definedAmount - _budgetModel.allocatedPayementsAmount < 0) {
+                          Toaster.error('Budget unallocated must be greater than 0');
+                          return;
+                        }
+
+                        if (_currentIndex == 2 && _budgetModel.unallocatedAmount < 0) {
+                          Toaster.error('Budget unallocated must be greater than 0');
+                          return;
+                        }
+
+                        budgetService.persist(_budgetModel);
+
+                        setState(() {
+                          _currentIndex++;
+                        });
+                      },
+                      goToDoneStep: () {
+                        budgetService.persist(_budgetModel);
+                        _currentIndex = 0;
+                        context.go("/");
+                      },
+                      goToPreviousStep: () {
+                        if (_currentIndex > 0) {
+                          budgetService.persist(_budgetModel);
+                          setState(() {
+                            _currentIndex--;
+                          });
+                        } else {
+                          context.go("/");
+                        }
+                      },
+                      steps: [
+                        CustomStepperStep(
+                          title: 'Budget Income',
+                          content: BudgetAmountCurrencySetupStep(
+                            budgetModel: _budgetModel,
+                            onAmountChanged: (amount) {
+                              _budgetModel.definedAmount = amount;
+                            },
+                            onCurrencyChanged: (currency) {
+                              _budgetModel.currency = currency;
+                            },
+                          ),
+                        ),
+                        CustomStepperStep(
+                          title: 'Budget Payements',
+                          content: BudgetPaymentsSetupStep(
+                            budgetModel: _budgetModel,
+                            onPaymentsChanged: (payments) {
+                              _budgetModel.payments = payments;
+                            },
+                          ),
+                        ),
+                        CustomStepperStep(
+                          title: 'Spending categories',
+                          content: BudgetCategoriesSetupStep(
+                            budgetModel: _budgetModel,
+                            onCategoriesChanged: (categories) {
+                              _budgetModel.categories = categories;
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
           );
         },
       ),

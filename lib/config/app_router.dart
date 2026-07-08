@@ -1,10 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ziyyer/screens/backbone_screen.dart';
-import 'package:ziyyer/screens/details_screen.dart';
-import 'package:ziyyer/screens/history_screen.dart';
-import 'package:ziyyer/screens/home_screen.dart';
+import 'package:ziyyer/shared/screens/add_expense_screen.dart';
+import 'package:ziyyer/shared/screens/backbone_screen.dart';
+import 'package:ziyyer/shared/screens/budget_screen.dart';
+import 'package:ziyyer/shared/screens/history_screen.dart';
+import 'package:ziyyer/shared/screens/home_screen.dart';
+import 'package:ziyyer/shared/screens/insights_screen.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final GoRouter appRouter = GoRouter(
+  navigatorKey: rootNavigatorKey,
   initialLocation: '/',
   routes: <RouteBase>[
     StatefulShellRoute.indexedStack(
@@ -17,7 +23,15 @@ final GoRouter appRouter = GoRouter(
           routes: [GoRoute(path: '/history', name: 'history', builder: (context, state) => const HistoryScreen())],
         ),
         StatefulShellBranch(
-          routes: [GoRoute(path: '/details', name: 'details', builder: (context, state) => const DetailsScreen())],
+          routes: [GoRoute(path: '/insights', name: 'insights', builder: (context, state) => const InsightsScreen())],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(path: '/add-expense', name: 'add-expense', builder: (context, state) => const AddExpenseScreen()),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [GoRoute(path: '/budget', name: 'budget', builder: (context, state) => const BudgetScreen())],
         ),
       ],
     ),

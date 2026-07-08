@@ -1,29 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
+import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_router.dart';
-import 'package:ziyyer/config/theme.dart';
-import 'package:ziyyer/constants/app_constants.dart';
-import 'package:ziyyer/database/database.dart';
-import 'package:ziyyer/services/service_locator.dart';
+import 'package:ziyyer/shared/database/database.dart';
+import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
+import 'package:ziyyer/shared/services/service_locator.dart';
+import 'package:ziyyer/theme.dart';
+
+void initializeDependencies() {
+  final database = AppDatabase();
+  PersistenceLocator.initialize(database);
+  ServiceLocator.initialize();
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final database = AppDatabase();
-  ServiceLocator.initialize(database);
-  runApp(const MyApp());
+  initializeDependencies();
+  runApp(const ZiyyerApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class ZiyyerApp extends StatelessWidget {
+  const ZiyyerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: AppConstants.appName,
-      routerConfig: appRouter,
-      themeMode: ThemeMode.light,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      debugShowCheckedModeBanner: false,
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        title: AppConstants.appName,
+        routerConfig: appRouter,
+        themeMode: ThemeMode.light,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

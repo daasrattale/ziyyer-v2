@@ -28,4 +28,6 @@ class AppIcons {
   static const IconData x = LucideIcons.x;
   static const IconData edit = LucideIcons.pencil;
   static const IconData settings = LucideIcons.settings;
+  static const IconData money = LucideIcons.banknote;
+  static const IconData description = LucideIcons.textAlignStart;
 }

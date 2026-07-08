@@ -18,7 +18,7 @@ class CategoryModel {
   final DateTime updatedAt;
 
   double get realAmount => transactions
-      .where((transaction) => transaction.createdAt.month == DateTime.now().month)
+      .where((transaction) => transaction.date.month == DateTime.now().month)
       .fold<double>(0, (sum, transaction) => sum + transaction.amount);
 
   @override

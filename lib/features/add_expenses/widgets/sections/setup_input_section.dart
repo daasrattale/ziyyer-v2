@@ -10,7 +10,7 @@ class SetupFieldContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
+      padding: EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
         color: AppColors.surface(context),
         borderRadius: BorderRadius.all(Radius.circular(AppConstants.defaultBorderRadius)),
@@ -37,8 +37,8 @@ InputDecoration buildSetupInputDecoration({
     errorBorder: InputBorder.none,
     focusedErrorBorder: InputBorder.none,
     prefixIcon: Padding(
-      padding: const EdgeInsets.only(right: 12),
-      child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 22),
+      padding: const EdgeInsets.only(right: 18),
+      child: Icon(icon, color: Theme.of(context).colorScheme.primary, size: 18),
     ),
     prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
     hintStyle: Theme.of(
@@ -55,6 +55,9 @@ class SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700));
+    return Text(
+      title.toUpperCase(),
+      style: Theme.of(context).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
+    );
   }
 }

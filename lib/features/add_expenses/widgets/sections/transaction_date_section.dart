@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
+import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 
 class TransactionDateSection extends StatelessWidget {
   final DateTime selectedDate;
@@ -36,11 +38,11 @@ class TransactionDateSection extends StatelessWidget {
               height: 60,
               child: Row(
                 children: [
-                  Icon(Icons.calendar_month_rounded, color: theme.colorScheme.primary),
+                  Icon(AppIcons.calendar, color: theme.colorScheme.primary, size: 18),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                      selectedDate.prettyDate(),
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),

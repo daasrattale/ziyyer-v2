@@ -27,13 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
           return Loader();
         }
 
-        BudgetModel budgetModel;
-
         if (!budgetSnapshot.hasData) {
           return const BudgetSetupWidget();
         }
 
-        budgetModel = budgetSnapshot.data!;
+        BudgetModel budgetModel = budgetSnapshot.data!;
 
         if (!budgetModel.isSetup) {
           if (!didShowBudgetSetupToast) {

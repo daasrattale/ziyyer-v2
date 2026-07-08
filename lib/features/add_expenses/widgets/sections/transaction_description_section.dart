@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
 
 class TransactionDescriptionSection extends StatelessWidget {
@@ -9,27 +8,47 @@ class TransactionDescriptionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel('Description'),
+        const SectionLabel('Description (optional)'),
         const SizedBox(height: 12),
-        SetupFieldContainer(
-          child: SizedBox(
-            height: 120,
+        Container(
+          height: 64,
+          padding: const EdgeInsets.symmetric(horizontal: 22),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFE7E7E7), width: 1.2),
+          ),
+          child: Center(
             child: TextField(
               controller: descriptionController,
-              keyboardType: TextInputType.multiline,
-              textAlignVertical: TextAlignVertical.top,
-              minLines: null,
-              maxLines: null,
-              expands: true,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500, height: 1.3),
-              decoration: buildSetupInputDecoration(
-                hintText: 'What was this expense for?',
-                icon: AppIcons.description,
-                context: context,
-              ).copyWith(alignLabelWithHint: true, contentPadding: const EdgeInsets.only(top: 16)),
+              keyboardType: TextInputType.text,
+              textInputAction: TextInputAction.done,
+              maxLines: 1,
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                color: theme.colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                hintText: 'e.g. Grocery run, Uber ride...',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                errorBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                isDense: true,
+                isCollapsed: true,
+                contentPadding: EdgeInsets.zero,
+                hintStyle: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w500,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
             ),
           ),
         ),

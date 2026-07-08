@@ -94,12 +94,9 @@ class _CurrencyBottomSheet extends StatelessWidget {
             final isSelected = code == currentCurrency.code;
 
             return ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
-                child: Text(
-                  symbol.length > 1 ? symbol.substring(0, 1) : symbol,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).primaryColor),
-                ),
+              leading: Text(
+                symbol.length > 1 ? symbol.substring(0, 1) : symbol,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).primaryColor),
               ),
               title: Text(code, style: const TextStyle(fontWeight: FontWeight.w600)),
               subtitle: Text(name, style: const TextStyle(color: Color(0xFF9E9E9E))),
@@ -107,7 +104,7 @@ class _CurrencyBottomSheet extends StatelessWidget {
               onTap: () => Navigator.of(context).pop(CurrencyModel(code, symbol, name)),
             );
           },
-          separatorBuilder: (_, __) => const Divider(height: 1),
+          separatorBuilder: (_, _) => const Divider(height: 1),
           itemCount: supportedCurrencies.length,
         ),
       ),

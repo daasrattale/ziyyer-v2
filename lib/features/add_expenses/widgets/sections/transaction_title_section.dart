@@ -11,7 +11,7 @@ class TransactionTitleSection extends StatelessWidget {
         Text('Add a new expense', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
         SizedBox(height: 8),
         Text(
-          'Track a new transaction and assign it to a category.?',
+          'Track a new transaction and assign it to a category.',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),

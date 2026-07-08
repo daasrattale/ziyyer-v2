@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_router.dart';
@@ -15,6 +16,8 @@ void initializeDependencies() {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting();
+
   initializeDependencies();
   runApp(const ZiyyerApp());
 }

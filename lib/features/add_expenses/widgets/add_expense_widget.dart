@@ -4,10 +4,12 @@ import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_catego
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_date_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_description_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_title_section.dart';
+import 'package:ziyyer/features/budget_setup/widgets/budget_setup_widget.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/services/budget_service.dart';
 import 'package:ziyyer/shared/services/transaction_service.dart';
+import 'package:ziyyer/shared/ui/loader.dart';
 import 'package:ziyyer/shared/utils/toaster.dart';
 
 class AddExpenseWidget extends StatefulWidget {
@@ -21,12 +23,22 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
   final BudgetService _budgetService = BudgetService();
   final TransactionService _transactionService = TransactionService();
 
+  late final Stream<BudgetModel?> _budgetStream;
+
   final TextEditingController amountController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
+
+  ScrollController scrollController = ScrollController();
 
   int? selectedCategoryId;
   DateTime selectedDate = DateTime.now();
   bool isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _budgetStream = _budgetService.watch();
+  }
 
   @override
   void dispose() {
@@ -57,10 +69,14 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
 
       if (!mounted) return;
 
+      setState(() {
+        amountController.text = '';
+        descriptionController.text = '';
+        selectedCategoryId = null;
+      });
+
       Toaster.success("Expense saved successfully");
-      amountController.text = '';
-      descriptionController.text = '';
-      selectedCategoryId = null;
+      scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Easing.linear);
     } finally {
       if (mounted) {
         setState(() {
@@ -81,21 +97,34 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<BudgetModel?>(
-        stream: _budgetService.watch(),
+        stream: _budgetStream,
         builder: (context, snapshot) {
           final budget = snapshot.data;
-          final categories = budget?.categories ?? const <CategoryModel>[];
 
+          if (snapshot.connectionState == ConnectionState.waiting && budget == null) {
+            return const Loader();
+          }
+
+          if (budget == null && snapshot.connectionState == ConnectionState.done) {
+            return const BudgetSetupWidget();
+          }
+
+          if (budget == null) {
+            return const SizedBox.shrink();
+          }
+
+          final categories = budget.categories;
           _ensureFallbackCategory(categories);
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            controller: scrollController,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const TransactionTitleSection(),
                 const SizedBox(height: 24),
-                TransactionAmountSection(amountController: amountController),
+                TransactionAmountSection(amountController: amountController, currencySymbol: budget.currency.symbol),
                 const SizedBox(height: 24),
                 TransactionCategorySection(
                   categories: categories.reversed.toList(),
@@ -107,8 +136,6 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                   },
                 ),
                 const SizedBox(height: 24),
-                TransactionDescriptionSection(descriptionController: descriptionController),
-                const SizedBox(height: 24),
                 TransactionDateSection(
                   selectedDate: selectedDate,
                   onDateChanged: (date) {
@@ -118,6 +145,8 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                   },
                 ),
                 const SizedBox(height: 24),
+                TransactionDescriptionSection(descriptionController: descriptionController),
+                const SizedBox(height: 24),
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -126,7 +155,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                       minimumSize: const Size.fromHeight(56),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     ),
-                    child: Text(isSaving ? 'Saving...' : 'Save expense'),
+                    child: Text(isSaving ? 'Saving...' : 'Save'),
                   ),
                 ),
                 const SizedBox(height: 24),

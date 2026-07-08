@@ -87,6 +87,47 @@ class AppColors {
   static Color gradientStartColor(BuildContext context) => gradientStart; // Same in both themes
 
   static Color gradientEndColor(BuildContext context) => gradientEnd; // Same in both themes
+
+  static const Map<String, Color> supportedCategoriesColors = {
+    'other': Color(0xFF9E9E9E),
+
+    'food': Color(0xFFFF9800),
+    'groceries': Color(0xFF4CAF50),
+    'shopping': Color(0xFFE91E63),
+
+    'housing': Color(0xFF3F51B5),
+    'rent': Color(0xFF3F51B5),
+    'mortgage': Color(0xFF5C6BC0),
+
+    'utilities': Color(0xFFFFC107),
+    'utility': Color(0xFFFFC107),
+    'bills': Color(0xFFFFB300),
+
+    'subscriptions': Color(0xFF9C27B0),
+    'subscription': Color(0xFF9C27B0),
+    'entertainment': Color(0xFF673AB7),
+
+    'health': Color(0xFFF44336),
+    'healthcare': Color(0xFFF44336),
+    'medical': Color(0xFFE53935),
+
+    'transportation': Color(0xFF2196F3),
+    'transport': Color(0xFF2196F3),
+    'transpostartion': Color(0xFF2196F3),
+    'travel': Color(0xFF00BCD4),
+
+    'income': Color(0xFF2E7D32),
+    'salary': Color(0xFF388E3C),
+    'investment': Color(0xFF00897B),
+    'savings': Color(0xFF009688),
+
+    'expense': Color(0xFFD32F2F),
+  };
+
+  static Color categoryColorFor(String? categoryName) {
+    final normalized = categoryName?.trim().toLowerCase();
+    return supportedCategoriesColors[normalized] ?? accentLight;
+  }
 }
 
 // ─────────────────────────────────────────

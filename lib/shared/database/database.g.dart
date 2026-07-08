@@ -24,14 +24,6 @@ class $BudgetTableTable extends BudgetTable
   late final GeneratedColumn<double> definedAmount = GeneratedColumn<double>(
       'defined_amount', aliasedName, false,
       type: DriftSqlType.double, requiredDuringInsert: true);
-  static const VerificationMeta _realAmountMeta =
-      const VerificationMeta('realAmount');
-  @override
-  late final GeneratedColumn<double> realAmount = GeneratedColumn<double>(
-      'real_amount', aliasedName, false,
-      type: DriftSqlType.double,
-      requiredDuringInsert: false,
-      defaultValue: const Constant(0));
   static const VerificationMeta _currencyMeta =
       const VerificationMeta('currency');
   @override
@@ -52,7 +44,7 @@ class $BudgetTableTable extends BudgetTable
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, definedAmount, realAmount, currency, createdAt, updatedAt];
+      [id, definedAmount, currency, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -73,12 +65,6 @@ class $BudgetTableTable extends BudgetTable
               data['defined_amount']!, _definedAmountMeta));
     } else if (isInserting) {
       context.missing(_definedAmountMeta);
-    }
-    if (data.containsKey('real_amount')) {
-      context.handle(
-          _realAmountMeta,
-          realAmount.isAcceptableOrUnknown(
-              data['real_amount']!, _realAmountMeta));
     }
     if (data.containsKey('currency')) {
       context.handle(_currencyMeta,
@@ -111,8 +97,6 @@ class $BudgetTableTable extends BudgetTable
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       definedAmount: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}defined_amount'])!,
-      realAmount: attachedDatabase.typeMapping
-          .read(DriftSqlType.double, data['${effectivePrefix}real_amount'])!,
       currency: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}currency'])!,
       createdAt: attachedDatabase.typeMapping
@@ -131,14 +115,12 @@ class $BudgetTableTable extends BudgetTable
 class Budget extends DataClass implements Insertable<Budget> {
   final int id;
   final double definedAmount;
-  final double realAmount;
   final String currency;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Budget(
       {required this.id,
       required this.definedAmount,
-      required this.realAmount,
       required this.currency,
       required this.createdAt,
       required this.updatedAt});
@@ -147,7 +129,6 @@ class Budget extends DataClass implements Insertable<Budget> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['defined_amount'] = Variable<double>(definedAmount);
-    map['real_amount'] = Variable<double>(realAmount);
     map['currency'] = Variable<String>(currency);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -158,7 +139,6 @@ class Budget extends DataClass implements Insertable<Budget> {
     return BudgetTableCompanion(
       id: Value(id),
       definedAmount: Value(definedAmount),
-      realAmount: Value(realAmount),
       currency: Value(currency),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -171,7 +151,6 @@ class Budget extends DataClass implements Insertable<Budget> {
     return Budget(
       id: serializer.fromJson<int>(json['id']),
       definedAmount: serializer.fromJson<double>(json['definedAmount']),
-      realAmount: serializer.fromJson<double>(json['realAmount']),
       currency: serializer.fromJson<String>(json['currency']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -183,7 +162,6 @@ class Budget extends DataClass implements Insertable<Budget> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'definedAmount': serializer.toJson<double>(definedAmount),
-      'realAmount': serializer.toJson<double>(realAmount),
       'currency': serializer.toJson<String>(currency),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -193,14 +171,12 @@ class Budget extends DataClass implements Insertable<Budget> {
   Budget copyWith(
           {int? id,
           double? definedAmount,
-          double? realAmount,
           String? currency,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       Budget(
         id: id ?? this.id,
         definedAmount: definedAmount ?? this.definedAmount,
-        realAmount: realAmount ?? this.realAmount,
         currency: currency ?? this.currency,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
@@ -210,7 +186,6 @@ class Budget extends DataClass implements Insertable<Budget> {
     return (StringBuffer('Budget(')
           ..write('id: $id, ')
           ..write('definedAmount: $definedAmount, ')
-          ..write('realAmount: $realAmount, ')
           ..write('currency: $currency, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -219,15 +194,14 @@ class Budget extends DataClass implements Insertable<Budget> {
   }
 
   @override
-  int get hashCode => Object.hash(
-      id, definedAmount, realAmount, currency, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, definedAmount, currency, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Budget &&
           other.id == this.id &&
           other.definedAmount == this.definedAmount &&
-          other.realAmount == this.realAmount &&
           other.currency == this.currency &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -236,14 +210,12 @@ class Budget extends DataClass implements Insertable<Budget> {
 class BudgetTableCompanion extends UpdateCompanion<Budget> {
   final Value<int> id;
   final Value<double> definedAmount;
-  final Value<double> realAmount;
   final Value<String> currency;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const BudgetTableCompanion({
     this.id = const Value.absent(),
     this.definedAmount = const Value.absent(),
-    this.realAmount = const Value.absent(),
     this.currency = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -251,7 +223,6 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
   BudgetTableCompanion.insert({
     this.id = const Value.absent(),
     required double definedAmount,
-    this.realAmount = const Value.absent(),
     required String currency,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -262,7 +233,6 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
   static Insertable<Budget> custom({
     Expression<int>? id,
     Expression<double>? definedAmount,
-    Expression<double>? realAmount,
     Expression<String>? currency,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -270,7 +240,6 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (definedAmount != null) 'defined_amount': definedAmount,
-      if (realAmount != null) 'real_amount': realAmount,
       if (currency != null) 'currency': currency,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -280,14 +249,12 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
   BudgetTableCompanion copyWith(
       {Value<int>? id,
       Value<double>? definedAmount,
-      Value<double>? realAmount,
       Value<String>? currency,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
     return BudgetTableCompanion(
       id: id ?? this.id,
       definedAmount: definedAmount ?? this.definedAmount,
-      realAmount: realAmount ?? this.realAmount,
       currency: currency ?? this.currency,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -302,9 +269,6 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     }
     if (definedAmount.present) {
       map['defined_amount'] = Variable<double>(definedAmount.value);
-    }
-    if (realAmount.present) {
-      map['real_amount'] = Variable<double>(realAmount.value);
     }
     if (currency.present) {
       map['currency'] = Variable<String>(currency.value);
@@ -323,7 +287,6 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     return (StringBuffer('BudgetTableCompanion(')
           ..write('id: $id, ')
           ..write('definedAmount: $definedAmount, ')
-          ..write('realAmount: $realAmount, ')
           ..write('currency: $currency, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -1312,7 +1275,6 @@ typedef $$BudgetTableTableInsertCompanionBuilder = BudgetTableCompanion
     Function({
   Value<int> id,
   required double definedAmount,
-  Value<double> realAmount,
   required String currency,
   required DateTime createdAt,
   required DateTime updatedAt,
@@ -1321,7 +1283,6 @@ typedef $$BudgetTableTableUpdateCompanionBuilder = BudgetTableCompanion
     Function({
   Value<int> id,
   Value<double> definedAmount,
-  Value<double> realAmount,
   Value<String> currency,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
@@ -1349,7 +1310,6 @@ class $$BudgetTableTableTableManager extends RootTableManager<
           getUpdateCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             Value<double> definedAmount = const Value.absent(),
-            Value<double> realAmount = const Value.absent(),
             Value<String> currency = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
@@ -1357,7 +1317,6 @@ class $$BudgetTableTableTableManager extends RootTableManager<
               BudgetTableCompanion(
             id: id,
             definedAmount: definedAmount,
-            realAmount: realAmount,
             currency: currency,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -1365,7 +1324,6 @@ class $$BudgetTableTableTableManager extends RootTableManager<
           getInsertCompanionBuilder: ({
             Value<int> id = const Value.absent(),
             required double definedAmount,
-            Value<double> realAmount = const Value.absent(),
             required String currency,
             required DateTime createdAt,
             required DateTime updatedAt,
@@ -1373,7 +1331,6 @@ class $$BudgetTableTableTableManager extends RootTableManager<
               BudgetTableCompanion.insert(
             id: id,
             definedAmount: definedAmount,
-            realAmount: realAmount,
             currency: currency,
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -1403,11 +1360,6 @@ class $$BudgetTableTableFilterComposer
 
   ColumnFilters<double> get definedAmount => $state.composableBuilder(
       column: $state.table.definedAmount,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
-  ColumnFilters<double> get realAmount => $state.composableBuilder(
-      column: $state.table.realAmount,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1463,11 +1415,6 @@ class $$BudgetTableTableOrderingComposer
 
   ColumnOrderings<double> get definedAmount => $state.composableBuilder(
       column: $state.table.definedAmount,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
-  ColumnOrderings<double> get realAmount => $state.composableBuilder(
-      column: $state.table.realAmount,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

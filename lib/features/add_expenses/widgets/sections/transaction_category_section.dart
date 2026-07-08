@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
+import 'package:ziyyer/theme.dart';
 
 class TransactionCategorySection extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -50,7 +52,11 @@ class TransactionCategorySection extends StatelessWidget {
                       value: category.id,
                       child: Row(
                         children: [
-                          Icon(Icons.label_outline_rounded, size: 20, color: theme.colorScheme.primary),
+                          Icon(
+                            AppIcons.categoryIconFor(category.name),
+                            size: 20,
+                            color: AppColors.categoryColorFor(category.name),
+                          ),
                           const SizedBox(width: 12),
                           Text(category.name, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
                         ],

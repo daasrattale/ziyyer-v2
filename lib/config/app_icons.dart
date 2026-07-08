@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppIcons {
-  AppIcons._();
-
   static const IconData home = FeatherIcons.home;
   static const IconData history = Icons.history;
   static const IconData insights = FeatherIcons.pieChart;
@@ -30,4 +28,36 @@ class AppIcons {
   static const IconData settings = LucideIcons.settings;
   static const IconData money = LucideIcons.banknote;
   static const IconData description = LucideIcons.textAlignStart;
+
+  static const Map<String, IconData> supportedCategoriesIcons = {
+    'other': category,
+    'food': coffee,
+    'groceries': shoppingBag,
+    'shopping': shoppingBag,
+    'housing': home,
+    'rent': home,
+    'mortgage': home,
+    'utilities': receipt,
+    'utility': receipt,
+    'subscriptions': film,
+    'subscription': film,
+    'health': receipt,
+    'healthcare': receipt,
+    'medical': receipt,
+    'transportation': truck,
+    'transport': truck,
+    'travel': truck,
+    'income': trendingUp,
+    'salary': trendingUp,
+    'investment': trendingUp,
+    'expense': trendingDown,
+    'entertainment': film,
+    'bills': receipt,
+    'savings': budget,
+  };
+
+  static IconData categoryIconFor(String? categoryName) {
+    final normalized = categoryName?.trim().toLowerCase();
+    return supportedCategoriesIcons[normalized] ?? category;
+  }
 }

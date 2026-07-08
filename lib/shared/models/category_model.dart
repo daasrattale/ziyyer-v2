@@ -17,6 +17,24 @@ class CategoryModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  CategoryModel copyWith({
+    int? id,
+    String? name,
+    double? definedAmount,
+    List<TransactionModel>? transactions,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return CategoryModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      definedAmount: definedAmount ?? this.definedAmount,
+      transactions: transactions ?? this.transactions,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   double get realAmount => transactions
       .where((transaction) => transaction.date.month == DateTime.now().month)
       .fold<double>(0, (sum, transaction) => sum + transaction.amount);

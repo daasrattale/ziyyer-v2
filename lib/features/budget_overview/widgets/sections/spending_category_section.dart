@@ -45,11 +45,11 @@ class SpendingCategorySection extends StatelessWidget {
             children: categories.reversed
                 .map(
                   (category) => _CategoryItem(
-                    iconData: AppIcons.home,
+                    iconData: AppIcons.categoryIconFor(category.name),
                     title: category.name.capitalizeFirst(),
                     spent: category.realAmount,
                     budget: category.definedAmount,
-                    baseColor: const Color(0xFF2E8B57), // Green tone
+                    baseColor: AppColors.categoryColorFor(category.name), // Green tone
                     isFirst: true,
                   ),
                 )
@@ -68,7 +68,6 @@ class _CategoryItem extends StatelessWidget {
   final double budget;
   final Color baseColor;
   final bool isFirst;
-  final bool isLast;
 
   const _CategoryItem({
     required this.iconData,
@@ -77,7 +76,6 @@ class _CategoryItem extends StatelessWidget {
     required this.budget,
     required this.baseColor,
     this.isFirst = false,
-    this.isLast = false,
   });
 
   @override
@@ -167,14 +165,6 @@ class _CategoryItem extends StatelessWidget {
               ],
             ),
           ),
-          // Add divider if not the last item
-          if (!isLast)
-            Divider(
-              height: 1,
-              indent: 76, // Align with the start of the text
-              endIndent: 20,
-              color: AppColors.divider(context).withValues(alpha: 0.5),
-            ),
         ],
       ),
     );

@@ -51,19 +51,6 @@ class BudgetService {
         );
       }
 
-      final categoryCompanions = model.categories
-          .map(
-            (category) => CategoryTableCompanion.insert(
-              budgetId: budgetId,
-              name: category.name.capitalizeFirst(),
-              definedAmount: category.definedAmount,
-              realAmount: Value(category.realAmount),
-              createdAt: category.createdAt,
-              updatedAt: category.updatedAt,
-            ),
-          )
-          .toList();
-
       final paymentCompanions = model.payments
           .map(
             (payment) => PaymentTableCompanion.insert(
@@ -74,32 +61,12 @@ class BudgetService {
           )
           .toList();
 
+      final normalizedCategories = model.categories
+          .map((category) => category.copyWith(name: category.name.capitalizeFirst(), updatedAt: now))
+          .toList();
+
       await _paymentPersistence.update(budgetId, paymentCompanions);
-      await _categoryPersistence.update(budgetId, categoryCompanions);
-
-      final persistedCategories = await _categoryPersistence.watch().first;
-      final budgetCategories = persistedCategories.where((category) => category.budgetId == budgetId).toList();
-
-      final categoryIdByName = {for (final category in budgetCategories) category.name: category.id};
-
-      final categoryIds = budgetCategories.map((category) => category.id).toList();
-
-      final transactionCompanions = model.categories.expand((categoryModel) {
-        final categoryId = categoryIdByName[categoryModel.name.capitalizeFirst()];
-        if (categoryId == null) return <TransactionTableCompanion>[];
-
-        return categoryModel.transactions.map(
-          (transaction) => TransactionTableCompanion.insert(
-            categoryId: categoryId,
-            amount: transaction.amount,
-            date: transaction.date,
-            description: Value(transaction.description),
-            createdAt: transaction.createdAt,
-          ),
-        );
-      }).toList();
-
-      await _transactionPersistence.update(categoryIds, transactionCompanions);
+      await _categoryPersistence.update(budgetId, normalizedCategories);
 
       return budgetId;
     });

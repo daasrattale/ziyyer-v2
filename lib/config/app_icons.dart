@@ -29,6 +29,7 @@ class AppIcons {
   static const IconData money = LucideIcons.banknote;
   static const IconData description = LucideIcons.textAlignStart;
   static const IconData calendar = LucideIcons.calendar;
+  static const IconData transaction = LucideIcons.arrowRightLeft;
 
   static const Map<String, IconData> supportedCategoriesIcons = {
     'other': category,

@@ -68,10 +68,6 @@ class TransactionService {
   Future<void> delete(TransactionModel transaction) async {
     final id = transaction.id;
 
-    if (id == null) {
-      throw ArgumentError('Transaction id is required for delete.');
-    }
-
     final affectedRows = await _transactionPersistence.deleteById(id);
 
     if (affectedRows == 0) {
@@ -82,14 +78,10 @@ class TransactionService {
   Future<void> update(TransactionModel transaction) async {
     final id = transaction.id;
 
-    if (id == null) {
-      throw ArgumentError('Transaction id is required for update.');
-    }
-
     final affectedRows = await _transactionPersistence.updateById(
       id,
       TransactionTableCompanion(
-        categoryId: Value(transaction.categoryId!),
+        categoryId: Value(transaction.categoryId),
         amount: Value(transaction.amount),
         date: Value(transaction.date),
         description: Value(transaction.description),

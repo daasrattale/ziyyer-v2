@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/features/transaction_details/widgets/transaction_details.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -31,24 +32,14 @@ class TransactionListWidgets extends StatefulWidget {
 }
 
 class _TransactionListWidgetsState extends State<TransactionListWidgets> {
-  late List<TransactionModel> _items;
-
   @override
   void initState() {
     super.initState();
-    _syncItems();
   }
 
   @override
   void didUpdateWidget(covariant TransactionListWidgets oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.transactions != widget.transactions) {
-      _syncItems();
-    }
-  }
-
-  void _syncItems() {
-    _items = List<TransactionModel>.from(widget.transactions)..sort((a, b) => b.date.compareTo(a.date));
   }
 
   Future<bool?> _showDeletePrompt(TransactionModel transaction) {
@@ -94,7 +85,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
     final entries = <_TransactionListEntry>[];
     String? currentMonthKey;
 
-    for (final transaction in _items) {
+    for (final transaction in widget.transactions) {
       final monthKey = '${transaction.date.year}-${transaction.date.month}';
 
       if (monthKey != currentMonthKey) {
@@ -110,7 +101,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
 
   @override
   Widget build(BuildContext context) {
-    if (_items.isEmpty) {
+    if (widget.transactions.isEmpty) {
       return Padding(
         padding: widget.padding,
         child: Container(
@@ -212,7 +203,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
             if (direction == DismissDirection.endToStart) {
               final removed = transaction;
               setState(() {
-                _items.removeWhere((item) => item.id == removed.id && item.createdAt == removed.createdAt);
+                widget.transactions.removeWhere((item) => item.id == removed.id && item.createdAt == removed.createdAt);
               });
               widget.onDeleteConfirmed?.call(removed);
             }
@@ -222,7 +213,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
             child: InkWell(
               borderRadius: BorderRadius.circular(24),
               onTap: () {
-                context.pushNamed(
+                context.pushNamed<TransactionDetailsResult>(
                   'transaction-details',
                   extra: TransactionsDetailsScreenArgs(
                     transaction: transaction,

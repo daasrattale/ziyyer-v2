@@ -7,6 +7,16 @@ import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
 import 'package:ziyyer/theme.dart';
 
+class TransactionDetailsResult {
+  final TransactionModel? updatedTransaction;
+  final int? deletedTransactionId;
+
+  const TransactionDetailsResult({this.updatedTransaction, this.deletedTransactionId});
+
+  bool get wasDeleted => deletedTransactionId != null;
+  bool get wasEdited => updatedTransaction != null;
+}
+
 class TransactionDetailsWidget extends StatelessWidget {
   final TransactionModel transaction;
   final CategoryModel? category;
@@ -29,11 +39,6 @@ class TransactionDetailsWidget extends StatelessWidget {
 
   String _formatTime() {
     return DateFormat('HH:mm').format(transaction.date);
-  }
-
-  String _formatReference() {
-    final id = transaction.id;
-    return '#${id.toString().padLeft(6, '0')}';
   }
 
   @override

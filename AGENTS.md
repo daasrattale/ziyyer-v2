@@ -1,5 +1,29 @@
-# Workflow
+# Ziyyer — Flutter Project
 
-Don't explore codebase beyond any explicitly mentioned files.
+Flutter project using FVM (see `.fvmrc`). Uses drift for local DB, go_router for navigation.
 
-If unsure about an API, write small scripts, print out information, to make an informed decision about next steps.
+## Commands
+
+- `flutter analyze` — lint check (required before any commit)
+- `dart run build_runner build --delete-conflicting-outputs` — regenerate drift & codegen
+- `flutter test` — run tests
+
+## Project Structure
+
+- `lib/` — main app source
+- `test/` — tests
+- `scripts/` — build/release helpers
+- `DATABASE.md` — drift schema docs; update when DB schema changes
+
+## Conventions
+
+- **Conventional Commits** for commit messages (`feat:`, `fix:`, `docs:`, `refactor:`, etc.)
+- Keep changes minimal. Don't refactor unrelated code.
+- Regenerate codegen after drift/DB changes.
+- Run `flutter analyze` before committing — no warnings.
+
+## opencode-Specific
+
+- Use Plan mode (Tab) to propose changes before building.
+- For safe batch operations, use `/init` to refresh AGENTS.md.
+- Subagents (@explore, @general) can be invoked for research.

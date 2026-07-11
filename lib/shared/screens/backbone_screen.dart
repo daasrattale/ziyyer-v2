@@ -31,6 +31,12 @@ class _BackboneScreenState extends State<BackboneScreen> {
 
     final maxWidth = screenWidth > 600 ? 600.0 : screenWidth - (horizontalMargin * 2);
 
+    // Calculate dynamic bar height to prevent content overflow
+    // This matches the internal sizing logic of _NavItem and containerPadding
+    final floatingBarHeight = (screenWidth * 0.145) + (screenHeight * 0.016);
+    const floatingBarOffset = 20.0;
+    final totalBarSpace = floatingBarHeight + floatingBarOffset;
+
     return Scaffold(
       backgroundColor: AppColors.background(context),
       body: BottomBar(
@@ -38,11 +44,16 @@ class _BackboneScreenState extends State<BackboneScreen> {
           width: maxWidth,
           respectSafeArea: false,
           borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
-          offset: 20,
+          offset: floatingBarOffset,
         ),
         body: SafeArea(
           child: Container(
-            margin: EdgeInsets.only(top: 16, bottom: bottomSafe + bottomInset + 30),
+            margin: EdgeInsets.only(
+              top: 16,
+              bottom: bottomInset > 0
+                  ? bottomInset + 16
+                  : (totalBarSpace > bottomSafe ? totalBarSpace - bottomSafe + 16 : 16),
+            ),
             child: widget.navigationShell,
           ),
         ),

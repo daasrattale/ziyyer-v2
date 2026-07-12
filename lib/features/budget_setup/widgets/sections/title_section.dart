@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 
 class TitleSection extends StatelessWidget {
   const TitleSection({super.key});
@@ -7,10 +8,10 @@ class TitleSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text('Your budget amount and currency', style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
+        Text(AppLocalizations.of(context)!.budgetAmountAndCurrency, style: Theme.of(context).textTheme.headlineMedium, textAlign: TextAlign.center),
         SizedBox(height: 8),
         Text(
-          'How much do you plan to spend in total? and in which currency?',
+          AppLocalizations.of(context)!.budgetAmountSubtitle,
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
         ),

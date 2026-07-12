@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/theme.dart';
@@ -89,7 +90,7 @@ class CustomStepper extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                           ),
                           icon: Icon(AppIcons.arrowLeft),
-                          label: const Text('Previous'),
+                          label:                         Text(AppLocalizations.of(context)!.previous),
                         ),
                       ],
 
@@ -107,7 +108,7 @@ class CustomStepper extends StatelessWidget {
                         label: AnimatedSwitcher(
                           duration: const Duration(milliseconds: 180),
                           child: Text(
-                            isLastStep ? 'Done' : steps[activeIndex + 1].title,
+                            isLastStep ? AppLocalizations.of(context)!.done : steps[activeIndex + 1].title,
                             key: ValueKey(isLastStep ? 'done' : steps[activeIndex + 1].title),
                           ),
                         ),

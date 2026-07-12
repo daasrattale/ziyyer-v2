@@ -3,6 +3,7 @@ import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_amount
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_category_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_date_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_description_section.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
 import 'package:ziyyer/shared/services/transaction_service.dart';
@@ -54,7 +55,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
     final amount = double.tryParse(amountController.text.trim().replaceAll(',', '.'));
 
     if (amount == null || amount <= 0) {
-      Toaster.error("Expense amount must be greater than 0");
+      Toaster.error(AppLocalizations.of(context)!.expenseAmountError);
       return;
     }
 
@@ -80,7 +81,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
         description: descriptionController.text.trim(),
         date: selectedDate,
       );
-      Toaster.success("Transaction updated successfully");
+      Toaster.success(AppLocalizations.of(context)!.transactionUpdatedSuccess);
       Navigator.of(context).pop(updated);
     } finally {
       if (mounted) {
@@ -94,10 +95,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Transaction'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.editTransaction), centerTitle: true),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Column(
@@ -133,9 +131,9 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
                 onPressed: isSaving ? null : _submit,
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(56),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                 ),
-                child: Text(isSaving ? 'Saving...' : 'Save'),
+                child: Text(isSaving ? AppLocalizations.of(context)!.saving : AppLocalizations.of(context)!.save),
               ),
             ),
             const SizedBox(height: 24),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
@@ -119,13 +120,13 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
         children: [
           const SizedBox(height: 8),
           Text(
-            'Recurring payments',
+            AppLocalizations.of(context)!.recurringPayments,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
           ),
           const SizedBox(height: 8),
           Text(
-            'Add recurring bills like rent or subscriptions.',
+            AppLocalizations.of(context)!.recurringPaymentsSubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontWeight: FontWeight.w400),
           ),
@@ -142,14 +143,14 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
               children: [
                 Expanded(
                   child: _SummaryValue(
-                    label: 'TOTAL PAYMENTS',
+                    label: AppLocalizations.of(context)!.totalPayments,
                     value: _formatAmount(widget.budgetModel.allocatedPayementsAmount),
                     alignment: CrossAxisAlignment.start,
                   ),
                 ),
                 Expanded(
                   child: _SummaryValue(
-                    label: 'LEFT TO ALLOCATE',
+                    label: AppLocalizations.of(context)!.leftToAllocate,
                     value: _formatAmount(
                       widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount,
                     ),
@@ -173,7 +174,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                   Icon(AppIcons.add, color: AppColors.textSecondary(context), size: 22),
                   const SizedBox(width: 10),
                   Text(
-                    'Add another payment',
+                    AppLocalizations.of(context)!.addAnotherPayment,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -231,7 +232,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                             color: AppColors.textPrimary(context),
                           ),
                           decoration: InputDecoration(
-                            hintText: 'e.g. Netflix',
+                            hintText: AppLocalizations.of(context)!.egNetflix,
                             hintStyle: TextStyle(
                               color: AppColors.textHint(context),
                               fontSize: 14,
@@ -273,7 +274,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                                   color: AppColors.textPrimary(context),
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: '0',
+                                  hintText: AppLocalizations.of(context)!.hintAmount,
                                   hintStyle: TextStyle(
                                     color: AppColors.textHint(context),
                                     fontSize: 14,
@@ -300,7 +301,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
 
           const SizedBox(height: 12),
           Text(
-            'Optional · skip if you have no recurring payments',
+            AppLocalizations.of(context)!.optionalSkipPayments,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
           ),

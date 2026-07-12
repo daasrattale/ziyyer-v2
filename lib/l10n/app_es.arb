@@ -1,0 +1,90 @@
+{
+  "@@locale": "es",
+
+  "home": "Inicio",
+  "history": "Historial",
+  "insight": "Resumen",
+  "settings": "Configuración",
+
+  "welcomeBack": "Bienvenido de nuevo",
+  "totalBalance": "SALDO TOTAL",
+  "percentFromLastMonth": "+20% respecto al mes pasado",
+  "income": "INGRESOS",
+  "payments": "PAGOS",
+  "allocated": "Asignado",
+  "transactions": "TRANSACCIONES",
+
+  "budgetIncome": "Ingreso presupuestario",
+  "budgetPayments": "Pagos presupuestarios",
+  "spendingCategories": "Categorías de gastos",
+  "spendingCategoriesSubtitle": "Divida su presupuesto en categorías como supermercado o transporte.",
+  "budgetAmountAndCurrency": "Su monto presupuestario y moneda",
+  "budgetAmountSubtitle": "¿Cuánto planea gastar en total? ¿y en qué moneda?",
+  "recurringPayments": "Pagos recurrentes",
+  "recurringPaymentsSubtitle": "Agregue facturas recurrentes como alquiler o suscripciones.",
+  "totalPayments": "TOTAL DE PAGOS",
+  "leftToAllocate": "PENDIENTE DE ASIGNAR",
+  "categoriesTotal": "TOTAL DE CATEGORÍAS",
+  "addAnotherCategory": "Agregar otra categoría",
+  "addAnotherPayment": "Agregar otro pago",
+  "quickSet": "CONFIG. RÁPIDA",
+
+  "egGroceries": "ej. Supermercado",
+  "egNetflix": "ej. Netflix",
+  "hintAmount": "0",
+  "optionalSkipPayments": "Opcional · omita si no tiene pagos recurrentes",
+  "optionalAdjustCategories": "Opcional · ajuste las categorías más tarde",
+  "otherCategoryAutoCreated": "La categoría 'Otro' se creará automáticamente",
+
+  "budgetAmountError": "El monto del presupuesto debe ser mayor que 0",
+  "budgetUnallocatedError": "El presupuesto no asignado debe ser mayor que 0",
+
+  "addNewExpense": "Agregar un nuevo gasto",
+  "addNewExpenseSubtitle": "Registre una nueva transacción y asíignela a una categoría.",
+  "amount": "MONTO",
+  "amountHint": "0,00",
+  "descriptionOptional": "Descripción (opcional)",
+  "descriptionHint": "ej. Compra en supermercado, viaje en Uber...",
+  "category": "CATEGORÍA",
+  "date": "Fecha",
+  "saving": "Guardando...",
+  "save": "Guardar",
+
+  "expenseAmountError": "El monto del gasto debe ser mayor que 0",
+  "expenseSavedSuccess": "Gasto guardado exitosamente",
+  "transactionUpdatedSuccess": "Transacción actualizada exitosamente",
+
+  "editTransaction": "Editar transacción",
+
+  "deleteTransaction": "¿Eliminar transacción?",
+  "deleteTransactionConfirm": "Esta acción no se puede deshacer.",
+  "cancel": "Cancelar",
+  "delete": "Eliminar",
+
+  "noTransactionsYet": "Sin transacciones aún",
+  "noTransactionsSubtitle": "Sus gastos guardados aparecerán aquí.",
+  "edit": "Editar",
+  "deleteTransactionDesc": "Esto eliminará permanentemente \"{description}\".",
+  "thisTransaction": "esta transacción",
+
+  "type": "Tipo",
+  "expense": "Gasto",
+  "time": "Hora",
+  "noDescription": "Sin descripción",
+  "other": "Otro",
+
+  "spendingByCategory": "Gastos por categoría",
+
+  "previous": "Anterior",
+  "done": "Listo",
+
+  "insightsScreen": "Pantalla de Resumen",
+  "historyScreen": "Pantalla de Historial",
+  "transactionsTitle": "Transacciones",
+
+  "language": "Idioma",
+  "languageSubtitle": "Elija su idioma preferido",
+  "english": "Inglés",
+  "french": "Francés",
+  "spanish": "Español"
+}

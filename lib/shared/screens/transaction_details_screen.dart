@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/transaction_details/widgets/transaction_details.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
 import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
@@ -54,14 +55,14 @@ class TransactionsDetailsScreen extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete transaction?'),
-          content: const Text('This action cannot be undone.'),
+          title: Text(AppLocalizations.of(context)!.deleteTransaction),
+          content: Text(AppLocalizations.of(context)!.deleteTransactionConfirm),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(AppLocalizations.of(context)!.cancel)),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
-              child: const Text('Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         );

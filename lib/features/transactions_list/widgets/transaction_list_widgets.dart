@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -33,35 +34,32 @@ class TransactionListWidgets extends StatefulWidget {
 }
 
 class _TransactionListWidgetsState extends State<TransactionListWidgets> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant TransactionListWidgets oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
   Future<bool?> _showDeletePrompt(TransactionModel transaction) {
     return showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Delete transaction?'),
+          title: Text(AppLocalizations.of(context)!.deleteTransaction),
           content: Text(
-            'This will permanently remove "${transaction.description?.trim().isNotEmpty == true ? transaction.description!.trim() : 'this transaction'}".',
+            AppLocalizations.of(context)!.deleteTransactionDesc(
+              transaction.description?.trim().isNotEmpty == true
+                  ? transaction.description!.trim()
+                  : AppLocalizations.of(context)!.thisTransaction,
+            ),
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: AppColors.expenseColor(context),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Delete'),
+              child: Text(AppLocalizations.of(context)!.delete),
             ),
           ],
         );
@@ -82,7 +80,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
     return '- ${widget.currencySymbol}${amount.toStringAsFixed(2)}';
   }
 
-  List<_TransactionListEntry> _buildGroupedEntries() {
+  List<_TransactionListEntry> _buildGroupedEntries(BuildContext context) {
     final entries = <_TransactionListEntry>[];
     String? currentMonthKey;
 
@@ -91,7 +89,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
 
       if (monthKey != currentMonthKey) {
         currentMonthKey = monthKey;
-        entries.add(_MonthHeaderEntry(transaction.date.monthAndYear()));
+        entries.add(_MonthHeaderEntry(transaction.date.monthAndYear(context)));
       }
 
       entries.add(_TransactionItemEntry(transaction));
@@ -126,12 +124,12 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
               ),
               const SizedBox(height: 14),
               Text(
-                'No transactions yet',
+                AppLocalizations.of(context)!.noTransactionsYet,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: 6),
               Text(
-                'Your saved expenses will appear here.',
+                AppLocalizations.of(context)!.noTransactionsSubtitle,
                 textAlign: TextAlign.center,
                 style: Theme.of(
                   context,
@@ -143,7 +141,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
       );
     }
 
-    final entries = _buildGroupedEntries();
+    final entries = _buildGroupedEntries(context);
 
     return ListView.separated(
       padding: widget.padding,
@@ -167,7 +165,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
 
         final transaction = (entry as _TransactionItemEntry).transaction;
         final category = _findCategory(transaction.categoryId);
-        final categoryName = category?.name ?? 'Other';
+        final categoryName = category?.name ?? AppLocalizations.of(context)!.other;
         final categoryColor = AppColors.categoryColorFor(categoryName);
         final categoryIcon = AppIcons.categoryIconFor(categoryName);
 
@@ -177,14 +175,14 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
             alignment: Alignment.centerLeft,
             color: AppColors.infoColor(context),
             icon: Icons.edit_rounded,
-            label: 'Edit',
+            label: AppLocalizations.of(context)!.edit,
             borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
           ),
           secondaryBackground: _SwipeActionBackground(
             alignment: Alignment.centerRight,
             color: AppColors.expenseColor(context),
             icon: Icons.delete_rounded,
-            label: 'Delete',
+            label: AppLocalizations.of(context)!.delete,
             borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
           ),
           confirmDismiss: (direction) async {
@@ -262,7 +260,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
                               children: [
                                 Flexible(
                                   child: Text(
-                                    transaction.date.prettyDate(),
+                                    transaction.date.prettyDate(context),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

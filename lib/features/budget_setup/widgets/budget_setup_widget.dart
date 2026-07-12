@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_amount_currency_setup_step.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_categories_setup_step.dart';
@@ -74,18 +75,18 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                         if (_currentIndex > 2) return;
 
                         if (_currentIndex == 0 && _budgetModel.definedAmount <= 0) {
-                          Toaster.error('Budget amount must be greater than 0');
+                          Toaster.error(AppLocalizations.of(context)!.budgetAmountError);
                           return;
                         }
 
                         if (_currentIndex == 1 &&
                             _budgetModel.definedAmount - _budgetModel.allocatedPayementsAmount < 0) {
-                          Toaster.error('Budget unallocated must be greater than 0');
+                          Toaster.error(AppLocalizations.of(context)!.budgetUnallocatedError);
                           return;
                         }
 
                         if (_currentIndex == 2 && _budgetModel.unallocatedAmount < 0) {
-                          Toaster.error('Budget unallocated must be greater than 0');
+                          Toaster.error(AppLocalizations.of(context)!.budgetUnallocatedError);
                           return;
                         }
 
@@ -113,7 +114,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                       },
                       steps: [
                         CustomStepperStep(
-                          title: 'Budget Income',
+                          title: AppLocalizations.of(context)!.budgetIncome,
                           content: BudgetAmountCurrencySetupStep(
                             budgetModel: _budgetModel,
                             onAmountChanged: (amount) {
@@ -125,7 +126,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                           ),
                         ),
                         CustomStepperStep(
-                          title: 'Budget Payements',
+                          title: AppLocalizations.of(context)!.budgetPayments,
                           content: BudgetPaymentsSetupStep(
                             budgetModel: _budgetModel,
                             onPaymentsChanged: (payments) {
@@ -134,7 +135,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                           ),
                         ),
                         CustomStepperStep(
-                          title: 'Spending categories',
+                          title: AppLocalizations.of(context)!.spendingCategories,
                           content: BudgetCategoriesSetupStep(
                             budgetModel: _budgetModel,
                             onCategoriesChanged: (categories) {

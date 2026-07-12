@@ -7,67 +7,92 @@ import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/shared/screens/history_screen.dart';
 import 'package:ziyyer/shared/screens/home_screen.dart';
 import 'package:ziyyer/shared/screens/insights_screen.dart';
+import 'package:ziyyer/shared/screens/language_screen.dart';
+import 'package:ziyyer/shared/screens/settings_screen.dart';
 import 'package:ziyyer/shared/screens/transaction_details_screen.dart';
 import 'package:ziyyer/shared/screens/transactions_screen.dart';
+import 'package:ziyyer/shared/services/locale_provider.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-final GoRouter appRouter = GoRouter(
-  navigatorKey: rootNavigatorKey,
-  initialLocation: '/',
-  routes: <RouteBase>[
-    StatefulShellRoute.indexedStack(
-      builder: (context, state, navigationShell) => BackboneScreen(navigationShell: navigationShell),
-      branches: [
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/', name: 'home', builder: (context, state) => const HomeScreen())],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/history', name: 'history', builder: (context, state) => const HistoryScreen())],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/insights', name: 'insights', builder: (context, state) => const InsightsScreen())],
-        ),
-        StatefulShellBranch(
-          routes: [
-            GoRoute(path: '/add-expense', name: 'add-expense', builder: (context, state) => const AddExpenseScreen()),
-          ],
-        ),
-        StatefulShellBranch(
-          routes: [GoRoute(path: '/budget', name: 'budget', builder: (context, state) => const BudgetScreen())],
-        ),
-      ],
-    ),
+class AppRouter {
+  final LocaleProvider localeProvider;
 
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: '/transactions',
-      name: 'transactions',
-      builder: (context, state) {
-        final args = state.extra as TransactionsScreenArgs;
+  AppRouter(this.localeProvider);
 
-        return TransactionsScreen(args: args);
-      },
-    ),
+  late final GoRouter appRouter = GoRouter(
+    navigatorKey: rootNavigatorKey,
+    initialLocation: '/',
+    routes: <RouteBase>[
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => BackboneScreen(navigationShell: navigationShell),
+        branches: [
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/', name: 'home', builder: (context, state) => const HomeScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/history', name: 'history', builder: (context, state) => const HistoryScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/insights', name: 'insights', builder: (context, state) => const InsightsScreen())],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(path: '/add-expense', name: 'add-expense', builder: (context, state) => const AddExpenseScreen()),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/settings',
+                name: 'settings',
+                builder: (context, state) => SettingsScreen(localeProvider: localeProvider),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [GoRoute(path: '/budget', name: 'budget', builder: (context, state) => BudgetScreen())],
+          ),
+        ],
+      ),
 
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: '/transaction-details',
-      name: 'transaction-details',
-      builder: (context, state) {
-        final args = state.extra as TransactionsDetailsScreenArgs;
-        return TransactionsDetailsScreen(args: args);
-      },
-    ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/transactions',
+        name: 'transactions',
+        builder: (context, state) {
+          final args = state.extra as TransactionsScreenArgs;
 
-    GoRoute(
-      parentNavigatorKey: rootNavigatorKey,
-      path: '/edit-expense',
-      name: 'edit-expense',
-      builder: (context, state) {
-        final args = state.extra as EditExpenseScreenArgs;
-        return EditExpenseScreen(args: args);
-      },
-    ),
-  ],
-);
+          return TransactionsScreen(args: args);
+        },
+      ),
+
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/transaction-details',
+        name: 'transaction-details',
+        builder: (context, state) {
+          final args = state.extra as TransactionsDetailsScreenArgs;
+          return TransactionsDetailsScreen(args: args);
+        },
+      ),
+
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/edit-expense',
+        name: 'edit-expense',
+        builder: (context, state) {
+          final args = state.extra as EditExpenseScreenArgs;
+          return EditExpenseScreen(args: args);
+        },
+      ),
+
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: '/language',
+        name: 'language',
+        builder: (context, state) => LanguageScreen(localeProvider: localeProvider),
+      ),
+    ],
+  );
+}

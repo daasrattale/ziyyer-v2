@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/transactions_list/widgets/transaction_list_widgets.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
 import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
+import 'package:ziyyer/theme.dart';
 
 class TransactionsScreenArgs {
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
-  final ValueChanged<TransactionModel>? onEdit;
   final ValueChanged<TransactionModel>? onDeleteConfirmed;
   final String currencySymbol;
 
   const TransactionsScreenArgs({
     required this.transactions,
     required this.categories,
-    this.onEdit,
     this.onDeleteConfirmed,
     required this.currencySymbol,
   });
@@ -64,7 +64,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           _transactions[index] = updated;
         }
       });
-      widget.args.onEdit?.call(updated);
     }
   }
 
@@ -75,13 +74,15 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         _transactions[index] = updated;
       }
     });
-    widget.args.onEdit?.call(updated);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Transactions')),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.transactionsTitle),
+        backgroundColor: AppColors.background(context),
+      ),
       body: TransactionListWidgets(
         transactions: _transactions,
         categories: widget.args.categories,

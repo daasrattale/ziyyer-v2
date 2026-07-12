@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/theme.dart';
 
 class TransactionAmountSection extends StatelessWidget {
@@ -14,7 +15,7 @@ class TransactionAmountSection extends StatelessWidget {
     return Column(
       children: [
         Text(
-          'AMOUNT',
+          AppLocalizations.of(context)!.amount,
           style: theme.textTheme.labelLarge?.copyWith(
             fontWeight: FontWeight.w600,
             letterSpacing: 2.2,

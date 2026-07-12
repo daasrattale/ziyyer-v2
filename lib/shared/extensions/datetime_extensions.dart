@@ -1,15 +1,20 @@
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:ziyyer/shared/extensions/string_extensions.dart';
 
 extension DateTimeX on DateTime {
-  String prettyDate([String locale = 'en']) {
-    return DateFormat('E d MMMM y', locale).format(this);
+  String prettyDate([BuildContext? context]) {
+    final locale = context != null ? Localizations.localeOf(context).languageCode : 'en';
+    return DateFormat('E d MMMM y', locale).format(this).capitalizeFirst();
   }
 
-  String monthAndYear([String locale = 'en']) {
+  String monthAndYear([BuildContext? context]) {
+    final locale = context != null ? Localizations.localeOf(context).languageCode : 'en';
     return DateFormat('MMMM y', locale).format(this);
   }
 
-  String fullDateTime([String locale = 'en']) {
+  String fullDateTime([BuildContext? context]) {
+    final locale = context != null ? Localizations.localeOf(context).languageCode : 'en';
     return DateFormat('E d MMMM y HH:ss a', locale).format(this);
   }
 }

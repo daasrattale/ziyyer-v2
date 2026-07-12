@@ -150,7 +150,9 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                 Expanded(
                   child: _SummaryValue(
                     label: 'LEFT TO ALLOCATE',
-                    value: _formatAmount(widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount),
+                    value: _formatAmount(
+                      widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount,
+                    ),
                     alignment: CrossAxisAlignment.end,
                     textAlign: TextAlign.right,
                   ),
@@ -158,110 +160,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
-
-          ..._rows.asMap().entries.map((entry) {
-            final index = entry.key;
-            final row = entry.value;
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppConstants.spacingMedium),
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface(context),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(color: AppColors.background(context), shape: BoxShape.circle),
-                      alignment: Alignment.center,
-                      child: Icon(AppIcons.receipt, color: AppColors.textHint(context), size: 18),
-                    ),
-                    const SizedBox(width: 14),
-
-                    Expanded(
-                      child: TextField(
-                        controller: row.nameController,
-                        textInputAction: TextInputAction.next,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.textPrimary(context),
-                        ),
-                        decoration: InputDecoration(
-                          hintText: 'e.g. Netflix',
-                          hintStyle: TextStyle(
-                            color: AppColors.textHint(context),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                          border: InputBorder.none,
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    Container(
-                      width: 128,
-                      height: 40,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: AppColors.background(context),
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                      child: Row(
-                        children: [
-                          Text(
-                            widget.budgetModel.currency.symbol,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.textSecondary(context),
-                            ),
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: row.amountController,
-                              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                              textAlign: TextAlign.right,
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary(context),
-                              ),
-                              decoration: InputDecoration(
-                                hintText: '0',
-                                hintStyle: TextStyle(
-                                  color: AppColors.textHint(context),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                border: InputBorder.none,
-                                isDense: true,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => _removeRow(index),
-                      icon: Icon(AppIcons.trash, color: AppColors.expenseColor(context), size: 18),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }),
-
           const SizedBox(height: 12),
-
           GestureDetector(
             onTap: _addEmptyRow,
             child: Container(
@@ -275,18 +174,137 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                   const SizedBox(width: 10),
                   Text(
                     'Add another payment',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context)),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary(context),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 18),
+          const SizedBox(height: 12),
+
+          ..._rows.asMap().entries.map((entry) {
+            final index = entry.key;
+            final row = entry.value;
+
+            return TweenAnimationBuilder<double>(
+              key: ValueKey(row.id),
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(offset: Offset(0, 16 * (1 - value)), child: child),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: AppConstants.spacingMedium),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface(context),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(color: AppColors.background(context), shape: BoxShape.circle),
+                        alignment: Alignment.center,
+                        child: Icon(AppIcons.receipt, color: AppColors.textHint(context), size: 18),
+                      ),
+                      const SizedBox(width: 14),
+
+                      Expanded(
+                        child: TextField(
+                          controller: row.nameController,
+                          textInputAction: TextInputAction.next,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textPrimary(context),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'e.g. Netflix',
+                            hintStyle: TextStyle(
+                              color: AppColors.textHint(context),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            border: InputBorder.none,
+                            isDense: true,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+
+                      Container(
+                        width: 128,
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: AppColors.background(context),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              widget.budgetModel.currency.symbol,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.textSecondary(context),
+                              ),
+                            ),
+                            Expanded(
+                              child: TextField(
+                                controller: row.amountController,
+                                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                textAlign: TextAlign.right,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textPrimary(context),
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: '0',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.textHint(context),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _removeRow(index),
+                        icon: Icon(AppIcons.trash, color: AppColors.expenseColor(context), size: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+
+          const SizedBox(height: 12),
           Text(
-            'Optional · skip if you have no recurring bills',
+            'Optional · skip if you have no recurring payments',
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
           ),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -333,13 +351,16 @@ class _SummaryValue extends StatelessWidget {
 }
 
 class _PaymentRowData {
+  static int _counter = 0;
+  final int id;
   final VoidCallback onChanged;
 
   final TextEditingController nameController;
   final TextEditingController amountController;
 
   _PaymentRowData({required this.onChanged, String initialName = '', String initialAmount = ''})
-    : nameController = TextEditingController(text: initialName),
+    : id = _counter++,
+      nameController = TextEditingController(text: initialName),
       amountController = TextEditingController(text: initialAmount) {
     nameController.addListener(onChanged);
     amountController.addListener(onChanged);

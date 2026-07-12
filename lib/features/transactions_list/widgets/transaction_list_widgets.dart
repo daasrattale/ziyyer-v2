@@ -189,6 +189,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
           confirmDismiss: (direction) async {
             if (direction == DismissDirection.startToEnd) {
               widget.onEdit?.call(transaction);
+              setState(() {});
               return false;
             }
 

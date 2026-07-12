@@ -35,7 +35,7 @@ class TransactionsDetailsScreen extends StatelessWidget {
   }
 
   void _navigateToEdit(BuildContext context) async {
-    final result = await context.pushNamed<bool>(
+    final updated = await context.pushNamed<TransactionModel>(
       'edit-expense',
       extra: EditExpenseScreenArgs(
         transaction: args.transaction,
@@ -44,8 +44,8 @@ class TransactionsDetailsScreen extends StatelessWidget {
       ),
     );
 
-    if (result == true && context.mounted) {
-      args.onEdit?.call(args.transaction);
+    if (updated != null && context.mounted) {
+      args.onEdit?.call(updated);
       context.pop();
     }
   }

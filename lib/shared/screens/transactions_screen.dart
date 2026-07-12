@@ -48,7 +48,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   }
 
   Future<void> _handleEdit(TransactionModel transaction) async {
-    final result = await context.pushNamed<bool>(
+    final updated = await context.pushNamed<TransactionModel>(
       'edit-expense',
       extra: EditExpenseScreenArgs(
         transaction: transaction,
@@ -57,8 +57,14 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
       ),
     );
 
-    if (result == true && mounted) {
-      widget.args.onEdit?.call(transaction);
+    if (updated != null && mounted) {
+      setState(() {
+        final index = _transactions.indexWhere((t) => t.id == updated.id);
+        if (index != -1) {
+          _transactions[index] = updated;
+        }
+      });
+      widget.args.onEdit?.call(updated);
     }
   }
 

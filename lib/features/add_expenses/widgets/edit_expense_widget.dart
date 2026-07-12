@@ -74,8 +74,14 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
 
       if (!mounted) return;
 
+      final updated = widget.transaction.copyWith(
+        amount: amount,
+        categoryId: selectedCategoryId,
+        description: descriptionController.text.trim(),
+        date: selectedDate,
+      );
       Toaster.success("Transaction updated successfully");
-      Navigator.of(context).pop(true);
+      Navigator.of(context).pop(updated);
     } finally {
       if (mounted) {
         setState(() {

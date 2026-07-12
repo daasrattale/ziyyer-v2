@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/theme.dart';
-import 'package:ziyyer/widgets/add_expense_btn.dart';
+import 'package:ziyyer/shared/widgets/add_expense_btn.dart';
 
 class BackboneScreen extends StatefulWidget {
   final StatefulNavigationShell navigationShell;

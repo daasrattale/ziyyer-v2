@@ -34,6 +34,7 @@ class BudgetService {
           BudgetTableCompanion.insert(
             definedAmount: model.definedAmount,
             currency: model.currency.code,
+            isSetup: Value(model.isSetup),
             createdAt: now,
             updatedAt: now,
           ),
@@ -46,6 +47,7 @@ class BudgetService {
           BudgetTableCompanion(
             definedAmount: Value(model.definedAmount),
             currency: Value(model.currency.code),
+            isSetup: Value(model.isSetup),
             updatedAt: Value(now),
           ),
         );
@@ -73,7 +75,7 @@ class BudgetService {
   }
 
   Stream<BudgetModel?> watch() {
-    return _budgetPersistence.watch().switchMap((budget) {
+    return _budgetPersistence.watch().startWith(null).switchMap((budget) {
       if (budget == null) {
         return Stream.value(null);
       }

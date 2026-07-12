@@ -30,6 +30,16 @@ class $BudgetTableTable extends BudgetTable
   late final GeneratedColumn<String> currency = GeneratedColumn<String>(
       'currency', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _isSetupMeta =
+      const VerificationMeta('isSetup');
+  @override
+  late final GeneratedColumn<bool> isSetup = GeneratedColumn<bool>(
+      'is_setup', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_setup" IN (0, 1))'),
+      defaultValue: const Constant(false));
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -44,7 +54,7 @@ class $BudgetTableTable extends BudgetTable
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, definedAmount, currency, createdAt, updatedAt];
+      [id, definedAmount, currency, isSetup, createdAt, updatedAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -71,6 +81,10 @@ class $BudgetTableTable extends BudgetTable
           currency.isAcceptableOrUnknown(data['currency']!, _currencyMeta));
     } else if (isInserting) {
       context.missing(_currencyMeta);
+    }
+    if (data.containsKey('is_setup')) {
+      context.handle(_isSetupMeta,
+          isSetup.isAcceptableOrUnknown(data['is_setup']!, _isSetupMeta));
     }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
@@ -99,6 +113,8 @@ class $BudgetTableTable extends BudgetTable
           .read(DriftSqlType.double, data['${effectivePrefix}defined_amount'])!,
       currency: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}currency'])!,
+      isSetup: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_setup'])!,
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
       updatedAt: attachedDatabase.typeMapping
@@ -116,12 +132,14 @@ class Budget extends DataClass implements Insertable<Budget> {
   final int id;
   final double definedAmount;
   final String currency;
+  final bool isSetup;
   final DateTime createdAt;
   final DateTime updatedAt;
   const Budget(
       {required this.id,
       required this.definedAmount,
       required this.currency,
+      required this.isSetup,
       required this.createdAt,
       required this.updatedAt});
   @override
@@ -130,6 +148,7 @@ class Budget extends DataClass implements Insertable<Budget> {
     map['id'] = Variable<int>(id);
     map['defined_amount'] = Variable<double>(definedAmount);
     map['currency'] = Variable<String>(currency);
+    map['is_setup'] = Variable<bool>(isSetup);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -140,6 +159,7 @@ class Budget extends DataClass implements Insertable<Budget> {
       id: Value(id),
       definedAmount: Value(definedAmount),
       currency: Value(currency),
+      isSetup: Value(isSetup),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -152,6 +172,7 @@ class Budget extends DataClass implements Insertable<Budget> {
       id: serializer.fromJson<int>(json['id']),
       definedAmount: serializer.fromJson<double>(json['definedAmount']),
       currency: serializer.fromJson<String>(json['currency']),
+      isSetup: serializer.fromJson<bool>(json['isSetup']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -163,6 +184,7 @@ class Budget extends DataClass implements Insertable<Budget> {
       'id': serializer.toJson<int>(id),
       'definedAmount': serializer.toJson<double>(definedAmount),
       'currency': serializer.toJson<String>(currency),
+      'isSetup': serializer.toJson<bool>(isSetup),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -172,12 +194,14 @@ class Budget extends DataClass implements Insertable<Budget> {
           {int? id,
           double? definedAmount,
           String? currency,
+          bool? isSetup,
           DateTime? createdAt,
           DateTime? updatedAt}) =>
       Budget(
         id: id ?? this.id,
         definedAmount: definedAmount ?? this.definedAmount,
         currency: currency ?? this.currency,
+        isSetup: isSetup ?? this.isSetup,
         createdAt: createdAt ?? this.createdAt,
         updatedAt: updatedAt ?? this.updatedAt,
       );
@@ -187,6 +211,7 @@ class Budget extends DataClass implements Insertable<Budget> {
           ..write('id: $id, ')
           ..write('definedAmount: $definedAmount, ')
           ..write('currency: $currency, ')
+          ..write('isSetup: $isSetup, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -195,7 +220,7 @@ class Budget extends DataClass implements Insertable<Budget> {
 
   @override
   int get hashCode =>
-      Object.hash(id, definedAmount, currency, createdAt, updatedAt);
+      Object.hash(id, definedAmount, currency, isSetup, createdAt, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -203,6 +228,7 @@ class Budget extends DataClass implements Insertable<Budget> {
           other.id == this.id &&
           other.definedAmount == this.definedAmount &&
           other.currency == this.currency &&
+          other.isSetup == this.isSetup &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -211,12 +237,14 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
   final Value<int> id;
   final Value<double> definedAmount;
   final Value<String> currency;
+  final Value<bool> isSetup;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const BudgetTableCompanion({
     this.id = const Value.absent(),
     this.definedAmount = const Value.absent(),
     this.currency = const Value.absent(),
+    this.isSetup = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -224,6 +252,7 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     this.id = const Value.absent(),
     required double definedAmount,
     required String currency,
+    this.isSetup = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
   })  : definedAmount = Value(definedAmount),
@@ -234,6 +263,7 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     Expression<int>? id,
     Expression<double>? definedAmount,
     Expression<String>? currency,
+    Expression<bool>? isSetup,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
   }) {
@@ -241,6 +271,7 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
       if (id != null) 'id': id,
       if (definedAmount != null) 'defined_amount': definedAmount,
       if (currency != null) 'currency': currency,
+      if (isSetup != null) 'is_setup': isSetup,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -250,12 +281,14 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
       {Value<int>? id,
       Value<double>? definedAmount,
       Value<String>? currency,
+      Value<bool>? isSetup,
       Value<DateTime>? createdAt,
       Value<DateTime>? updatedAt}) {
     return BudgetTableCompanion(
       id: id ?? this.id,
       definedAmount: definedAmount ?? this.definedAmount,
       currency: currency ?? this.currency,
+      isSetup: isSetup ?? this.isSetup,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -273,6 +306,9 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
     if (currency.present) {
       map['currency'] = Variable<String>(currency.value);
     }
+    if (isSetup.present) {
+      map['is_setup'] = Variable<bool>(isSetup.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -288,6 +324,7 @@ class BudgetTableCompanion extends UpdateCompanion<Budget> {
           ..write('id: $id, ')
           ..write('definedAmount: $definedAmount, ')
           ..write('currency: $currency, ')
+          ..write('isSetup: $isSetup, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -1276,6 +1313,7 @@ typedef $$BudgetTableTableInsertCompanionBuilder = BudgetTableCompanion
   Value<int> id,
   required double definedAmount,
   required String currency,
+  Value<bool> isSetup,
   required DateTime createdAt,
   required DateTime updatedAt,
 });
@@ -1284,6 +1322,7 @@ typedef $$BudgetTableTableUpdateCompanionBuilder = BudgetTableCompanion
   Value<int> id,
   Value<double> definedAmount,
   Value<String> currency,
+  Value<bool> isSetup,
   Value<DateTime> createdAt,
   Value<DateTime> updatedAt,
 });
@@ -1311,6 +1350,7 @@ class $$BudgetTableTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<double> definedAmount = const Value.absent(),
             Value<String> currency = const Value.absent(),
+            Value<bool> isSetup = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
             Value<DateTime> updatedAt = const Value.absent(),
           }) =>
@@ -1318,6 +1358,7 @@ class $$BudgetTableTableTableManager extends RootTableManager<
             id: id,
             definedAmount: definedAmount,
             currency: currency,
+            isSetup: isSetup,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
@@ -1325,6 +1366,7 @@ class $$BudgetTableTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required double definedAmount,
             required String currency,
+            Value<bool> isSetup = const Value.absent(),
             required DateTime createdAt,
             required DateTime updatedAt,
           }) =>
@@ -1332,6 +1374,7 @@ class $$BudgetTableTableTableManager extends RootTableManager<
             id: id,
             definedAmount: definedAmount,
             currency: currency,
+            isSetup: isSetup,
             createdAt: createdAt,
             updatedAt: updatedAt,
           ),
@@ -1365,6 +1408,11 @@ class $$BudgetTableTableFilterComposer
 
   ColumnFilters<String> get currency => $state.composableBuilder(
       column: $state.table.currency,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<bool> get isSetup => $state.composableBuilder(
+      column: $state.table.isSetup,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -1420,6 +1468,11 @@ class $$BudgetTableTableOrderingComposer
 
   ColumnOrderings<String> get currency => $state.composableBuilder(
       column: $state.table.currency,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<bool> get isSetup => $state.composableBuilder(
+      column: $state.table.isSetup,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

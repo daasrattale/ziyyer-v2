@@ -9,6 +9,7 @@ class BudgetModel {
   int? id;
   double definedAmount;
   CurrencyModel currency;
+  bool isSetup;
   List<CategoryModel> categories;
   List<PaymentModel> payments;
   DateTime? createdAt;
@@ -18,6 +19,7 @@ class BudgetModel {
     required this.id,
     required this.definedAmount,
     required this.currency,
+    required this.isSetup,
     required this.categories,
     required this.payments,
     required this.createdAt,
@@ -35,6 +37,7 @@ class BudgetModel {
       id: budget.id,
       definedAmount: budget.definedAmount,
       currency: AppConstants.supportedCurrencies.where((c) => c.code == budget.currency).first,
+      isSetup: budget.isSetup,
       categories: categories,
       payments: payments,
       createdAt: budget.createdAt,
@@ -47,11 +50,13 @@ class BudgetModel {
     double? allocatedAmount,
     double? unallocatedAmount,
     List<PaymentModel>? payments,
+    bool? isSetup,
   }) {
     return BudgetModel(
       id: id,
       definedAmount: definedAmount,
       currency: currency,
+      isSetup: isSetup ?? this.isSetup,
       categories: categories ?? this.categories,
       payments: payments ?? this.payments,
       createdAt: createdAt,
@@ -64,6 +69,7 @@ class BudgetModel {
       id: null,
       definedAmount: 2500,
       currency: AppConstants.defaultCurrency,
+      isSetup: false,
       categories: [],
       payments: [],
       createdAt: null,
@@ -77,7 +83,6 @@ class BudgetModel {
   double get allocatedAmount => allocatedCategoriesAmount + allocatedPayementsAmount;
   double get unallocatedAmount => definedAmount - allocatedAmount;
   double get balance => definedAmount - realAmount;
-  bool get isSetup => definedAmount > 0 && categories.isNotEmpty;
 
   double get realAmount => categories.fold<double>(0, (sum, category) => sum + category.realAmount);
 

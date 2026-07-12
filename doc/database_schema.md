@@ -2,7 +2,7 @@
 
 **Engine:** SQLite via Drift ORM  
 **DB file:** `ziyyer.sqlite` in app documents directory  
-**Schema version:** 1
+**Schema version:** 2
 
 ## Tables
 
@@ -12,6 +12,7 @@
 | id | INTEGER | PK AUTOINCREMENT |
 | defined_amount | REAL | NOT NULL |
 | currency | TEXT | NOT NULL |
+| is_setup | BOOLEAN | DEFAULT false |
 | created_at | DATETIME | NOT NULL |
 | updated_at | DATETIME | NOT NULL |
 

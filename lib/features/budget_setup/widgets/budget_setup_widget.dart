@@ -8,7 +8,7 @@ import 'package:ziyyer/shared/services/budget_service.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
 import 'package:ziyyer/shared/ui/loader.dart';
 import 'package:ziyyer/shared/utils/toaster.dart';
-import 'package:ziyyer/widgets/custom_stepper.dart';
+import 'package:ziyyer/shared/widgets/custom_stepper.dart';
 
 class BudgetSetupWidget extends StatefulWidget {
   const BudgetSetupWidget({super.key});
@@ -92,6 +92,7 @@ class _BudgetSetupWidgetState extends State<BudgetSetupWidget> {
                         });
                       },
                       goToDoneStep: () {
+                        _budgetModel.isSetup = true;
                         budgetService.persist(_budgetModel);
                         _currentIndex = 0;
                         context.go("/");

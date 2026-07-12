@@ -16,7 +16,25 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+        onUpgrade: (Migrator m, int from, int to) async {
+          if (from < 2) {
+            await m.addColumn(budgetTable, budgetTable.isSetup);
+            // Migrate existing budgets: set isSetup = true if they have categories
+            await customStatement('''
+              UPDATE budget_table 
+              SET is_setup = 1 
+              WHERE id IN (SELECT DISTINCT budget_id FROM category_table)
+            ''');
+          }
+        },
+      );
 }
 
 LazyDatabase _openConnection() {

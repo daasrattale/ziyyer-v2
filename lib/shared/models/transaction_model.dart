@@ -6,6 +6,7 @@ class TransactionModel {
   final double amount;
   final DateTime date;
   final String? description;
+  final String? paymentMethod;
   final DateTime createdAt;
 
   const TransactionModel({
@@ -14,6 +15,7 @@ class TransactionModel {
     required this.amount,
     required this.date,
     this.description,
+    this.paymentMethod,
     required this.createdAt,
   });
 
@@ -24,6 +26,7 @@ class TransactionModel {
       amount: 0,
       date: DateTime.now(),
       description: null,
+      paymentMethod: null,
       createdAt: DateTime.now(),
     );
   }
@@ -34,6 +37,7 @@ class TransactionModel {
     double? amount,
     DateTime? date,
     String? description,
+    String? paymentMethod,
     DateTime? createdAt,
   }) {
     return TransactionModel(
@@ -42,6 +46,7 @@ class TransactionModel {
       amount: amount ?? this.amount,
       date: date ?? this.date,
       description: description ?? this.description,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -53,6 +58,7 @@ class TransactionModel {
       amount: transaction.amount,
       date: transaction.date,
       description: transaction.description,
+      paymentMethod: transaction.paymentMethod,
       createdAt: transaction.createdAt,
     );
   }

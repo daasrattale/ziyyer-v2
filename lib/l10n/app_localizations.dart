@@ -531,6 +531,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Spanish'**
   String get spanish;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'PAYMENT METHOD'**
+  String get paymentMethod;
+
+  /// No description provided for @applePay.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Pay'**
+  String get applePay;
+
+  /// No description provided for @cash.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cash;
+
+  /// No description provided for @creditCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Credit Card'**
+  String get creditCard;
+
+  /// No description provided for @debitCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Debit Card'**
+  String get debitCard;
+
+  /// No description provided for @bankTransfer.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Transfer'**
+  String get bankTransfer;
+
+  /// No description provided for @scanReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Receipt'**
+  String get scanReceipt;
+
+  /// No description provided for @scanningReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning receipt...'**
+  String get scanningReceipt;
+
+  /// No description provided for @receiptScanError.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to scan receipt'**
+  String get receiptScanError;
+
+  /// No description provided for @noTextFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No text found on receipt'**
+  String get noTextFound;
+
+  /// No description provided for @receiptScannedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt scanned successfully'**
+  String get receiptScannedSuccess;
+
+  /// No description provided for @addExpenseOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Expense'**
+  String get addExpenseOption;
+
+  /// No description provided for @scanReceiptOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Receipt'**
+  String get scanReceiptOption;
+
+  /// No description provided for @enterManuallyOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Manually'**
+  String get enterManuallyOption;
+
+  /// No description provided for @scanReceiptDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a photo of your receipt to auto-fill details'**
+  String get scanReceiptDesc;
+
+  /// No description provided for @enterManuallyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter expense details by hand'**
+  String get enterManuallyDesc;
 }
 
 class _AppLocalizationsDelegate

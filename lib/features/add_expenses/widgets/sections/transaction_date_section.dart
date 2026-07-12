@@ -10,17 +10,39 @@ class TransactionDateSection extends StatelessWidget {
 
   const TransactionDateSection({super.key, required this.selectedDate, required this.onDateChanged});
 
-  Future<void> _pickDate(BuildContext context) async {
-    final picked = await showDatePicker(
+  Future<void> _pickDateTime(BuildContext context) async {
+    final pickedDate = await showDatePicker(
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
 
-    if (picked != null) {
-      onDateChanged(picked);
+    if (pickedDate == null || !context.mounted) return;
+
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(selectedDate),
+    );
+
+    if (pickedTime == null) {
+      onDateChanged(DateTime(
+        pickedDate.year,
+        pickedDate.month,
+        pickedDate.day,
+        selectedDate.hour,
+        selectedDate.minute,
+      ));
+      return;
     }
+
+    onDateChanged(DateTime(
+      pickedDate.year,
+      pickedDate.month,
+      pickedDate.day,
+      pickedTime.hour,
+      pickedTime.minute,
+    ));
   }
 
   @override
@@ -33,7 +55,7 @@ class TransactionDateSection extends StatelessWidget {
         SectionLabel(AppLocalizations.of(context)!.date),
         const SizedBox(height: 12),
         GestureDetector(
-          onTap: () => _pickDate(context),
+          onTap: () => _pickDateTime(context),
           child: SetupFieldContainer(
             child: SizedBox(
               height: 60,
@@ -43,7 +65,7 @@ class TransactionDateSection extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      selectedDate.prettyDate(context),
+                      selectedDate.prettyDateTime(context),
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),

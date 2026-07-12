@@ -8,5 +8,6 @@ class TransactionTable extends Table {
   RealColumn get amount => real()();
   DateTimeColumn get date => dateTime()();
   TextColumn get description => text().nullable()();
+  TextColumn get paymentMethod => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
 }

@@ -86,5 +86,24 @@
   "languageSubtitle": "Choisissez votre langue préférée",
   "english": "Anglais",
   "french": "Français",
-  "spanish": "Espagnol"
+  "spanish": "Espagnol",
+
+  "paymentMethod": "MODE DE PAIEMENT",
+  "applePay": "Apple Pay",
+  "cash": "Espèces",
+  "creditCard": "Carte de crédit",
+  "debitCard": "Carte de débit",
+  "bankTransfer": "Virement bancaire",
+
+  "scanReceipt": "Scanner le reçu",
+  "scanningReceipt": "Scan du reçu en cours...",
+  "receiptScanError": "Échec du scan du reçu",
+  "noTextFound": "Aucun texte trouvé sur le reçu",
+  "receiptScannedSuccess": "Reçu scanné avec succès",
+
+  "addExpenseOption": "Ajouter une dépense",
+  "scanReceiptOption": "Scanner le reçu",
+  "enterManuallyOption": "Saisie manuelle",
+  "scanReceiptDesc": "Prenez une photo de votre reçu pour remplir automatiquement",
+  "enterManuallyDesc": "Saisissez les détails de la dépense manuellement"
 }

@@ -235,4 +235,53 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get spanish => 'Español';
+
+  @override
+  String get paymentMethod => 'MÉTODO DE PAGO';
+
+  @override
+  String get applePay => 'Apple Pay';
+
+  @override
+  String get cash => 'Efectivo';
+
+  @override
+  String get creditCard => 'Tarjeta de crédito';
+
+  @override
+  String get debitCard => 'Tarjeta de débito';
+
+  @override
+  String get bankTransfer => 'Transferencia bancaria';
+
+  @override
+  String get scanReceipt => 'Escanear recibo';
+
+  @override
+  String get scanningReceipt => 'Escaneando recibo...';
+
+  @override
+  String get receiptScanError => 'Error al escanear el recibo';
+
+  @override
+  String get noTextFound => 'No se encontró texto en el recibo';
+
+  @override
+  String get receiptScannedSuccess => 'Recibo escaneado exitosamente';
+
+  @override
+  String get addExpenseOption => 'Agregar gasto';
+
+  @override
+  String get scanReceiptOption => 'Escanear recibo';
+
+  @override
+  String get enterManuallyOption => 'Ingresar manualmente';
+
+  @override
+  String get scanReceiptDesc =>
+      'Tome una foto de su recibo para autocompletar los datos';
+
+  @override
+  String get enterManuallyDesc => 'Ingrese los detalles del gasto manualmente';
 }

@@ -43,6 +43,10 @@ flutter {
     source = "../.."
 }
 
+dependencies {
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+}
+
 // Ensure Flutter tooling can find the produced artifacts by copying them
 // into the root `build/app/outputs/...` location after build.
 tasks.register("copyDebugAab") {

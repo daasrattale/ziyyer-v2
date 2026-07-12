@@ -86,5 +86,24 @@
   "languageSubtitle": "Choose your preferred language",
   "english": "English",
   "french": "French",
-  "spanish": "Spanish"
+  "spanish": "Spanish",
+
+  "paymentMethod": "PAYMENT METHOD",
+  "applePay": "Apple Pay",
+  "cash": "Cash",
+  "creditCard": "Credit Card",
+  "debitCard": "Debit Card",
+  "bankTransfer": "Bank Transfer",
+
+  "scanReceipt": "Scan Receipt",
+  "scanningReceipt": "Scanning receipt...",
+  "receiptScanError": "Failed to scan receipt",
+  "noTextFound": "No text found on receipt",
+  "receiptScannedSuccess": "Receipt scanned successfully",
+
+  "addExpenseOption": "Add Expense",
+  "scanReceiptOption": "Scan Receipt",
+  "enterManuallyOption": "Enter Manually",
+  "scanReceiptDesc": "Take a photo of your receipt to auto-fill details",
+  "enterManuallyDesc": "Enter expense details by hand"
 }

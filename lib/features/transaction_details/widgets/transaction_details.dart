@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/extensions/string_extensions.dart';
@@ -39,7 +40,7 @@ class TransactionDetailsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final categoryName = category?.name ?? 'Other';
+    final categoryName = category?.name ?? AppLocalizations.of(context)!.other;
     final categoryColor = AppColors.categoryColorFor(categoryName);
     final categoryIcon = AppIcons.categoryIconFor(categoryName);
 
@@ -77,7 +78,7 @@ class TransactionDetailsWidget extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              (transaction.description ?? 'No description'),
+              (transaction.description ?? AppLocalizations.of(context)!.noDescription),
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w700,
@@ -100,11 +101,11 @@ class TransactionDetailsWidget extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _DetailsRow(label: 'Type', value: 'Expense'),
+                  _DetailsRow(label: AppLocalizations.of(context)!.type, value: AppLocalizations.of(context)!.expense),
                   _DetailsDivider(),
-                  _DetailsRow(label: 'Category', value: categoryName),
+                  _DetailsRow(label: AppLocalizations.of(context)!.category, value: categoryName),
                   _DetailsDivider(),
-                  _DetailsRow(label: 'Time', value: transaction.date.fullDateTime()),
+                  _DetailsRow(label: AppLocalizations.of(context)!.time, value: transaction.date.fullDateTime()),
                   // _DetailsDivider(),
                   // _DetailsRow(label: 'Reference', value: _formatReference()),
                 ],
@@ -117,7 +118,7 @@ class TransactionDetailsWidget extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline_rounded),
-                    label: const Text('Delete'),
+                    label: Text(AppLocalizations.of(context)!.delete),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
                       backgroundColor: AppColors.expenseColor(context),
@@ -131,7 +132,7 @@ class TransactionDetailsWidget extends StatelessWidget {
                   child: FilledButton.icon(
                     onPressed: onEdit,
                     icon: const Icon(Icons.edit_outlined),
-                    label: const Text('Edit'),
+                    label: Text(AppLocalizations.of(context)!.edit),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
                       backgroundColor: AppColors.accent(context),

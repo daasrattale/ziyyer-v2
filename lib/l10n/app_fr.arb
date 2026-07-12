@@ -1,0 +1,84 @@
+{
+  "@@locale": "fr",
+
+  "home": "Accueil",
+  "history": "Historique",
+  "insight": "Aperçu",
+  "settings": "Paramètres",
+
+  "welcomeBack": "Bon retour",
+  "totalBalance": "SOLDE TOTAL",
+  "percentFromLastMonth": "+20% par rapport au mois dernier",
+  "income": "REVENUS",
+  "payments": "PAIEMENTS",
+  "allocated": "Alloué",
+  "transactions": "TRANSACTIONS",
+
+  "budgetIncome": "Revenu budgétaire",
+  "budgetPayments": "Paiements budgétaires",
+  "spendingCategories": "Catégories de dépenses",
+  "spendingCategoriesSubtitle": "Répartissez votre budget en catégories comme courses ou transport.",
+  "budgetAmountAndCurrency": "Votre montant budgétaire et devise",
+  "budgetAmountSubtitle": "Combien prévoyez-vous de dépenser au total ? et dans quelle devise ?",
+  "recurringPayments": "Paiements récurrents",
+  "recurringPaymentsSubtitle": "Ajoutez des factures récurrentes comme le loyer ou les abonnements.",
+  "totalPayments": "TOTAL DES PAIEMENTS",
+  "leftToAllocate": "RESTE À ALLUER",
+  "categoriesTotal": "TOTAL DES CATÉGORIES",
+  "addAnotherCategory": "Ajouter une catégorie",
+  "addAnotherPayment": "Ajouter un paiement",
+  "quickSet": "CONFIG. RAPIDE",
+
+  "egGroceries": "ex. Courses",
+  "egNetflix": "ex. Netflix",
+  "hintAmount": "0",
+  "optionalSkipPayments": "Facultatif · ignorez si vous n'avez pas de paiements récurrents",
+  "optionalAdjustCategories": "Facultatif · ajustez les catégories plus tard",
+  "otherCategoryAutoCreated": "La catégorie 'Autre' sera créée automatiquement",
+
+  "budgetAmountError": "Le montant du budget doit être supérieur à 0",
+  "budgetUnallocatedError": "Le budget non alloué doit être supérieur à 0",
+
+  "addNewExpense": "Ajouter une nouvelle dépense",
+  "addNewExpenseSubtitle": "Enregistrez une nouvelle transaction et assignez-la à une catégorie.",
+  "amount": "MONTANT",
+  "amountHint": "0,00",
+  "descriptionOptional": "Description (facultatif)",
+  "descriptionHint": "ex. Course au supermarché, trajet Uber...",
+  "category": "CATÉGORIE",
+  "date": "Date",
+  "saving": "Enregistrement...",
+  "save": "Enregistrer",
+
+  "expenseAmountError": "Le montant de la dépense doit être supérieur à 0",
+  "expenseSavedSuccess": "Dépense enregistrée avec succès",
+  "transactionUpdatedSuccess": "Transaction mise à jour avec succès",
+
+  "editTransaction": "Modifier la transaction",
+
+  "deleteTransaction": "Supprimer la transaction ?",
+  "deleteTransactionConfirm": "Cette action est irréversible.",
+  "cancel": "Annuler",
+  "delete": "Supprimer",
+
+  "noTransactionsYet": "Aucune transaction",
+  "noTransactionsSubtitle": "Vos dépenses enregistrées apparaîtront ici.",
+  "edit": "Modifier",
+  "deleteTransactionDesc": "Cela supprimera définitivement « {description} ».",
+  "thisTransaction": "cette transaction",
+
+  "type": "Type",
+  "expense": "Dépense",
+  "time": "Heure",
+  "noDescription": "Pas de description",
+  "other": "Autre",
+
+  "spendingByCategory": "Dépenses par catégorie",
+
+  "previous": "Précédent",
+  "done": "Terminé",
+
+  "insightsScreen": "Écran Aperçus",
+  "historyScreen": "Écran Historique",
+  "transactionsTitle": "Transactions"
+}

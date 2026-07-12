@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:toastification/toastification.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_router.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/database/database.dart';
 import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
@@ -35,6 +37,13 @@ class ZiyyerApp extends StatelessWidget {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('en'), Locale('fr'), Locale('es')],
       ),
     );
   }

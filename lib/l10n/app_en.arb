@@ -1,0 +1,84 @@
+{
+  "@@locale": "en",
+
+  "home": "Home",
+  "history": "History",
+  "insight": "Insight",
+  "settings": "Settings",
+
+  "welcomeBack": "Welcome back",
+  "totalBalance": "TOTAL BALANCE",
+  "percentFromLastMonth": "+20% from last month",
+  "income": "INCOME",
+  "payments": "PAYMENTS",
+  "allocated": "Allocated",
+  "transactions": "TRANSACTIONS",
+
+  "budgetIncome": "Budget Income",
+  "budgetPayments": "Budget Payments",
+  "spendingCategories": "Spending categories",
+  "spendingCategoriesSubtitle": "Split your budget into categories like groceries or transport.",
+  "budgetAmountAndCurrency": "Your budget amount and currency",
+  "budgetAmountSubtitle": "How much do you plan to spend in total? and in which currency?",
+  "recurringPayments": "Recurring payments",
+  "recurringPaymentsSubtitle": "Add recurring bills like rent or subscriptions.",
+  "totalPayments": "TOTAL PAYMENTS",
+  "leftToAllocate": "LEFT TO ALLOCATE",
+  "categoriesTotal": "CATEGORIES TOTAL",
+  "addAnotherCategory": "Add another category",
+  "addAnotherPayment": "Add another payment",
+  "quickSet": "QUICK SET",
+
+  "egGroceries": "e.g. Groceries",
+  "egNetflix": "e.g. Netflix",
+  "hintAmount": "0",
+  "optionalSkipPayments": "Optional · skip if you have no recurring payments",
+  "optionalAdjustCategories": "Optional · adjust categories later anytime",
+  "otherCategoryAutoCreated": "The 'Other' category will be automatically created",
+
+  "budgetAmountError": "Budget amount must be greater than 0",
+  "budgetUnallocatedError": "Budget unallocated must be greater than 0",
+
+  "addNewExpense": "Add a new expense",
+  "addNewExpenseSubtitle": "Track a new transaction and assign it to a category.",
+  "amount": "AMOUNT",
+  "amountHint": "0.00",
+  "descriptionOptional": "Description (optional)",
+  "descriptionHint": "e.g. Grocery run, Uber ride...",
+  "category": "CATEGORY",
+  "date": "Date",
+  "saving": "Saving...",
+  "save": "Save",
+
+  "expenseAmountError": "Expense amount must be greater than 0",
+  "expenseSavedSuccess": "Expense saved successfully",
+  "transactionUpdatedSuccess": "Transaction updated successfully",
+
+  "editTransaction": "Edit Transaction",
+
+  "deleteTransaction": "Delete transaction?",
+  "deleteTransactionConfirm": "This action cannot be undone.",
+  "cancel": "Cancel",
+  "delete": "Delete",
+
+  "noTransactionsYet": "No transactions yet",
+  "noTransactionsSubtitle": "Your saved expenses will appear here.",
+  "edit": "Edit",
+  "deleteTransactionDesc": "This will permanently remove \"{description}\".",
+  "thisTransaction": "this transaction",
+
+  "type": "Type",
+  "expense": "Expense",
+  "time": "Time",
+  "noDescription": "No description",
+  "other": "Other",
+
+  "spendingByCategory": "Spending by category",
+
+  "previous": "Previous",
+  "done": "Done",
+
+  "insightsScreen": "Insights Screen",
+  "historyScreen": "History Screen",
+  "transactionsTitle": "Transactions"
+}

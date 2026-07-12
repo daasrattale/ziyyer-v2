@@ -10,6 +10,7 @@ import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/services/budget_service.dart';
 import 'package:ziyyer/shared/services/transaction_service.dart';
 import 'package:ziyyer/shared/ui/loader.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/utils/toaster.dart';
 
 class AddExpenseWidget extends StatefulWidget {
@@ -51,7 +52,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
     final amount = double.tryParse(amountController.text.trim().replaceAll(',', '.'));
 
     if (amount == null || amount <= 0) {
-      Toaster.error("Expense amount must be greater than 0");
+      Toaster.error(AppLocalizations.of(context)!.expenseAmountError);
       return;
     }
 
@@ -75,7 +76,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
         selectedCategoryId = null;
       });
 
-      Toaster.success("Expense saved successfully");
+      Toaster.success(AppLocalizations.of(context)!.expenseSavedSuccess);
       scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Easing.linear);
     } finally {
       if (mounted) {
@@ -155,7 +156,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                       minimumSize: const Size.fromHeight(56),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     ),
-                    child: Text(isSaving ? 'Saving...' : 'Save'),
+                    child: Text(isSaving ? AppLocalizations.of(context)!.saving : AppLocalizations.of(context)!.save),
                   ),
                 ),
                 const SizedBox(height: 24),

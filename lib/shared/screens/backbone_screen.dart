@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/widgets/add_expense_btn.dart';
 import 'package:ziyyer/theme.dart';
@@ -58,7 +59,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                 children: [
                   _NavItem(
                     icon: AppIcons.home,
-                    label: 'Home',
+                    label: AppLocalizations.of(context)!.home,
                     isSelected: widget.navigationShell.currentIndex == 0,
                     onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
                     screenWidth: screenWidth,
@@ -66,7 +67,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                   ),
                   _NavItem(
                     icon: AppIcons.history,
-                    label: 'History',
+                    label: AppLocalizations.of(context)!.history,
                     isSelected: widget.navigationShell.currentIndex == 1,
                     onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
                     screenWidth: screenWidth,
@@ -77,7 +78,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                   ),
                   _NavItem(
                     icon: AppIcons.insights,
-                    label: 'Insight',
+                    label: AppLocalizations.of(context)!.insight,
                     isSelected: widget.navigationShell.currentIndex == 2,
                     onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
                     screenWidth: screenWidth,
@@ -85,7 +86,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
                   ),
                   _NavItem(
                     icon: AppIcons.settings,
-                    label: 'Settings',
+                    label: AppLocalizations.of(context)!.settings,
                     isSelected: widget.navigationShell.currentIndex == 3,
                     onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
                     screenWidth: screenWidth,

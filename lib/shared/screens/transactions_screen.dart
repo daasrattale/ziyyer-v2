@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/transactions_list/widgets/transaction_list_widgets.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
@@ -81,7 +82,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Transactions')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.transactionsTitle)),
       body: TransactionListWidgets(
         transactions: _transactions,
         categories: widget.args.categories,

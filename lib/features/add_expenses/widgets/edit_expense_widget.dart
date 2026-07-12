@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_amount_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_category_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_date_section.dart';
@@ -54,7 +55,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
     final amount = double.tryParse(amountController.text.trim().replaceAll(',', '.'));
 
     if (amount == null || amount <= 0) {
-      Toaster.error("Expense amount must be greater than 0");
+      Toaster.error(AppLocalizations.of(context)!.expenseAmountError);
       return;
     }
 
@@ -80,7 +81,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
         description: descriptionController.text.trim(),
         date: selectedDate,
       );
-      Toaster.success("Transaction updated successfully");
+      Toaster.success(AppLocalizations.of(context)!.transactionUpdatedSuccess);
       Navigator.of(context).pop(updated);
     } finally {
       if (mounted) {
@@ -95,7 +96,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Edit Transaction'),
+        title: Text(AppLocalizations.of(context)!.editTransaction),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -135,7 +136,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
                   minimumSize: const Size.fromHeight(56),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                 ),
-                child: Text(isSaving ? 'Saving...' : 'Save'),
+                child: Text(isSaving ? AppLocalizations.of(context)!.saving : AppLocalizations.of(context)!.save),
               ),
             ),
             const SizedBox(height: 24),

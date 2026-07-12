@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
@@ -33,7 +34,7 @@ class BudgetSummary extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'TOTAL BALANCE',
+                AppLocalizations.of(context)!.totalBalance,
                 style: textTheme.labelSmall?.copyWith(
                   color: AppColors.darkTextPrimary,
                   fontWeight: FontWeight.w600,
@@ -95,7 +96,7 @@ class BudgetSummary extends StatelessWidget {
                 Icon(AppIcons.arrowUpRight, color: Colors.white, size: 14),
                 const SizedBox(width: 6),
                 Text(
-                  '+20% from last month',
+                  AppLocalizations.of(context)!.percentFromLastMonth,
                   style: textTheme.labelMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
@@ -111,13 +112,13 @@ class BudgetSummary extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
-                child: _buildSummaryColumn(context, 'INCOME', budgetModel.definedAmount, CrossAxisAlignment.start),
+                child: _buildSummaryColumn(context, AppLocalizations.of(context)!.income, budgetModel.definedAmount, CrossAxisAlignment.start),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _buildSummaryColumn(
                   context,
-                  'PAYMENTS',
+                  AppLocalizations.of(context)!.payments,
                   budgetModel.allocatedPayementsAmount,
                   CrossAxisAlignment.end,
                 ),

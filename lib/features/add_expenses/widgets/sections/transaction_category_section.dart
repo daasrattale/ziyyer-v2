@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/theme.dart';
 
@@ -24,7 +25,7 @@ class TransactionCategorySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel('CATEGORY'),
+        SectionLabel(AppLocalizations.of(context)!.category),
         const SizedBox(height: 12),
         LayoutBuilder(
           builder: (context, constraints) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 
 class TransactionDateSection extends StatelessWidget {
@@ -29,7 +30,7 @@ class TransactionDateSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel('Date'),
+        SectionLabel(AppLocalizations.of(context)!.date),
         const SizedBox(height: 12),
         GestureDetector(
           onTap: () => _pickDate(context),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
@@ -27,7 +28,7 @@ class SummaryCardsRow extends StatelessWidget {
         children: [
           Expanded(
             child: _SummaryCard(
-              title: 'Allocated'.toUpperCase(),
+              title: AppLocalizations.of(context)!.allocated.toUpperCase(),
               amount: incomeAmount,
               subtitle: now.monthAndYear(),
               iconData: AppIcons.budget,
@@ -39,7 +40,7 @@ class SummaryCardsRow extends StatelessWidget {
           const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: _SummaryCard(
-              title: 'TRANSACTIONS'.toUpperCase(),
+              title: AppLocalizations.of(context)!.transactions.toUpperCase(),
               amount: transactionsAmount,
               subtitle: now.monthAndYear(),
               iconData: AppIcons.transaction,

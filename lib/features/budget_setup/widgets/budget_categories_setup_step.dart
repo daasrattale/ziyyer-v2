@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
@@ -118,13 +119,13 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
         children: [
           const SizedBox(height: 8),
           Text(
-            'Spending categories',
+            AppLocalizations.of(context)!.spendingCategories,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
           ),
           const SizedBox(height: 8),
           Text(
-            'Split your budget into categories like groceries or transport.',
+            AppLocalizations.of(context)!.spendingCategoriesSubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontWeight: FontWeight.w400),
           ),
@@ -141,14 +142,14 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
               children: [
                 Expanded(
                   child: _SummaryValue(
-                    label: 'CATEGORIES TOTAL',
+                    label: AppLocalizations.of(context)!.categoriesTotal,
                     value: _formatAmount(widget.budgetModel.allocatedCategoriesAmount),
                     alignment: CrossAxisAlignment.start,
                   ),
                 ),
                 Expanded(
                   child: _SummaryValue(
-                    label: 'LEFT TO ALLOCATE',
+                    label: AppLocalizations.of(context)!.leftToAllocate,
                     value: _formatAmount(widget.budgetModel.unallocatedAmount),
                     alignment: CrossAxisAlignment.end,
                     textAlign: TextAlign.right,
@@ -170,7 +171,7 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
                   Icon(AppIcons.add, color: AppColors.accent(context), size: 22),
                   const SizedBox(width: 10),
                   Text(
-                    'Add another category',
+                    AppLocalizations.of(context)!.addAnotherCategory,
                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.accent(context)),
                   ),
                 ],
@@ -225,7 +226,7 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
                             color: AppColors.textPrimary(context),
                           ),
                           decoration: InputDecoration(
-                            hintText: 'e.g. Groceries',
+                            hintText: AppLocalizations.of(context)!.egGroceries,
                             hintStyle: TextStyle(
                               color: AppColors.textHint(context),
                               fontSize: 14,
@@ -268,7 +269,7 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
                                   color: AppColors.textPrimary(context),
                                 ),
                                 decoration: InputDecoration(
-                                  hintText: '0',
+                                  hintText: AppLocalizations.of(context)!.hintAmount,
                                   hintStyle: TextStyle(
                                     color: AppColors.textHint(context),
                                     fontSize: 14,
@@ -296,13 +297,13 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
           }),
           const SizedBox(height: 18),
           Text(
-            'Optional · adjust categories later anytime',
+            AppLocalizations.of(context)!.optionalAdjustCategories,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
           ),
           const SizedBox(height: 18),
           Text(
-            'The \'Other\' category will be automatically created',
+            AppLocalizations.of(context)!.otherCategoryAutoCreated,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
           ),

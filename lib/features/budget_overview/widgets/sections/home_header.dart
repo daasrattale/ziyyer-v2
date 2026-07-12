@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/theme.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
@@ -23,7 +24,7 @@ class HomeHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Welcome back',
+                AppLocalizations.of(context)!.welcomeBack,
                 style: textTheme.labelLarge?.copyWith(color: AppColors.textSecondary(context), fontWeight: FontWeight.w500, letterSpacing: 0.3),
               ),
               const SizedBox(height: AppConstants.spacingExtraSmall),

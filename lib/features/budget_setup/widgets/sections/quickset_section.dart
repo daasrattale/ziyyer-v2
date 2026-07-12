@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
 import 'package:ziyyer/shared/utils/amount_formatter.dart';
@@ -19,7 +20,7 @@ class QuicksetSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text('QUICK SET', style: Theme.of(context).textTheme.labelMedium),
+        Text(AppLocalizations.of(context)!.quickSet, style: Theme.of(context).textTheme.labelMedium),
         const SizedBox(height: 12),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,

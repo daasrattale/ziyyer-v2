@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/setup_input_section.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 
 class TransactionDescriptionSection extends StatelessWidget {
   final TextEditingController descriptionController;
@@ -13,7 +14,7 @@ class TransactionDescriptionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SectionLabel('Description (optional)'),
+        SectionLabel(AppLocalizations.of(context)!.descriptionOptional),
         const SizedBox(height: 12),
         Container(
           height: 64,
@@ -34,7 +35,7 @@ class TransactionDescriptionSection extends StatelessWidget {
                 color: theme.colorScheme.onSurface,
               ),
               decoration: InputDecoration(
-                hintText: 'e.g. Grocery run, Uber ride...',
+                hintText: AppLocalizations.of(context)!.descriptionHint,
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,

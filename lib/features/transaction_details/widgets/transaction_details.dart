@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/extensions/string_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -35,10 +35,6 @@ class TransactionDetailsWidget extends StatelessWidget {
 
   String _formatAmount() {
     return '-$currencySymbol${transaction.amount.toStringAsFixed(2)}';
-  }
-
-  String _formatTime() {
-    return DateFormat('HH:mm').format(transaction.date);
   }
 
   @override
@@ -108,7 +104,7 @@ class TransactionDetailsWidget extends StatelessWidget {
                   _DetailsDivider(),
                   _DetailsRow(label: 'Category', value: categoryName),
                   _DetailsDivider(),
-                  _DetailsRow(label: 'Time', value: _formatTime()),
+                  _DetailsRow(label: 'Time', value: transaction.date.fullDateTime()),
                   // _DetailsDivider(),
                   // _DetailsRow(label: 'Reference', value: _formatReference()),
                 ],
@@ -177,10 +173,10 @@ class _DetailsRow extends StatelessWidget {
           Flexible(
             child: Text(
               value.capitalizeFirst(),
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.left,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary(context)),
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: AppColors.textPrimary(context)),
             ),
           ),
         ],

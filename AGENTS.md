@@ -25,6 +25,6 @@ Flutter project using FVM (see `.fvmrc`). Uses drift for local DB, go_router for
 ## opencode-Specific
 
 - Use Plan mode (Tab) to propose changes before building.
-- For safe batch operations, use `/init` to refresh AGENTS.md.
+- For safe batch operations, use `/init` to refresh `AGENTS.md`.
 - Subagents (@explore, @general) can be invoked for research.
 - Project docs: `doc/` folder (features, dependencies, database schema, technologies)

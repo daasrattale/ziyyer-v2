@@ -67,7 +67,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
 
   void _addEmptyRow() {
     setState(() {
-      _rows.add(_PaymentRowData(onChanged: _handleRowChanged));
+      _rows.insert(0, _PaymentRowData(onChanged: _handleRowChanged));
     });
     _notifyParent();
   }

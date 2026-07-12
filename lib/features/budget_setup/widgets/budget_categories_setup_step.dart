@@ -56,7 +56,12 @@ class _BudgetCategoriesSetupStepState extends State<BudgetCategoriesSetupStep> {
 
   void _addEmptyRow() {
     setState(() {
-      _rows.add(_CategoryRowData(onChanged: _handleRowChanged));
+      final otherIndex = _rows.indexWhere((row) => row.nameController.text.toLowerCase() == 'other');
+      final otherRow = otherIndex != -1 ? _rows.removeAt(otherIndex) : null;
+      _rows.insert(0, _CategoryRowData(onChanged: _handleRowChanged));
+      if (otherRow != null) {
+        _rows.add(otherRow);
+      }
     });
     _notifyParent();
   }

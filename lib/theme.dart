@@ -114,6 +114,9 @@ class AppColors {
     'transportation': Color(0xFF2196F3),
     'transport': Color(0xFF2196F3),
     'transpostartion': Color(0xFF2196F3),
+    'electricity': Color(0xFF2196F3),
+    'elec': Color(0xFF2196F3),
+
     'travel': Color(0xFF00BCD4),
 
     'income': Color(0xFF2E7D32),

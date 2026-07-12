@@ -183,10 +183,3 @@ class _DetailsRow extends StatelessWidget {
     );
   }
 }
-
-class _DetailsDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8EC));
-  }
-}

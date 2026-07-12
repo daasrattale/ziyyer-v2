@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/transaction_details/widgets/transaction_details.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
+import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/theme.dart';
 
 class TransactionsDetailsScreenArgs {
@@ -31,6 +32,22 @@ class TransactionsDetailsScreen extends StatelessWidget {
       if (category.id == args.transaction.categoryId) return category;
     }
     return null;
+  }
+
+  void _navigateToEdit(BuildContext context) async {
+    final result = await context.pushNamed<bool>(
+      'edit-expense',
+      extra: EditExpenseScreenArgs(
+        transaction: args.transaction,
+        categories: args.categories,
+        currencySymbol: args.currencySymbol,
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      args.onEdit?.call(args.transaction);
+      context.pop();
+    }
   }
 
   Future<void> _confirmDelete(BuildContext context) async {
@@ -68,7 +85,7 @@ class TransactionsDetailsScreen extends StatelessWidget {
         transaction: args.transaction,
         category: _findCategory(),
         currencySymbol: args.currencySymbol,
-        onEdit: () => args.onEdit?.call(args.transaction),
+        onEdit: () => _navigateToEdit(context),
         onDelete: () => _confirmDelete(context),
       ),
     );

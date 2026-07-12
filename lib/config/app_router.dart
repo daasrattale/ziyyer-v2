@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ziyyer/shared/screens/add_expense_screen.dart';
 import 'package:ziyyer/shared/screens/backbone_screen.dart';
 import 'package:ziyyer/shared/screens/budget_screen.dart';
+import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/shared/screens/history_screen.dart';
 import 'package:ziyyer/shared/screens/home_screen.dart';
 import 'package:ziyyer/shared/screens/insights_screen.dart';
@@ -56,6 +57,16 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final args = state.extra as TransactionsDetailsScreenArgs;
         return TransactionsDetailsScreen(args: args);
+      },
+    ),
+
+    GoRoute(
+      parentNavigatorKey: rootNavigatorKey,
+      path: '/edit-expense',
+      name: 'edit-expense',
+      builder: (context, state) {
+        final args = state.extra as EditExpenseScreenArgs;
+        return EditExpenseScreen(args: args);
       },
     ),
   ],

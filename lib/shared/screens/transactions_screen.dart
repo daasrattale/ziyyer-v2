@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/transactions_list/widgets/transaction_list_widgets.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
+import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/shared/services/service_locator.dart';
 
 class TransactionsScreenArgs {
@@ -45,14 +47,19 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     ServiceLocator.transactionService.delete(deletedTransaction);
   }
 
-  void _handleEdit(TransactionModel updatedTransaction) {
-    setState(() {
-      final index = _transactions.indexWhere((item) => item.id == updatedTransaction.id);
-      if (index != -1) {
-        _transactions[index] = updatedTransaction;
-      }
-    });
-    //todo: add service update function
+  Future<void> _handleEdit(TransactionModel transaction) async {
+    final result = await context.pushNamed<bool>(
+      'edit-expense',
+      extra: EditExpenseScreenArgs(
+        transaction: transaction,
+        categories: widget.args.categories,
+        currencySymbol: widget.args.currencySymbol,
+      ),
+    );
+
+    if (result == true && mounted) {
+      widget.args.onEdit?.call(transaction);
+    }
   }
 
   @override

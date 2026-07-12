@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
-import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/widgets/add_expense_btn.dart';
 import 'package:ziyyer/theme.dart';
 
@@ -32,9 +32,7 @@ class _BackboneScreenState extends State<BackboneScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: SafeArea(
-        child: widget.navigationShell,
-      ),
+      body: SafeArea(child: widget.navigationShell),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.fromLTRB(horizontalMargin, 0, horizontalMargin, bottomSafe + 8),
         child: ConstrainedBox(
@@ -55,42 +53,47 @@ class _BackboneScreenState extends State<BackboneScreen> {
             child: Padding(
               padding: containerPadding,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _NavItem(
-                    icon: AppIcons.home,
-                    label: AppLocalizations.of(context)!.home,
-                    isSelected: widget.navigationShell.currentIndex == 0,
-                    onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
-                    screenWidth: screenWidth,
-                    isLandscape: isLandscape,
+                  Expanded(
+                    child: _NavItem(
+                      icon: AppIcons.home,
+                      label: AppLocalizations.of(context)!.home,
+                      isSelected: widget.navigationShell.currentIndex == 0,
+                      onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
+                      screenWidth: screenWidth,
+                      isLandscape: isLandscape,
+                    ),
                   ),
-                  _NavItem(
-                    icon: AppIcons.history,
-                    label: AppLocalizations.of(context)!.history,
-                    isSelected: widget.navigationShell.currentIndex == 1,
-                    onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
-                    screenWidth: screenWidth,
-                    isLandscape: isLandscape,
+                  Expanded(
+                    child: _NavItem(
+                      icon: AppIcons.history,
+                      label: AppLocalizations.of(context)!.history,
+                      isSelected: widget.navigationShell.currentIndex == 1,
+                      onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
+                      screenWidth: screenWidth,
+                      isLandscape: isLandscape,
+                    ),
                   ),
-                  AddExpenseButton(
-                    onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                  AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true)),
+                  Expanded(
+                    child: _NavItem(
+                      icon: AppIcons.insights,
+                      label: AppLocalizations.of(context)!.insight,
+                      isSelected: widget.navigationShell.currentIndex == 2,
+                      onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
+                      screenWidth: screenWidth,
+                      isLandscape: isLandscape,
+                    ),
                   ),
-                  _NavItem(
-                    icon: AppIcons.insights,
-                    label: AppLocalizations.of(context)!.insight,
-                    isSelected: widget.navigationShell.currentIndex == 2,
-                    onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
-                    screenWidth: screenWidth,
-                    isLandscape: isLandscape,
-                  ),
-                  _NavItem(
-                    icon: AppIcons.settings,
-                    label: AppLocalizations.of(context)!.settings,
-                    isSelected: widget.navigationShell.currentIndex == 3,
-                    onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
-                    screenWidth: screenWidth,
-                    isLandscape: isLandscape,
+                  Expanded(
+                    child: _NavItem(
+                      icon: AppIcons.settings,
+                      label: AppLocalizations.of(context)!.settings,
+                      isSelected: widget.navigationShell.currentIndex == 4,
+                      onTap: () => widget.navigationShell.goBranch(4, initialLocation: true),
+                      screenWidth: screenWidth,
+                      isLandscape: isLandscape,
+                    ),
                   ),
                 ],
               ),
@@ -124,18 +127,17 @@ class _NavItem extends StatelessWidget {
     final selectedColor = AppColors.accentColor(context);
     final unselectedColor = AppColors.textHint(context);
 
-    final iconSize = screenWidth * 0.06;
-    final fontSize = isSelected ? screenWidth * 0.03 : screenWidth * 0.0275;
-    final horizontalPadding = screenWidth * 0.04;
+    final iconSize = screenWidth * 0.05;
+    final fontSize = isSelected ? screenWidth * 0.029 : screenWidth * 0.0275;
     final verticalPadding = screenWidth * 0.02;
-    final spacing = screenWidth * 0.015;
+    final spacing = screenWidth * 0.01;
 
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
+        padding: EdgeInsets.symmetric(vertical: verticalPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -163,7 +165,7 @@ class _NavItem extends StatelessWidget {
                     fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     color: isSelected ? selectedColor : unselectedColor,
                   ),
-              child: Text(label),
+              child: Text(label, overflow: TextOverflow.ellipsis, maxLines: 1, textAlign: TextAlign.center),
             ),
           ],
         ),

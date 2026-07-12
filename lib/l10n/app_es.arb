@@ -80,5 +80,11 @@
 
   "insightsScreen": "Pantalla de Resumen",
   "historyScreen": "Pantalla de Historial",
-  "transactionsTitle": "Transacciones"
+  "transactionsTitle": "Transacciones",
+
+  "language": "Idioma",
+  "languageSubtitle": "Elija su idioma preferido",
+  "english": "Inglés",
+  "french": "Francés",
+  "spanish": "Español"
 }

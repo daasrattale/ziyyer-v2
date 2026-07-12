@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -34,16 +34,6 @@ class TransactionListWidgets extends StatefulWidget {
 }
 
 class _TransactionListWidgetsState extends State<TransactionListWidgets> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void didUpdateWidget(covariant TransactionListWidgets oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
   Future<bool?> _showDeletePrompt(TransactionModel transaction) {
     return showDialog<bool>(
       context: context,
@@ -52,15 +42,20 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
           title: Text(AppLocalizations.of(context)!.deleteTransaction),
           content: Text(
             AppLocalizations.of(context)!.deleteTransactionDesc(
-              transaction.description?.trim().isNotEmpty == true ? transaction.description!.trim() : AppLocalizations.of(context)!.thisTransaction,
+              transaction.description?.trim().isNotEmpty == true
+                  ? transaction.description!.trim()
+                  : AppLocalizations.of(context)!.thisTransaction,
             ),
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           actions: [
-            TextButton(onPressed: () => Navigator.of(context).pop(false), child: Text(AppLocalizations.of(context)!.cancel)),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: AppColors.expenseColor(context),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
               onPressed: () => Navigator.of(context).pop(true),
@@ -85,7 +80,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
     return '- ${widget.currencySymbol}${amount.toStringAsFixed(2)}';
   }
 
-  List<_TransactionListEntry> _buildGroupedEntries() {
+  List<_TransactionListEntry> _buildGroupedEntries(BuildContext context) {
     final entries = <_TransactionListEntry>[];
     String? currentMonthKey;
 
@@ -94,7 +89,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
 
       if (monthKey != currentMonthKey) {
         currentMonthKey = monthKey;
-        entries.add(_MonthHeaderEntry(transaction.date.monthAndYear()));
+        entries.add(_MonthHeaderEntry(transaction.date.monthAndYear(context)));
       }
 
       entries.add(_TransactionItemEntry(transaction));
@@ -146,7 +141,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
       );
     }
 
-    final entries = _buildGroupedEntries();
+    final entries = _buildGroupedEntries(context);
 
     return ListView.separated(
       padding: widget.padding,
@@ -265,7 +260,7 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
                               children: [
                                 Flexible(
                                   child: Text(
-                                    transaction.date.prettyDate(),
+                                    transaction.date.prettyDate(context),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

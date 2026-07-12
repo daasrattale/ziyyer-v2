@@ -21,7 +21,7 @@ class TransactionDescriptionSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 22),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(999),
             border: Border.all(color: const Color(0xFFE7E7E7), width: 1.2),
           ),
           child: Center(
@@ -45,8 +45,8 @@ class TransactionDescriptionSection extends StatelessWidget {
                 isDense: true,
                 isCollapsed: true,
                 contentPadding: EdgeInsets.zero,
-                hintStyle: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
+                hintStyle: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w400,
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),

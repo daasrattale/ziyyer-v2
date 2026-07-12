@@ -21,7 +21,7 @@ class Toaster {
   static ToastificationItem _toast(String message, ToastificationType type) {
     return toastification.show(
       type: type,
-      style: ToastificationStyle.minimal,
+      style: ToastificationStyle.fillColored,
       title: Text(message),
       autoCloseDuration: const Duration(seconds: 5),
     );

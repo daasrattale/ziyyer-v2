@@ -80,5 +80,11 @@
 
   "insightsScreen": "Insights Screen",
   "historyScreen": "History Screen",
-  "transactionsTitle": "Transactions"
+  "transactionsTitle": "Transactions",
+
+  "language": "Language",
+  "languageSubtitle": "Choose your preferred language",
+  "english": "English",
+  "french": "French",
+  "spanish": "Spanish"
 }

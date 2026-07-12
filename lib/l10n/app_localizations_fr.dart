@@ -221,4 +221,19 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get transactionsTitle => 'Transactions';
+
+  @override
+  String get language => 'Langue';
+
+  @override
+  String get languageSubtitle => 'Choisissez votre langue préférée';
+
+  @override
+  String get english => 'Anglais';
+
+  @override
+  String get french => 'Français';
+
+  @override
+  String get spanish => 'Espagnol';
 }

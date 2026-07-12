@@ -43,7 +43,7 @@ class TransactionDateSection extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      selectedDate.prettyDate(),
+                      selectedDate.prettyDate(context),
                       style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                     ),
                   ),

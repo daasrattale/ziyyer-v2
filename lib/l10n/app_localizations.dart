@@ -501,6 +501,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Transactions'**
   String get transactionsTitle;
+
+  /// No description provided for @language.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get language;
+
+  /// No description provided for @languageSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your preferred language'**
+  String get languageSubtitle;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @french.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get french;
+
+  /// No description provided for @spanish.
+  ///
+  /// In en, this message translates to:
+  /// **'Spanish'**
+  String get spanish;
 }
 
 class _AppLocalizationsDelegate

@@ -30,7 +30,7 @@ class SummaryCardsRow extends StatelessWidget {
             child: _SummaryCard(
               title: AppLocalizations.of(context)!.allocated.toUpperCase(),
               amount: incomeAmount,
-              subtitle: now.monthAndYear(),
+              subtitle: now.monthAndYear(context),
               iconData: AppIcons.budget,
               iconColor: AppColors.income,
               iconBackgroundColor: AppColors.income.withAlpha(20),
@@ -42,7 +42,7 @@ class SummaryCardsRow extends StatelessWidget {
             child: _SummaryCard(
               title: AppLocalizations.of(context)!.transactions.toUpperCase(),
               amount: transactionsAmount,
-              subtitle: now.monthAndYear(),
+              subtitle: now.monthAndYear(context),
               iconData: AppIcons.transaction,
               iconColor: AppColors.expense,
               iconBackgroundColor: AppColors.expense.withAlpha(20),

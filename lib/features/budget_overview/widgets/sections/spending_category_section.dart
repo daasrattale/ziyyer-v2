@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/extensions/string_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/currency_model.dart';
@@ -52,12 +52,9 @@ class SpendingCategorySection extends StatelessWidget {
                       context.pushNamed(
                         'transactions',
                         extra: TransactionsScreenArgs(
-                          transactions: category.transactions,
+                          transactions: category.transactions.where((t) => t.categoryId == category.id).toList(),
                           categories: categories,
                           currencySymbol: currencyModel.symbol,
-                          onEdit: (transaction) {
-                            // todo: add edit function
-                          },
                           onDeleteConfirmed: (transaction) {
                             ServiceLocator.transactionService.delete(transaction);
                           },

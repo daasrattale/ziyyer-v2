@@ -220,4 +220,19 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transactionsTitle => 'Transacciones';
+
+  @override
+  String get language => 'Idioma';
+
+  @override
+  String get languageSubtitle => 'Elija su idioma preferido';
+
+  @override
+  String get english => 'Inglés';
+
+  @override
+  String get french => 'Francés';
+
+  @override
+  String get spanish => 'Español';
 }

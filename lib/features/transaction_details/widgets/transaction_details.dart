@@ -105,7 +105,7 @@ class TransactionDetailsWidget extends StatelessWidget {
                   _DetailsDivider(),
                   _DetailsRow(label: AppLocalizations.of(context)!.category, value: categoryName),
                   _DetailsDivider(),
-                  _DetailsRow(label: AppLocalizations.of(context)!.time, value: transaction.date.fullDateTime()),
+                  _DetailsRow(label: AppLocalizations.of(context)!.time, value: transaction.date.fullDateTime(context)),
                   // _DetailsDivider(),
                   // _DetailsRow(label: 'Reference', value: _formatReference()),
                 ],

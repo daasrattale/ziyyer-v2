@@ -68,6 +68,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
   }
 
+  void _handleTransactionUpdated(TransactionModel updated) {
+    setState(() {
+      final index = _transactions.indexWhere((t) => t.id == updated.id);
+      if (index != -1) {
+        _transactions[index] = updated;
+      }
+    });
+    widget.args.onEdit?.call(updated);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -78,6 +88,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
         currencySymbol: widget.args.currencySymbol,
         onDeleteConfirmed: _handleDelete,
         onEdit: _handleEdit,
+        onTransactionUpdated: _handleTransactionUpdated,
       ),
     );
   }

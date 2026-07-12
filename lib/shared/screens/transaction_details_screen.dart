@@ -6,18 +6,18 @@ import 'package:ziyyer/shared/models/transaction_model.dart';
 import 'package:ziyyer/shared/screens/edit_expense_screen.dart';
 import 'package:ziyyer/theme.dart';
 
+export 'package:ziyyer/features/transaction_details/widgets/transaction_details.dart' show TransactionDetailsResult;
+
 class TransactionsDetailsScreenArgs {
   final TransactionModel transaction;
   final List<CategoryModel> categories;
   final String currencySymbol;
-  final ValueChanged<TransactionModel>? onEdit;
   final ValueChanged<TransactionModel>? onDeleteConfirmed;
 
   const TransactionsDetailsScreenArgs({
     required this.transaction,
     required this.categories,
     required this.currencySymbol,
-    this.onEdit,
     this.onDeleteConfirmed,
   });
 }
@@ -45,8 +45,7 @@ class TransactionsDetailsScreen extends StatelessWidget {
     );
 
     if (updated != null && context.mounted) {
-      args.onEdit?.call(updated);
-      context.pop();
+      context.pop(TransactionDetailsResult(updatedTransaction: updated));
     }
   }
 

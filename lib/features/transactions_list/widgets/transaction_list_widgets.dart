@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
-import 'package:ziyyer/features/transaction_details/widgets/transaction_details.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -13,6 +12,7 @@ class TransactionListWidgets extends StatefulWidget {
   final List<TransactionModel> transactions;
   final List<CategoryModel> categories;
   final ValueChanged<TransactionModel>? onEdit;
+  final ValueChanged<TransactionModel>? onTransactionUpdated;
   final ValueChanged<TransactionModel>? onDeleteConfirmed;
   final String currencySymbol;
   final EdgeInsetsGeometry padding;
@@ -22,6 +22,7 @@ class TransactionListWidgets extends StatefulWidget {
     required this.transactions,
     required this.categories,
     required this.onEdit,
+    this.onTransactionUpdated,
     required this.onDeleteConfirmed,
     required this.currencySymbol,
     this.padding = const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -213,17 +214,20 @@ class _TransactionListWidgetsState extends State<TransactionListWidgets> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(24),
-              onTap: () {
-                context.pushNamed<TransactionDetailsResult>(
+              onTap: () async {
+                final result = await context.pushNamed<TransactionDetailsResult>(
                   'transaction-details',
                   extra: TransactionsDetailsScreenArgs(
                     transaction: transaction,
                     categories: widget.categories,
                     currencySymbol: widget.currencySymbol,
-                    onEdit: widget.onEdit,
                     onDeleteConfirmed: widget.onDeleteConfirmed,
                   ),
                 );
+
+                if (result != null && result.wasEdited && result.updatedTransaction != null) {
+                  widget.onTransactionUpdated?.call(result.updatedTransaction!);
+                }
               },
               child: Container(
                 decoration: BoxDecoration(

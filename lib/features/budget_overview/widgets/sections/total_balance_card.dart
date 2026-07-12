@@ -52,7 +52,6 @@ class BudgetSummary extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: AppConstants.spacingMedium),
           Row(
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
@@ -83,7 +82,7 @@ class BudgetSummary extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: AppConstants.spacingExtraLarge),
+          SizedBox(height: AppConstants.spacingSmall),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             decoration: BoxDecoration(
@@ -105,9 +104,9 @@ class BudgetSummary extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           Divider(color: Colors.white.withValues(alpha: 0.14), height: 1),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

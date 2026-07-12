@@ -67,7 +67,7 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
 
   void _addEmptyRow() {
     setState(() {
-      _rows.add(_PaymentRowData(onChanged: _handleRowChanged));
+      _rows.insert(0, _PaymentRowData(onChanged: _handleRowChanged));
     });
     _notifyParent();
   }
@@ -112,60 +112,96 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const SizedBox(height: 8),
-        Text(
-          'Recurring payments',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Add recurring bills like rent or subscriptions.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontWeight: FontWeight.w400),
-        ),
-        const SizedBox(height: 24),
-
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
-          decoration: BoxDecoration(
-            color: AppColors.surface(context),
-            borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+    return SingleChildScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            'Recurring payments',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.w700, color: AppColors.textPrimary(context)),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: _SummaryValue(
-                  label: 'TOTAL PAYMENTS',
-                  value: _formatAmount(widget.budgetModel.allocatedPayementsAmount),
-                  alignment: CrossAxisAlignment.start,
-                ),
-              ),
-              Expanded(
-                child: _SummaryValue(
-                  label: 'LEFT TO ALLOCATE',
-                  value: _formatAmount(widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount),
-                  alignment: CrossAxisAlignment.end,
-                  textAlign: TextAlign.right,
-                ),
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            'Add recurring bills like rent or subscriptions.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary(context), fontWeight: FontWeight.w400),
           ),
-        ),
-        const SizedBox(height: 24),
+          const SizedBox(height: 24),
 
-        Expanded(
-          child: ListView.builder(
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            itemCount: _rows.length,
-            itemBuilder: (context, index) {
-              final row = _rows[index];
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+            decoration: BoxDecoration(
+              color: AppColors.surface(context),
+              borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _SummaryValue(
+                    label: 'TOTAL PAYMENTS',
+                    value: _formatAmount(widget.budgetModel.allocatedPayementsAmount),
+                    alignment: CrossAxisAlignment.start,
+                  ),
+                ),
+                Expanded(
+                  child: _SummaryValue(
+                    label: 'LEFT TO ALLOCATE',
+                    value: _formatAmount(
+                      widget.budgetModel.definedAmount - widget.budgetModel.allocatedPayementsAmount,
+                    ),
+                    alignment: CrossAxisAlignment.end,
+                    textAlign: TextAlign.right,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          GestureDetector(
+            onTap: _addEmptyRow,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(999)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(AppIcons.add, color: AppColors.textSecondary(context), size: 22),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Add another payment',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.textSecondary(context),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
 
-              return Padding(
+          ..._rows.asMap().entries.map((entry) {
+            final index = entry.key;
+            final row = entry.value;
+
+            return TweenAnimationBuilder<double>(
+              key: ValueKey(row.id),
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
+              builder: (context, value, child) {
+                return Opacity(
+                  opacity: value,
+                  child: Transform.translate(offset: Offset(0, 16 * (1 - value)), child: child),
+                );
+              },
+              child: Padding(
                 padding: const EdgeInsets.only(bottom: AppConstants.spacingMedium),
                 child: Container(
                   width: double.infinity,
@@ -258,39 +294,19 @@ class _BudgetPaymentsSetupStepState extends State<BudgetPaymentsSetupStep> {
                     ],
                   ),
                 ),
-              );
-            },
-          ),
-        ),
+              ),
+            );
+          }),
 
-        const SizedBox(height: 12),
-
-        GestureDetector(
-          onTap: _addEmptyRow,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(color: AppColors.surface(context), borderRadius: BorderRadius.circular(999)),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(AppIcons.add, color: AppColors.textSecondary(context), size: 22),
-                const SizedBox(width: 10),
-                Text(
-                  'Add another payment',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.textSecondary(context)),
-                ),
-              ],
-            ),
+          const SizedBox(height: 12),
+          Text(
+            'Optional · skip if you have no recurring payments',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
           ),
-        ),
-        const SizedBox(height: 18),
-        Text(
-          'Optional · skip if you have no recurring bills',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, color: AppColors.textHint(context), fontWeight: FontWeight.w400),
-        ),
-      ],
+          const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 }
@@ -335,13 +351,16 @@ class _SummaryValue extends StatelessWidget {
 }
 
 class _PaymentRowData {
+  static int _counter = 0;
+  final int id;
   final VoidCallback onChanged;
 
   final TextEditingController nameController;
   final TextEditingController amountController;
 
   _PaymentRowData({required this.onChanged, String initialName = '', String initialAmount = ''})
-    : nameController = TextEditingController(text: initialName),
+    : id = _counter++,
+      nameController = TextEditingController(text: initialName),
       amountController = TextEditingController(text: initialAmount) {
     nameController.addListener(onChanged);
     amountController.addListener(onChanged);

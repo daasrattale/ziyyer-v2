@@ -10,6 +10,7 @@ class CustomStepper extends StatelessWidget {
   final VoidCallback goToPreviousStep;
   final VoidCallback goToDoneStep;
   final bool previousHidden;
+  final double keyboardHeight;
 
   const CustomStepper({
     super.key,
@@ -19,13 +20,14 @@ class CustomStepper extends StatelessWidget {
     required this.goToPreviousStep,
     required this.goToDoneStep,
     this.previousHidden = false,
+    this.keyboardHeight = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final bottomSafe = MediaQuery.of(context).padding.bottom;
     final isLastStep = activeIndex == steps.length - 1;
+    final isKeyboardOpen = keyboardHeight > 0;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -61,60 +63,60 @@ class CustomStepper extends StatelessWidget {
               ),
             ),
           ),
-          SafeArea(
-            top: false,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              padding: EdgeInsets.only(top: 16, bottom: bottomInset > 0 ? 0 : 8),
-              margin: EdgeInsets.only(bottom: bottomSafe + 6),
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 220),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                child: Row(
-                  key: ValueKey(activeIndex),
-                  mainAxisAlignment: previousHidden ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (!previousHidden) ...[
+          if (!isKeyboardOpen)
+            SafeArea(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                padding: const EdgeInsets.only(top: 16, bottom: 8),
+                margin: EdgeInsets.only(bottom: bottomSafe + 6),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  child: Row(
+                    key: ValueKey(activeIndex),
+                    mainAxisAlignment: previousHidden ? MainAxisAlignment.end : MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (!previousHidden) ...[
+                        FilledButton.icon(
+                          onPressed: goToPreviousStep,
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: AppColors.surface(context),
+                            foregroundColor: AppColors.textPrimary(context),
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                          ),
+                          icon: Icon(AppIcons.arrowLeft),
+                          label: const Text('Previous'),
+                        ),
+                      ],
+
                       FilledButton.icon(
-                        onPressed: goToPreviousStep,
-                        style: OutlinedButton.styleFrom(
-                          backgroundColor: AppColors.surface(context),
-                          foregroundColor: AppColors.textPrimary(context),
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        onPressed: isLastStep ? goToDoneStep : goToNextStep,
+                        style: FilledButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
                         ),
-                        icon: Icon(AppIcons.arrowLeft),
-                        label: const Text('Previous'),
-                      ),
-                    ],
-
-                    FilledButton.icon(
-                      onPressed: isLastStep ? goToDoneStep : goToNextStep,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                      ),
-                      iconAlignment: IconAlignment.end,
-                      icon: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 180),
-                        child: Icon(isLastStep ? AppIcons.check : AppIcons.arrowRight, key: ValueKey(isLastStep)),
-                      ),
-                      label: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 180),
-                        child: Text(
-                          isLastStep ? 'Done' : steps[activeIndex + 1].title,
-                          key: ValueKey(isLastStep ? 'done' : steps[activeIndex + 1].title),
+                        iconAlignment: IconAlignment.end,
+                        icon: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          child: Icon(isLastStep ? AppIcons.check : AppIcons.arrowRight, key: ValueKey(isLastStep)),
+                        ),
+                        label: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          child: Text(
+                            isLastStep ? 'Done' : steps[activeIndex + 1].title,
+                            key: ValueKey(isLastStep ? 'done' : steps[activeIndex + 1].title),
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );

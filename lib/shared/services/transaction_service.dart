@@ -3,6 +3,7 @@ import 'package:ziyyer/shared/database/database.dart';
 import 'package:ziyyer/shared/database/persistence/category_persistence.dart';
 import 'package:ziyyer/shared/database/persistence/persistence_locator.dart';
 import 'package:ziyyer/shared/database/persistence/transaction_persistence.dart';
+import 'package:ziyyer/shared/models/transaction_model.dart';
 
 class TransactionService {
   TransactionService();
@@ -62,5 +63,34 @@ class TransactionService {
         createdAt: DateTime.now(),
       ),
     );
+  }
+
+  Future<void> delete(TransactionModel transaction) async {
+    final id = transaction.id;
+
+    final affectedRows = await _transactionPersistence.deleteById(id);
+
+    if (affectedRows == 0) {
+      throw StateError('Transaction not found.');
+    }
+  }
+
+  Future<void> update(TransactionModel transaction) async {
+    final id = transaction.id;
+
+    final affectedRows = await _transactionPersistence.updateById(
+      id,
+      TransactionTableCompanion(
+        categoryId: Value(transaction.categoryId),
+        amount: Value(transaction.amount),
+        date: Value(transaction.date),
+        description: Value(transaction.description),
+        createdAt: Value(transaction.createdAt),
+      ),
+    );
+
+    if (affectedRows == 0) {
+      throw StateError('Transaction not found.');
+    }
   }
 }

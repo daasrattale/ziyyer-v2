@@ -24,8 +24,9 @@ class BudgetOverviewWidget extends StatelessWidget {
                   SummaryCardsRow(
                     incomeAmount: budgetModel.allocatedAmount,
                     transactionsAmount: budgetModel.realAmount,
+                    currencyModel: budgetModel.currency,
                   ),
-                  SpendingCategorySection(categories: budgetModel.categories),
+                  SpendingCategorySection(categories: budgetModel.categories, currencyModel: budgetModel.currency),
                 ],
               ),
             ),

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_floating_bottom_bar/flutter_floating_bottom_bar.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/shared/widgets/add_expense_btn.dart';
 import 'package:ziyyer/theme.dart';
-import 'package:ziyyer/widgets/add_expense_btn.dart';
 
 class BackboneScreen extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -22,7 +21,6 @@ class _BackboneScreenState extends State<BackboneScreen> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     final isLandscape = screenWidth > screenHeight;
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final bottomSafe = MediaQuery.of(context).padding.bottom;
 
     final horizontalMargin = screenWidth * 0.04;
@@ -33,75 +31,68 @@ class _BackboneScreenState extends State<BackboneScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background(context),
-      body: BottomBar(
-        layout: BottomBarLayout(
-          width: maxWidth,
-          respectSafeArea: false,
-          borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
-          offset: 20,
-        ),
-        body: SafeArea(
+      body: SafeArea(
+        child: widget.navigationShell,
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.fromLTRB(horizontalMargin, 0, horizontalMargin, bottomSafe + 8),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: Container(
-            margin: EdgeInsets.only(top: 16, bottom: bottomSafe + bottomInset + 30),
-            child: widget.navigationShell,
-          ),
-        ),
-        motion: const BottomBarMotion.cupertino(
-          preset: BottomBarCupertinoMotion.interactive,
-          duration: Duration(milliseconds: 360),
-        ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface(context),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 20,
-                offset: const Offset(0, -5),
-                color: AppColors.textPrimary(context).withAlpha(15),
-              ),
-            ],
-            borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
-            border: Border.all(color: AppColors.card(context)),
-          ),
-          child: Padding(
-            padding: containerPadding,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _NavItem(
-                  icon: AppIcons.home,
-                  label: 'Home',
-                  isSelected: widget.navigationShell.currentIndex == 0,
-                  onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
-                  screenWidth: screenWidth,
-                  isLandscape: isLandscape,
-                ),
-                _NavItem(
-                  icon: AppIcons.history,
-                  label: 'History',
-                  isSelected: widget.navigationShell.currentIndex == 1,
-                  onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
-                  screenWidth: screenWidth,
-                  isLandscape: isLandscape,
-                ),
-                AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true)),
-                _NavItem(
-                  icon: AppIcons.insights,
-                  label: 'Insight',
-                  isSelected: widget.navigationShell.currentIndex == 2,
-                  onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
-                  screenWidth: screenWidth,
-                  isLandscape: isLandscape,
-                ),
-                _NavItem(
-                  icon: AppIcons.settings,
-                  label: 'Settings',
-                  isSelected: widget.navigationShell.currentIndex == 3,
-                  onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
-                  screenWidth: screenWidth,
-                  isLandscape: isLandscape,
+            decoration: BoxDecoration(
+              color: AppColors.surface(context),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 20,
+                  offset: const Offset(0, -5),
+                  color: AppColors.textPrimary(context).withAlpha(15),
                 ),
               ],
+              borderRadius: BorderRadius.circular(AppConstants.maxBorderRadius),
+              border: Border.all(color: AppColors.card(context)),
+            ),
+            child: Padding(
+              padding: containerPadding,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _NavItem(
+                    icon: AppIcons.home,
+                    label: 'Home',
+                    isSelected: widget.navigationShell.currentIndex == 0,
+                    onTap: () => widget.navigationShell.goBranch(0, initialLocation: true),
+                    screenWidth: screenWidth,
+                    isLandscape: isLandscape,
+                  ),
+                  _NavItem(
+                    icon: AppIcons.history,
+                    label: 'History',
+                    isSelected: widget.navigationShell.currentIndex == 1,
+                    onTap: () => widget.navigationShell.goBranch(1, initialLocation: true),
+                    screenWidth: screenWidth,
+                    isLandscape: isLandscape,
+                  ),
+                  AddExpenseButton(
+                    onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                  ),
+                  _NavItem(
+                    icon: AppIcons.insights,
+                    label: 'Insight',
+                    isSelected: widget.navigationShell.currentIndex == 2,
+                    onTap: () => widget.navigationShell.goBranch(2, initialLocation: true),
+                    screenWidth: screenWidth,
+                    isLandscape: isLandscape,
+                  ),
+                  _NavItem(
+                    icon: AppIcons.settings,
+                    label: 'Settings',
+                    isSelected: widget.navigationShell.currentIndex == 3,
+                    onTap: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                    screenWidth: screenWidth,
+                    isLandscape: isLandscape,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

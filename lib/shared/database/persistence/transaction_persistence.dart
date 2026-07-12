@@ -5,7 +5,7 @@ class TransactionPersistence {
 
   final AppDatabase db;
 
-  Future<void> creatAlle(List<TransactionTableCompanion> companions) async {
+  Future<void> createAll(List<TransactionTableCompanion> companions) async {
     if (companions.isEmpty) return;
 
     await db.batch((batch) {
@@ -31,5 +31,13 @@ class TransactionPersistence {
 
   Stream<List<Transaction>> watch() {
     return db.select(db.transactionTable).watch();
+  }
+
+  Future<int> deleteById(int id) async {
+    return (db.delete(db.transactionTable)..where((t) => t.id.equals(id))).go();
+  }
+
+  Future<int> updateById(int id, TransactionTableCompanion companion) async {
+    return (db.update(db.transactionTable)..where((t) => t.id.equals(id))).write(companion);
   }
 }

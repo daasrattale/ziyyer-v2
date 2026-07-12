@@ -1,39 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
+import 'package:ziyyer/shared/models/currency_model.dart';
 import 'package:ziyyer/theme.dart';
 
 class SummaryCardsRow extends StatelessWidget {
   final double incomeAmount;
   final double transactionsAmount;
+  final CurrencyModel currencyModel;
 
-  const SummaryCardsRow({super.key, required this.incomeAmount, required this.transactionsAmount});
+  const SummaryCardsRow({
+    super.key,
+    required this.incomeAmount,
+    required this.transactionsAmount,
+    required this.currencyModel,
+  });
 
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppConstants.screenMargin),
       child: Row(
         children: [
           Expanded(
             child: _SummaryCard(
-              title: 'INCOME',
+              title: 'Allocated'.toUpperCase(),
               amount: incomeAmount,
-              subtitle: 'Allocated',
-              iconData: AppIcons.trendingUp,
+              subtitle: now.monthAndYear(),
+              iconData: AppIcons.budget,
               iconColor: AppColors.income,
               iconBackgroundColor: AppColors.income.withAlpha(20),
+              currencySymbol: currencyModel.symbol,
             ),
           ),
           const SizedBox(width: AppConstants.spacingMedium),
           Expanded(
             child: _SummaryCard(
-              title: 'TRANSACTIONS',
+              title: 'TRANSACTIONS'.toUpperCase(),
               amount: transactionsAmount,
-              subtitle: 'This month',
-              iconData: AppIcons.trendingDown,
+              subtitle: now.monthAndYear(),
+              iconData: AppIcons.transaction,
               iconColor: AppColors.expense,
               iconBackgroundColor: AppColors.expense.withAlpha(20),
+              currencySymbol: currencyModel.symbol,
             ),
           ),
         ],
@@ -49,6 +61,7 @@ class _SummaryCard extends StatelessWidget {
   final IconData iconData;
   final Color iconColor;
   final Color iconBackgroundColor;
+  final String currencySymbol;
 
   const _SummaryCard({
     required this.title,
@@ -57,6 +70,7 @@ class _SummaryCard extends StatelessWidget {
     required this.iconData,
     required this.iconColor,
     required this.iconBackgroundColor,
+    required this.currencySymbol,
   });
 
   @override
@@ -89,7 +103,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: AppConstants.spacingSmall),
           Text(
-            '\$$formattedAmount',
+            '$currencySymbol$formattedAmount',
             style: Theme.of(context).textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: AppConstants.spacingSmall),

@@ -86,5 +86,24 @@
   "languageSubtitle": "Elija su idioma preferido",
   "english": "Inglés",
   "french": "Francés",
-  "spanish": "Español"
+  "spanish": "Español",
+
+  "paymentMethod": "MÉTODO DE PAGO",
+  "applePay": "Apple Pay",
+  "cash": "Efectivo",
+  "creditCard": "Tarjeta de crédito",
+  "debitCard": "Tarjeta de débito",
+  "bankTransfer": "Transferencia bancaria",
+
+  "scanReceipt": "Escanear recibo",
+  "scanningReceipt": "Escaneando recibo...",
+  "receiptScanError": "Error al escanear el recibo",
+  "noTextFound": "No se encontró texto en el recibo",
+  "receiptScannedSuccess": "Recibo escaneado exitosamente",
+
+  "addExpenseOption": "Agregar gasto",
+  "scanReceiptOption": "Escanear recibo",
+  "enterManuallyOption": "Ingresar manualmente",
+  "scanReceiptDesc": "Tome una foto de su recibo para autocompletar los datos",
+  "enterManuallyDesc": "Ingrese los detalles del gasto manualmente"
 }

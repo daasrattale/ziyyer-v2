@@ -236,4 +236,54 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get spanish => 'Espagnol';
+
+  @override
+  String get paymentMethod => 'MODE DE PAIEMENT';
+
+  @override
+  String get applePay => 'Apple Pay';
+
+  @override
+  String get cash => 'Espèces';
+
+  @override
+  String get creditCard => 'Carte de crédit';
+
+  @override
+  String get debitCard => 'Carte de débit';
+
+  @override
+  String get bankTransfer => 'Virement bancaire';
+
+  @override
+  String get scanReceipt => 'Scanner le reçu';
+
+  @override
+  String get scanningReceipt => 'Scan du reçu en cours...';
+
+  @override
+  String get receiptScanError => 'Échec du scan du reçu';
+
+  @override
+  String get noTextFound => 'Aucun texte trouvé sur le reçu';
+
+  @override
+  String get receiptScannedSuccess => 'Reçu scanné avec succès';
+
+  @override
+  String get addExpenseOption => 'Ajouter une dépense';
+
+  @override
+  String get scanReceiptOption => 'Scanner le reçu';
+
+  @override
+  String get enterManuallyOption => 'Saisie manuelle';
+
+  @override
+  String get scanReceiptDesc =>
+      'Prenez une photo de votre reçu pour remplir automatiquement';
+
+  @override
+  String get enterManuallyDesc =>
+      'Saisissez les détails de la dépense manuellement';
 }

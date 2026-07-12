@@ -4,6 +4,7 @@ import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/config/app_icons.dart';
 import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/widgets/add_expense_btn.dart';
+import 'package:ziyyer/shared/widgets/add_expense_options_sheet.dart';
 import 'package:ziyyer/theme.dart';
 
 class BackboneScreen extends StatefulWidget {
@@ -74,7 +75,13 @@ class _BackboneScreenState extends State<BackboneScreen> {
                       isLandscape: isLandscape,
                     ),
                   ),
-                  AddExpenseButton(onPressed: () => widget.navigationShell.goBranch(3, initialLocation: true)),
+                  AddExpenseButton(
+                    onPressed: () => AddExpenseOptionsSheet.show(
+                      context,
+                      onManually: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                      onScanned: () => widget.navigationShell.goBranch(3, initialLocation: true),
+                    ),
+                  ),
                   Expanded(
                     child: _NavItem(
                       icon: AppIcons.insights,

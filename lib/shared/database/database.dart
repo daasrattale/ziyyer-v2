@@ -16,7 +16,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -32,6 +32,9 @@ class AppDatabase extends _$AppDatabase {
               SET is_setup = 1 
               WHERE id IN (SELECT DISTINCT budget_id FROM category_table)
             ''');
+          }
+          if (from < 3) {
+            await m.addColumn(transactionTable, transactionTable.paymentMethod);
           }
         },
       );

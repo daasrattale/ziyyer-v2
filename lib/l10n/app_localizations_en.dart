@@ -233,4 +233,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get spanish => 'Spanish';
+
+  @override
+  String get paymentMethod => 'PAYMENT METHOD';
+
+  @override
+  String get applePay => 'Apple Pay';
+
+  @override
+  String get cash => 'Cash';
+
+  @override
+  String get creditCard => 'Credit Card';
+
+  @override
+  String get debitCard => 'Debit Card';
+
+  @override
+  String get bankTransfer => 'Bank Transfer';
+
+  @override
+  String get scanReceipt => 'Scan Receipt';
+
+  @override
+  String get scanningReceipt => 'Scanning receipt...';
+
+  @override
+  String get receiptScanError => 'Failed to scan receipt';
+
+  @override
+  String get noTextFound => 'No text found on receipt';
+
+  @override
+  String get receiptScannedSuccess => 'Receipt scanned successfully';
+
+  @override
+  String get addExpenseOption => 'Add Expense';
+
+  @override
+  String get scanReceiptOption => 'Scan Receipt';
+
+  @override
+  String get enterManuallyOption => 'Enter Manually';
+
+  @override
+  String get scanReceiptDesc =>
+      'Take a photo of your receipt to auto-fill details';
+
+  @override
+  String get enterManuallyDesc => 'Enter expense details by hand';
 }

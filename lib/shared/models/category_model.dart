@@ -35,9 +35,12 @@ class CategoryModel {
     );
   }
 
-  double get realAmount => transactions
-      .where((transaction) => transaction.date.month == DateTime.now().month)
-      .fold<double>(0, (sum, transaction) => sum + transaction.amount);
+  double get realAmount {
+    final now = DateTime.now();
+    return transactions
+        .where((t) => t.date.year == now.year && t.date.month == now.month)
+        .fold<double>(0, (sum, t) => sum + t.amount);
+  }
 
   @override
   String toString() {

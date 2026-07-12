@@ -34,6 +34,9 @@ dependencies:
   toastification: ^3.2.0
   flag: ^7.0.2
 
+  # Receipt scanning
+  image_picker: ^1.0.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

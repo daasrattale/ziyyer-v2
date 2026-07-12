@@ -11,7 +11,7 @@ class TransactionService {
   final CategoryPersistence _categoryPersistence = PersistenceLocator.categoryPersistence;
   final TransactionPersistence _transactionPersistence = PersistenceLocator.transactionPersistence;
 
-  Future<void> persist({required double amount, int? categoryId, String? description, DateTime? date}) async {
+  Future<void> persist({required double amount, int? categoryId, String? description, DateTime? date, String? paymentMethod}) async {
     final categories = await _categoryPersistence.watch().first;
 
     Category? resolvedCategory;
@@ -60,6 +60,7 @@ class TransactionService {
         amount: amount,
         date: date ?? DateTime.now(),
         description: Value(description?.trim().isEmpty == true ? null : description?.trim()),
+        paymentMethod: Value(paymentMethod?.trim().isEmpty == true ? null : paymentMethod?.trim()),
         createdAt: DateTime.now(),
       ),
     );
@@ -85,6 +86,7 @@ class TransactionService {
         amount: Value(transaction.amount),
         date: Value(transaction.date),
         description: Value(transaction.description),
+        paymentMethod: Value(transaction.paymentMethod),
         createdAt: Value(transaction.createdAt),
       ),
     );

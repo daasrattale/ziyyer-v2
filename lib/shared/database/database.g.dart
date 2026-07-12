@@ -739,6 +739,12 @@ class $TransactionTableTable extends TransactionTable
   late final GeneratedColumn<String> description = GeneratedColumn<String>(
       'description', aliasedName, true,
       type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _paymentMethodMeta =
+      const VerificationMeta('paymentMethod');
+  @override
+  late final GeneratedColumn<String> paymentMethod = GeneratedColumn<String>(
+      'payment_method', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
   static const VerificationMeta _createdAtMeta =
       const VerificationMeta('createdAt');
   @override
@@ -747,7 +753,7 @@ class $TransactionTableTable extends TransactionTable
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, categoryId, amount, date, description, createdAt];
+      [id, categoryId, amount, date, description, paymentMethod, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -787,6 +793,12 @@ class $TransactionTableTable extends TransactionTable
           description.isAcceptableOrUnknown(
               data['description']!, _descriptionMeta));
     }
+    if (data.containsKey('payment_method')) {
+      context.handle(
+          _paymentMethodMeta,
+          paymentMethod.isAcceptableOrUnknown(
+              data['payment_method']!, _paymentMethodMeta));
+    }
     if (data.containsKey('created_at')) {
       context.handle(_createdAtMeta,
           createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta));
@@ -812,6 +824,8 @@ class $TransactionTableTable extends TransactionTable
           .read(DriftSqlType.dateTime, data['${effectivePrefix}date'])!,
       description: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}description']),
+      paymentMethod: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}payment_method']),
       createdAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}created_at'])!,
     );
@@ -829,6 +843,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
   final double amount;
   final DateTime date;
   final String? description;
+  final String? paymentMethod;
   final DateTime createdAt;
   const Transaction(
       {required this.id,
@@ -836,6 +851,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       required this.amount,
       required this.date,
       this.description,
+      this.paymentMethod,
       required this.createdAt});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -846,6 +862,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
     map['date'] = Variable<DateTime>(date);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
+    }
+    if (!nullToAbsent || paymentMethod != null) {
+      map['payment_method'] = Variable<String>(paymentMethod);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -860,6 +879,9 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
+      paymentMethod: paymentMethod == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentMethod),
       createdAt: Value(createdAt),
     );
   }
@@ -873,6 +895,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       amount: serializer.fromJson<double>(json['amount']),
       date: serializer.fromJson<DateTime>(json['date']),
       description: serializer.fromJson<String?>(json['description']),
+      paymentMethod: serializer.fromJson<String?>(json['paymentMethod']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
   }
@@ -885,6 +908,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
       'amount': serializer.toJson<double>(amount),
       'date': serializer.toJson<DateTime>(date),
       'description': serializer.toJson<String?>(description),
+      'paymentMethod': serializer.toJson<String?>(paymentMethod),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
   }
@@ -895,6 +919,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           double? amount,
           DateTime? date,
           Value<String?> description = const Value.absent(),
+          Value<String?> paymentMethod = const Value.absent(),
           DateTime? createdAt}) =>
       Transaction(
         id: id ?? this.id,
@@ -902,6 +927,8 @@ class Transaction extends DataClass implements Insertable<Transaction> {
         amount: amount ?? this.amount,
         date: date ?? this.date,
         description: description.present ? description.value : this.description,
+        paymentMethod:
+            paymentMethod.present ? paymentMethod.value : this.paymentMethod,
         createdAt: createdAt ?? this.createdAt,
       );
   @override
@@ -912,14 +939,15 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           ..write('amount: $amount, ')
           ..write('date: $date, ')
           ..write('description: $description, ')
+          ..write('paymentMethod: $paymentMethod, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, categoryId, amount, date, description, createdAt);
+  int get hashCode => Object.hash(
+      id, categoryId, amount, date, description, paymentMethod, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -929,6 +957,7 @@ class Transaction extends DataClass implements Insertable<Transaction> {
           other.amount == this.amount &&
           other.date == this.date &&
           other.description == this.description &&
+          other.paymentMethod == this.paymentMethod &&
           other.createdAt == this.createdAt);
 }
 
@@ -938,6 +967,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
   final Value<double> amount;
   final Value<DateTime> date;
   final Value<String?> description;
+  final Value<String?> paymentMethod;
   final Value<DateTime> createdAt;
   const TransactionTableCompanion({
     this.id = const Value.absent(),
@@ -945,6 +975,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
     this.amount = const Value.absent(),
     this.date = const Value.absent(),
     this.description = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
   TransactionTableCompanion.insert({
@@ -953,6 +984,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
     required double amount,
     required DateTime date,
     this.description = const Value.absent(),
+    this.paymentMethod = const Value.absent(),
     required DateTime createdAt,
   })  : categoryId = Value(categoryId),
         amount = Value(amount),
@@ -964,6 +996,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
     Expression<double>? amount,
     Expression<DateTime>? date,
     Expression<String>? description,
+    Expression<String>? paymentMethod,
     Expression<DateTime>? createdAt,
   }) {
     return RawValuesInsertable({
@@ -972,6 +1005,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
       if (amount != null) 'amount': amount,
       if (date != null) 'date': date,
       if (description != null) 'description': description,
+      if (paymentMethod != null) 'payment_method': paymentMethod,
       if (createdAt != null) 'created_at': createdAt,
     });
   }
@@ -982,6 +1016,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
       Value<double>? amount,
       Value<DateTime>? date,
       Value<String?>? description,
+      Value<String?>? paymentMethod,
       Value<DateTime>? createdAt}) {
     return TransactionTableCompanion(
       id: id ?? this.id,
@@ -989,6 +1024,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
       amount: amount ?? this.amount,
       date: date ?? this.date,
       description: description ?? this.description,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -1011,6 +1047,9 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
     if (description.present) {
       map['description'] = Variable<String>(description.value);
     }
+    if (paymentMethod.present) {
+      map['payment_method'] = Variable<String>(paymentMethod.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
@@ -1025,6 +1064,7 @@ class TransactionTableCompanion extends UpdateCompanion<Transaction> {
           ..write('amount: $amount, ')
           ..write('date: $date, ')
           ..write('description: $description, ')
+          ..write('paymentMethod: $paymentMethod, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
         .toString();
@@ -1691,6 +1731,7 @@ typedef $$TransactionTableTableInsertCompanionBuilder
   required double amount,
   required DateTime date,
   Value<String?> description,
+  Value<String?> paymentMethod,
   required DateTime createdAt,
 });
 typedef $$TransactionTableTableUpdateCompanionBuilder
@@ -1700,6 +1741,7 @@ typedef $$TransactionTableTableUpdateCompanionBuilder
   Value<double> amount,
   Value<DateTime> date,
   Value<String?> description,
+  Value<String?> paymentMethod,
   Value<DateTime> createdAt,
 });
 
@@ -1729,6 +1771,7 @@ class $$TransactionTableTableTableManager extends RootTableManager<
             Value<double> amount = const Value.absent(),
             Value<DateTime> date = const Value.absent(),
             Value<String?> description = const Value.absent(),
+            Value<String?> paymentMethod = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
               TransactionTableCompanion(
@@ -1737,6 +1780,7 @@ class $$TransactionTableTableTableManager extends RootTableManager<
             amount: amount,
             date: date,
             description: description,
+            paymentMethod: paymentMethod,
             createdAt: createdAt,
           ),
           getInsertCompanionBuilder: ({
@@ -1745,6 +1789,7 @@ class $$TransactionTableTableTableManager extends RootTableManager<
             required double amount,
             required DateTime date,
             Value<String?> description = const Value.absent(),
+            Value<String?> paymentMethod = const Value.absent(),
             required DateTime createdAt,
           }) =>
               TransactionTableCompanion.insert(
@@ -1753,6 +1798,7 @@ class $$TransactionTableTableTableManager extends RootTableManager<
             amount: amount,
             date: date,
             description: description,
+            paymentMethod: paymentMethod,
             createdAt: createdAt,
           ),
         ));
@@ -1794,6 +1840,11 @@ class $$TransactionTableTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<String> get paymentMethod => $state.composableBuilder(
+      column: $state.table.paymentMethod,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<DateTime> get createdAt => $state.composableBuilder(
       column: $state.table.createdAt,
       builder: (column, joinBuilders) =>
@@ -1832,6 +1883,11 @@ class $$TransactionTableTableOrderingComposer
 
   ColumnOrderings<String> get description => $state.composableBuilder(
       column: $state.table.description,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get paymentMethod => $state.composableBuilder(
+      column: $state.table.paymentMethod,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

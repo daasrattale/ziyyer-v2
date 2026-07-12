@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_amount_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_category_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_date_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_description_section.dart';
+import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_payment_method_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_title_section.dart';
 import 'package:ziyyer/features/budget_setup/widgets/budget_setup_widget.dart';
+import 'package:ziyyer/features/receipt_scanner/services/pending_receipt_service.dart';
 import 'package:ziyyer/shared/models/budget_model.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/services/budget_service.dart';
@@ -33,19 +36,48 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
 
   int? selectedCategoryId;
   DateTime selectedDate = DateTime.now();
+  String? selectedPaymentMethod;
   bool isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _budgetStream = _budgetService.watch();
+    PendingReceiptService.hasReceipt.addListener(_onReceiptReady);
   }
 
   @override
   void dispose() {
+    PendingReceiptService.hasReceipt.removeListener(_onReceiptReady);
     amountController.dispose();
     descriptionController.dispose();
     super.dispose();
+  }
+
+  void _onReceiptReady() {
+    if (!mounted || !PendingReceiptService.hasReceipt.value) return;
+    _consumePendingReceipt();
+  }
+
+  void _consumePendingReceipt() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final receipt = PendingReceiptService.consume();
+      if (receipt == null || !mounted) return;
+
+      if (receipt.amount != null) {
+        amountController.text = receipt.amount!.toStringAsFixed(2);
+      }
+      if (receipt.date != null) {
+        setState(() => selectedDate = receipt.date!);
+      }
+      if (receipt.description != null) {
+        descriptionController.text = receipt.description!;
+      }
+      if (receipt.paymentMethod != null) {
+        setState(() => selectedPaymentMethod = receipt.paymentMethod);
+      }
+      Toaster.success(AppLocalizations.of(context)!.receiptScannedSuccess);
+    });
   }
 
   Future<void> _submit() async {
@@ -66,6 +98,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
         categoryId: selectedCategoryId,
         description: descriptionController.text.trim(),
         date: selectedDate,
+        paymentMethod: selectedPaymentMethod,
       );
 
       if (!mounted) return;
@@ -74,10 +107,14 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
         amountController.text = '';
         descriptionController.text = '';
         selectedCategoryId = null;
+        selectedPaymentMethod = null;
       });
 
       Toaster.success(AppLocalizations.of(context)!.expenseSavedSuccess);
-      scrollController.animateTo(0, duration: Duration(milliseconds: 500), curve: Easing.linear);
+
+      if (context.mounted) {
+        context.go('/');
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -142,6 +179,15 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                   onDateChanged: (date) {
                     setState(() {
                       selectedDate = date;
+                    });
+                  },
+                ),
+                const SizedBox(height: 24),
+                TransactionPaymentMethodSection(
+                  selectedPaymentMethod: selectedPaymentMethod,
+                  onPaymentMethodChanged: (method) {
+                    setState(() {
+                      selectedPaymentMethod = method;
                     });
                   },
                 ),

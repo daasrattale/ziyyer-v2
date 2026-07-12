@@ -3,6 +3,7 @@ import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_amount
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_category_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_date_section.dart';
 import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_description_section.dart';
+import 'package:ziyyer/features/add_expenses/widgets/sections/transaction_payment_method_section.dart';
 import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
 import 'package:ziyyer/shared/models/transaction_model.dart';
@@ -33,6 +34,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
 
   late int selectedCategoryId;
   late DateTime selectedDate;
+  late String? selectedPaymentMethod;
   bool isSaving = false;
 
   @override
@@ -42,6 +44,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
     descriptionController = TextEditingController(text: widget.transaction.description ?? '');
     selectedCategoryId = widget.transaction.categoryId;
     selectedDate = widget.transaction.date;
+    selectedPaymentMethod = widget.transaction.paymentMethod;
   }
 
   @override
@@ -70,6 +73,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
           categoryId: selectedCategoryId,
           description: descriptionController.text.trim(),
           date: selectedDate,
+          paymentMethod: selectedPaymentMethod,
         ),
       );
 
@@ -80,6 +84,7 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
         categoryId: selectedCategoryId,
         description: descriptionController.text.trim(),
         date: selectedDate,
+        paymentMethod: selectedPaymentMethod,
       );
       Toaster.success(AppLocalizations.of(context)!.transactionUpdatedSuccess);
       Navigator.of(context).pop(updated);
@@ -119,6 +124,15 @@ class _EditExpenseWidgetState extends State<EditExpenseWidget> {
               onDateChanged: (date) {
                 setState(() {
                   selectedDate = date;
+                });
+              },
+            ),
+            const SizedBox(height: 24),
+            TransactionPaymentMethodSection(
+              selectedPaymentMethod: selectedPaymentMethod,
+              onPaymentMethodChanged: (method) {
+                setState(() {
+                  selectedPaymentMethod = method;
                 });
               },
             ),

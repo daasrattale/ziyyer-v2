@@ -32,7 +32,7 @@ class SettingsWidget extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
               ),
               const SizedBox(height: AppConstants.spacingLarge),
-              _SectionHeader(title: l10n.settings),
+              _SectionHeader(title: l10n.userPreferences),
               const SizedBox(height: AppConstants.spacingSmall),
               Container(
                 decoration: BoxDecoration(
@@ -104,7 +104,7 @@ class _SettingsTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         child: Row(
           children: [
             Icon(icon, color: AppColors.accent(context), size: 22),
@@ -116,9 +116,10 @@ class _SettingsTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: Theme.of(
-                      context,
-                    ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)),
+                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary(context),
+                    ),
                   ),
                   Text(
                     subtitle,

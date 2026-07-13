@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ziyyer/config/app_constants.dart';
-import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/config/app_icons.dart';
+import 'package:ziyyer/l10n/app_localizations.dart';
 import 'package:ziyyer/shared/extensions/datetime_extensions.dart';
 import 'package:ziyyer/shared/extensions/string_extensions.dart';
 import 'package:ziyyer/shared/models/category_model.dart';
@@ -94,22 +94,17 @@ class TransactionDetailsWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 36),
-            Container(
-              decoration: BoxDecoration(
-                color: AppColors.surface(context),
-                borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius - 4),
-              ),
-              child: Column(
-                children: [
-                  _DetailsRow(label: AppLocalizations.of(context)!.type, value: AppLocalizations.of(context)!.expense),
-                  _DetailsDivider(),
-                  _DetailsRow(label: AppLocalizations.of(context)!.category, value: categoryName),
-                  _DetailsDivider(),
-                  _DetailsRow(label: AppLocalizations.of(context)!.time, value: transaction.date.fullDateTime(context)),
-                  // _DetailsDivider(),
-                  // _DetailsRow(label: 'Reference', value: _formatReference()),
-                ],
-              ),
+            Column(
+              spacing: 8,
+              children: [
+                _DetailsRow(label: AppLocalizations.of(context)!.type, value: AppLocalizations.of(context)!.expense),
+                _DetailsRow(label: AppLocalizations.of(context)!.category, value: categoryName),
+                _DetailsRow(
+                  label: AppLocalizations.of(context)!.paymentMethod,
+                  value: transaction.paymentMethod ?? AppLocalizations.of(context)!.other,
+                ),
+                _DetailsRow(label: AppLocalizations.of(context)!.time, value: transaction.date.fullDateTime(context)),
+              ],
             ),
             const Spacer(),
             Row(
@@ -158,37 +153,33 @@ class _DetailsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface(context),
+        borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius - 4),
+      ),
       child: Row(
         children: [
           Expanded(
             child: Text(
-              label.toUpperCase(),
+              label.capitalizeFirst(),
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary(context), fontWeight: FontWeight.normal),
             ),
           ),
-          const SizedBox(width: 16),
           Flexible(
             child: Text(
               value.capitalizeFirst(),
               textAlign: TextAlign.left,
               style: Theme.of(
                 context,
-              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500, color: AppColors.textPrimary(context)),
+              ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600, color: AppColors.textPrimary(context)),
             ),
           ),
         ],
       ),
     );
-  }
-}
-
-class _DetailsDivider extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Divider(height: 1, thickness: 1, color: Color(0xFFE8E8EC));
   }
 }

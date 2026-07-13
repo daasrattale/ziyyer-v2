@@ -285,4 +285,130 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterManuallyDesc => 'Enter expense details by hand';
+
+  @override
+  String get monthlySpending => 'Monthly Spending';
+
+  @override
+  String get totalSpent => 'Total Spent';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get transactionCount => 'Transactions';
+
+  @override
+  String get dailySpending => 'Daily Spending';
+
+  @override
+  String get topCategories => 'Top Categories';
+
+  @override
+  String get budgetHealth => 'Budget Health';
+
+  @override
+  String get budgetUsed => 'of budget used';
+
+  @override
+  String get avgTransaction => 'Avg. Transaction';
+
+  @override
+  String get largestTransaction => 'Largest Transaction';
+
+  @override
+  String get mostActiveCategory => 'Most Active';
+
+  @override
+  String get noDataForMonth => 'No data for this month';
+
+  @override
+  String get noTransactions => 'No transactions';
+
+  @override
+  String get ofTotal => 'of total';
+
+  @override
+  String get spendingVelocity => 'Spending Pace';
+
+  @override
+  String get dailyAverage => 'Daily Avg';
+
+  @override
+  String get projectedTotal => 'Projected';
+
+  @override
+  String get onTrack => 'On Track';
+
+  @override
+  String get overPace => 'Over Pace';
+
+  @override
+  String get underPace => 'Under Pace';
+
+  @override
+  String get monthComparison => 'Month Comparison';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get lastMonth => 'Last Month';
+
+  @override
+  String get paymentMethods => 'Payment Methods';
+
+  @override
+  String get weekendVsWeekday => 'Weekend vs Weekday';
+
+  @override
+  String get weekend => 'Weekend';
+
+  @override
+  String get weekday => 'Weekday';
+
+  @override
+  String get biggestExpense => 'Biggest Expense';
+
+  @override
+  String get noSpendDays => 'No-Spend Days';
+
+  @override
+  String get daysTracked => 'days with no spending';
+
+  @override
+  String get lessThanLastMonth => 'less than last month';
+
+  @override
+  String get moreThanLastMonth => 'more than last month';
+
+  @override
+  String get sameAsLastMonth => 'same as last month';
+
+  @override
+  String get projectedBy => 'Projected by';
+
+  @override
+  String get onBudgetPace => 'You\'re on pace';
+
+  @override
+  String get overBudgetPace => 'Spending above pace';
+
+  @override
+  String get underBudgetPace => 'Great job saving!';
+
+  @override
+  String get critical => 'Critical';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get healthy => 'Healthy';
+
+  @override
+  String get spent => 'Spent';
+
+  @override
+  String get remainingBudget => 'Remaining';
 }

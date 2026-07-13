@@ -633,6 +633,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter expense details by hand'**
   String get enterManuallyDesc;
+
+  /// No description provided for @monthlySpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Spending'**
+  String get monthlySpending;
+
+  /// No description provided for @totalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get totalSpent;
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// No description provided for @transactionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Transactions'**
+  String get transactionCount;
+
+  /// No description provided for @dailySpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Spending'**
+  String get dailySpending;
+
+  /// No description provided for @topCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Categories'**
+  String get topCategories;
+
+  /// No description provided for @budgetHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Health'**
+  String get budgetHealth;
+
+  /// No description provided for @budgetUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'of budget used'**
+  String get budgetUsed;
+
+  /// No description provided for @avgTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Avg. Transaction'**
+  String get avgTransaction;
+
+  /// No description provided for @largestTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest Transaction'**
+  String get largestTransaction;
+
+  /// No description provided for @mostActiveCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Most Active'**
+  String get mostActiveCategory;
+
+  /// No description provided for @noDataForMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'No data for this month'**
+  String get noDataForMonth;
+
+  /// No description provided for @noTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions'**
+  String get noTransactions;
+
+  /// No description provided for @ofTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'of total'**
+  String get ofTotal;
+
+  /// No description provided for @spendingVelocity.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending Pace'**
+  String get spendingVelocity;
+
+  /// No description provided for @dailyAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Avg'**
+  String get dailyAverage;
+
+  /// No description provided for @projectedTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected'**
+  String get projectedTotal;
+
+  /// No description provided for @onTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'On Track'**
+  String get onTrack;
+
+  /// No description provided for @overPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Pace'**
+  String get overPace;
+
+  /// No description provided for @underPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Under Pace'**
+  String get underPace;
+
+  /// No description provided for @monthComparison.
+  ///
+  /// In en, this message translates to:
+  /// **'Month Comparison'**
+  String get monthComparison;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// No description provided for @lastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Month'**
+  String get lastMonth;
+
+  /// No description provided for @paymentMethods.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment Methods'**
+  String get paymentMethods;
+
+  /// No description provided for @weekendVsWeekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend vs Weekday'**
+  String get weekendVsWeekday;
+
+  /// No description provided for @weekend.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekend'**
+  String get weekend;
+
+  /// No description provided for @weekday.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekday'**
+  String get weekday;
+
+  /// No description provided for @biggestExpense.
+  ///
+  /// In en, this message translates to:
+  /// **'Biggest Expense'**
+  String get biggestExpense;
+
+  /// No description provided for @noSpendDays.
+  ///
+  /// In en, this message translates to:
+  /// **'No-Spend Days'**
+  String get noSpendDays;
+
+  /// No description provided for @daysTracked.
+  ///
+  /// In en, this message translates to:
+  /// **'days with no spending'**
+  String get daysTracked;
+
+  /// No description provided for @lessThanLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'less than last month'**
+  String get lessThanLastMonth;
+
+  /// No description provided for @moreThanLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'more than last month'**
+  String get moreThanLastMonth;
+
+  /// No description provided for @sameAsLastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'same as last month'**
+  String get sameAsLastMonth;
+
+  /// No description provided for @projectedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Projected by'**
+  String get projectedBy;
+
+  /// No description provided for @onBudgetPace.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re on pace'**
+  String get onBudgetPace;
+
+  /// No description provided for @overBudgetPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Spending above pace'**
+  String get overBudgetPace;
+
+  /// No description provided for @underBudgetPace.
+  ///
+  /// In en, this message translates to:
+  /// **'Great job saving!'**
+  String get underBudgetPace;
+
+  /// No description provided for @critical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get critical;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @healthy.
+  ///
+  /// In en, this message translates to:
+  /// **'Healthy'**
+  String get healthy;
+
+  /// No description provided for @spent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get spent;
+
+  /// No description provided for @remainingBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remainingBudget;
 }
 
 class _AppLocalizationsDelegate

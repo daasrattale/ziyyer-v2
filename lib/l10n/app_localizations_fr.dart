@@ -289,4 +289,130 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get enterManuallyDesc =>
       'Saisissez les détails de la dépense manuellement';
+
+  @override
+  String get monthlySpending => 'Dépenses mensuelles';
+
+  @override
+  String get totalSpent => 'Total dépensé';
+
+  @override
+  String get remaining => 'Restant';
+
+  @override
+  String get transactionCount => 'Transactions';
+
+  @override
+  String get dailySpending => 'Dépenses quotidiennes';
+
+  @override
+  String get topCategories => 'Meilleures catégories';
+
+  @override
+  String get budgetHealth => 'Santé du budget';
+
+  @override
+  String get budgetUsed => 'du budget utilisé';
+
+  @override
+  String get avgTransaction => 'Tx. Moyen';
+
+  @override
+  String get largestTransaction => 'Plus grande transaction';
+
+  @override
+  String get mostActiveCategory => 'Plus actif';
+
+  @override
+  String get noDataForMonth => 'Aucune donnée pour ce mois';
+
+  @override
+  String get noTransactions => 'Aucune transaction';
+
+  @override
+  String get ofTotal => 'du total';
+
+  @override
+  String get spendingVelocity => 'Rythme de dépenses';
+
+  @override
+  String get dailyAverage => 'Moy. jour';
+
+  @override
+  String get projectedTotal => 'Projeté';
+
+  @override
+  String get onTrack => 'Dans les temps';
+
+  @override
+  String get overPace => 'En retard';
+
+  @override
+  String get underPace => 'En avance';
+
+  @override
+  String get monthComparison => 'Comparaison mensuelle';
+
+  @override
+  String get thisMonth => 'Ce mois';
+
+  @override
+  String get lastMonth => 'Mois dernier';
+
+  @override
+  String get paymentMethods => 'Modes de paiement';
+
+  @override
+  String get weekendVsWeekday => 'Weekend vs Semaine';
+
+  @override
+  String get weekend => 'Weekend';
+
+  @override
+  String get weekday => 'Semaine';
+
+  @override
+  String get biggestExpense => 'Plus grosse dépense';
+
+  @override
+  String get noSpendDays => 'Jours sans dépense';
+
+  @override
+  String get daysTracked => 'jours sans dépense';
+
+  @override
+  String get lessThanLastMonth => 'moins que le mois dernier';
+
+  @override
+  String get moreThanLastMonth => 'plus que le mois dernier';
+
+  @override
+  String get sameAsLastMonth => 'identique au mois dernier';
+
+  @override
+  String get projectedBy => 'Projeté au';
+
+  @override
+  String get onBudgetPace => 'Vous êtes dans les temps';
+
+  @override
+  String get overBudgetPace => 'Dépenses au-dessus du rythme';
+
+  @override
+  String get underBudgetPace => 'Bravo pour les économies !';
+
+  @override
+  String get critical => 'Critique';
+
+  @override
+  String get warning => 'Attention';
+
+  @override
+  String get healthy => 'Sain';
+
+  @override
+  String get spent => 'Dépensé';
+
+  @override
+  String get remainingBudget => 'Restant';
 }

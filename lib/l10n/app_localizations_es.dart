@@ -21,6 +21,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settings => 'Configuración';
 
   @override
+  String get userPreferences => 'Preferencias de usuario';
+
+  @override
   String get welcomeBack => 'Bienvenido de nuevo';
 
   @override

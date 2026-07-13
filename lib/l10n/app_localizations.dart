@@ -124,6 +124,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @userPreferences.
+  ///
+  /// In en, this message translates to:
+  /// **'User preferences'**
+  String get userPreferences;
+
   /// No description provided for @welcomeBack.
   ///
   /// In en, this message translates to:

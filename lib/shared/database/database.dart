@@ -26,7 +26,6 @@ class AppDatabase extends _$AppDatabase {
         onUpgrade: (Migrator m, int from, int to) async {
           if (from < 2) {
             await m.addColumn(budgetTable, budgetTable.isSetup);
-            // Migrate existing budgets: set isSetup = true if they have categories
             await customStatement('''
               UPDATE budget_table 
               SET is_setup = 1 

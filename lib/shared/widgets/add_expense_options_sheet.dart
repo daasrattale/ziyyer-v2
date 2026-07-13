@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ziyyer/config/app_constants.dart';
 import 'package:ziyyer/features/receipt_scanner/services/pending_receipt_service.dart';
 import 'package:ziyyer/features/receipt_scanner/services/receipt_parser.dart';
 import 'package:ziyyer/features/receipt_scanner/services/text_recognition_service.dart';
@@ -11,11 +12,7 @@ class AddExpenseOptionsSheet extends StatelessWidget {
   final VoidCallback onManually;
   final VoidCallback onScanned;
 
-  const AddExpenseOptionsSheet({
-    super.key,
-    required this.onManually,
-    required this.onScanned,
-  });
+  const AddExpenseOptionsSheet({super.key, required this.onManually, required this.onScanned});
 
   static Future<void> show(BuildContext context, {required VoidCallback onManually, required VoidCallback onScanned}) {
     return showModalBottomSheet(
@@ -31,10 +28,7 @@ class AddExpenseOptionsSheet extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: BoxDecoration(
-        color: AppColors.surface(context),
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: BoxDecoration(color: AppColors.background(context), borderRadius: BorderRadius.circular(24)),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -43,10 +37,7 @@ class AddExpenseOptionsSheet extends StatelessWidget {
             Container(
               width: 40,
               height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.divider(context),
-                borderRadius: BorderRadius.circular(2),
-              ),
+              decoration: BoxDecoration(color: AppColors.divider(context), borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 20),
             Text(
@@ -76,7 +67,6 @@ class AddExpenseOptionsSheet extends StatelessWidget {
                 },
               ),
             ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
@@ -87,10 +77,7 @@ class AddExpenseOptionsSheet extends StatelessWidget {
     Navigator.pop(context);
 
     final picker = ImagePicker();
-    final image = await picker.pickImage(
-      source: ImageSource.camera,
-      preferredCameraDevice: CameraDevice.rear,
-    );
+    final image = await picker.pickImage(source: ImageSource.camera, preferredCameraDevice: CameraDevice.rear);
 
     if (image == null || !context.mounted) return;
     await _processImage(context, image.path);
@@ -124,12 +111,7 @@ class _OptionTile extends StatelessWidget {
   final String subtitle;
   final VoidCallback onTap;
 
-  const _OptionTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
+  const _OptionTile({required this.icon, required this.title, required this.subtitle, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -143,8 +125,8 @@ class _OptionTile extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppColors.cardAlt(context),
-            borderRadius: BorderRadius.circular(16),
+            color: AppColors.surface(context),
+            borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius - 4),
           ),
           child: Row(
             children: [
@@ -153,7 +135,7 @@ class _OptionTile extends StatelessWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   color: AppColors.accent(context).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppConstants.defaultBorderRadius),
                 ),
                 child: Icon(icon, color: AppColors.accent(context), size: 24),
               ),
@@ -162,15 +144,9 @@ class _OptionTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-                    ),
+                    Text(title, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
                     const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary(context)),
-                    ),
+                    Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(color: AppColors.textSecondary(context))),
                   ],
                 ),
               ),

@@ -21,6 +21,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get settings => 'Paramètres';
 
   @override
+  String get userPreferences => 'Préférences utilisateur';
+
+  @override
   String get welcomeBack => 'Bon retour';
 
   @override
